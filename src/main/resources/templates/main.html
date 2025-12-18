@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>홈</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
+    </th:block>
+</head>
+<body>
+    <main layout:fragment="content">
+        <!-- 메인 배너 슬라이더 -->
+        <section class="hero-banner">
+            <div class="banner-slider">
+                <div class="banner-slide active" style="background-image: url('/images/banner01.png');">
+                    <div class="banner-content">
+<!--                        <h2>겨울 시즌 세일</h2>-->
+<!--                        <p>최대 50% 할인</p>-->
+                    </div>
+                </div>
+                <div class="banner-slide" style="background-image: url('/images/ca.jpg');">
+                    <div class="banner-content">
+<!--                        <h2>신상품 입고</h2>-->
+<!--                        <p>2024 신제품을 만나보세요</p>-->
+                    </div>
+                </div>
+                <div class="banner-slide" style="background-image: url('/images/banner03.jpg');">
+                    <div class="banner-content">
+<!--                        <h2>무료 배송</h2>-->
+<!--                        <p>5만원 이상 구매시</p>-->
+                    </div>
+                </div>
+            </div>
+            <div class="banner-controls">
+                <button class="banner-prev"><i class="fas fa-chevron-left"></i></button>
+                <button class="banner-next"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="banner-fade"></div>
+        </section>
+        
+        <!-- 카테고리 카드 섹션 -->
+        <section class="category-cards">
+            <div class="cards-container">
+                <div class="category-card" th:each="category : ${categories}">
+                    <h3 th:text="${category.name}">카테고리명</h3>
+                    <div class="card-image">
+                        <img th:src="@{${category.imageUrl != null ? category.imageUrl : '/images/category-default.jpg'}}"
+                             alt="카테고리">
+                    </div>
+                    <a th:href="@{/product(categoryId=${category.id})}" class="card-link">더 보기</a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 오늘의 딜 섹션 -->
+        <section class="deals-section">
+            <div class="section-container">
+                <h2 class="section-title">오늘의 딜</h2>
+                <div class="products-slider">
+                    <!-- 상품들은 나중에 th:each로 반복 -->
+                    <div class="product-card" th:each="i : ${#numbers.sequence(1, 6)}">
+                        <div class="product-image">
+                            <img th:src="@{/images/product-sample.jpg}" alt="상품">
+                            <span class="deal-badge">-30%</span>
+                        </div>
+                        <div class="product-info">
+                            <h4 class="product-name">샘플 상품명</h4>
+                            <div class="rating">
+                                <span class="rating-stars">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </span>
+                                <span class="rating-count">(128)</span>
+                            </div>
+                            <div class="product-price">
+                                <span class="price-original">35,000원</span>
+                                <span class="price-sale">24,500원</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 인기 상품 섹션 -->
+        <section class="popular-section">
+            <div class="section-container">
+                <h2 class="section-title">인기 상품</h2>
+                <div class="products-grid">
+                    <!-- 상품들은 나중에 th:each로 반복 -->
+                    <div class="product-card" th:each="i : ${#numbers.sequence(1, 8)}">
+                        <a href="#" class="product-link">
+                            <div class="product-image">
+                                <img th:src="@{/images/product-sample.jpg}" alt="상품">
+                            </div>
+                            <div class="product-info">
+                                <h4 class="product-name">인기 상품명이 여기에 표시됩니다</h4>
+                                <div class="rating">
+                                    <span class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </span>
+                                    <span class="rating-count">(256)</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price-sale">29,900원</span>
+                                </div>
+                                <div class="prime-badge">
+                                    <i class="fas fa-truck"></i> 무료배송
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 최근 본 상품 (나중에 구현) -->
+        <section class="recent-section" style="display: none;">
+            <div class="section-container">
+                <h2 class="section-title">최근 본 상품</h2>
+                <div class="products-slider">
+                    <!-- 최근 본 상품들 -->
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/main.js}"></script>
+    </th:block>
+</body>
+</html>
