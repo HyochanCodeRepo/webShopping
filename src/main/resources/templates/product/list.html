@@ -223,6 +223,14 @@
 </head>
 <body>
     <main layout:fragment="content">
+        <!-- 성공 메시지 -->
+        <div th:if="${message}" style="max-width: 1500px; margin: 20px auto; padding: 0 20px;">
+            <div style="padding: 15px 20px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${message}"></span>
+            </div>
+        </div>
+        
         <div class="product-list-container">
             <!-- 카테고리 헤더 -->
             <div class="category-header">

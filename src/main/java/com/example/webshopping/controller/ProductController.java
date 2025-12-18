@@ -128,6 +128,20 @@ public class ProductController {
 
     }
 
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        log.info("delete mapping id : {}",id);
+
+        Product product =
+            productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Long categoryId = product.getCategory().getId();
+
+        productRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
+
+        return "redirect:/product/list?categoryId=" + categoryId;
+    }
+
 
 
 }
