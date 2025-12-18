@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>상품 목록</title>
+    <th:block layout:fragment="css">
+        <style>
+            .product-list-container {
+                max-width: 1500px;
+                margin: 0 auto;
+                padding: 30px 20px;
+            }
+            
+            .category-header {
+                margin-bottom: 30px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #E31837;
+            }
+            
+            .category-header h1 {
+                font-size: 28px;
+                font-weight: 700;
+                color: #333;
+                margin-bottom: 8px;
+            }
+            
+            .category-header .product-count {
+                font-size: 14px;
+                color: #666;
+            }
+            
+            /* 필터/정렬 영역 */
+            .filter-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                padding: 15px;
+                background: #f8f8f8;
+                border-radius: 4px;
+            }
+            
+            .filter-options {
+                display: flex;
+                gap: 10px;
+            }
+            
+            .sort-select {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                cursor: pointer;
+            }
+            
+            /* 상품 그리드 */
+            .products-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 25px;
+                margin-bottom: 40px;
+            }
+            
+            .product-card {
+                background: #fff;
+                border: 1px solid #e8e8e8;
+                border-radius: 8px;
+                overflow: hidden;
+                transition: all 0.3s;
+                cursor: pointer;
+            }
+            
+            .product-card:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transform: translateY(-2px);
+            }
+            
+            .product-link {
+                display: block;
+                text-decoration: none;
+                color: inherit;
+            }
+            
+            .product-image-wrapper {
+                position: relative;
+                width: 100%;
+                height: 280px;
+                overflow: hidden;
+                background: #f7f7f7;
+            }
+            
+            .product-image-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s;
+            }
+            
+            .product-card:hover .product-image-wrapper img {
+                transform: scale(1.05);
+            }
+            
+            .discount-badge {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                background: #E31837;
+                color: #fff;
+                padding: 6px 12px;
+                font-size: 14px;
+                font-weight: 700;
+                border-radius: 4px;
+                z-index: 10;
+            }
+            
+            .product-info {
+                padding: 18px;
+            }
+            
+            .product-name {
+                font-size: 15px;
+                font-weight: 500;
+                color: #333;
+                line-height: 1.5;
+                height: 45px;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                margin-bottom: 12px;
+            }
+            
+            .product-price-section {
+                margin-bottom: 8px;
+            }
+            
+            .original-price {
+                font-size: 14px;
+                color: #999;
+                text-decoration: line-through;
+                margin-right: 8px;
+            }
+            
+            .discount-price {
+                font-size: 20px;
+                font-weight: 700;
+                color: #E31837;
+            }
+            
+            .regular-price {
+                font-size: 20px;
+                font-weight: 700;
+                color: #333;
+            }
+            
+            .stock-info {
+                font-size: 13px;
+                color: #666;
+                margin-top: 8px;
+            }
+            
+            .stock-info.low-stock {
+                color: #E31837;
+                font-weight: 600;
+            }
+            
+            /* 상품 없을 때 */
+            .no-products {
+                text-align: center;
+                padding: 80px 20px;
+            }
+            
+            .no-products i {
+                font-size: 60px;
+                color: #ddd;
+                margin-bottom: 20px;
+            }
+            
+            .no-products h3 {
+                font-size: 20px;
+                color: #666;
+                margin-bottom: 10px;
+            }
+            
+            .no-products p {
+                font-size: 14px;
+                color: #999;
+            }
+            
+            /* 반응형 */
+            @media (max-width: 1200px) {
+                .products-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .products-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 15px;
+                }
+                
+                .product-image-wrapper {
+                    height: 200px;
+                }
+                
+                .filter-bar {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: flex-start;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .products-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="product-list-container">
+            <!-- 카테고리 헤더 -->
+            <div class="category-header">
+                <h1 th:text="${categoryName}">카테고리명</h1>
+                <div class="product-count">
+                    <span th:text="${#lists.size(products)}">0</span>개의 상품
+                </div>
+            </div>
+            
+            <!-- 필터/정렬 바 -->
+            <div class="filter-bar">
+                <div class="filter-options">
+                    <!-- 나중에 필터 기능 추가 가능 -->
+                </div>
+                <select class="sort-select">
+                    <option value="newest">최신순</option>
+                    <option value="price-low">낮은 가격순</option>
+                    <option value="price-high">높은 가격순</option>
+                    <option value="popular">인기순</option>
+                </select>
+            </div>
+            
+            <!-- 상품 그리드 -->
+            <div class="products-grid" th:if="${not #lists.isEmpty(products)}">
+                <div class="product-card" th:each="product : ${products}">
+                    <a th:href="@{/product/detail/{id}(id=${product.id})}" class="product-link">
+                        <!-- 상품 이미지 -->
+                        <div class="product-image-wrapper">
+                            <img th:src="${product.repImageUrl != null ? product.repImageUrl : '/images/product-sample.jpg'}" 
+                                 th:alt="${product.productName}">
+                            <!-- 할인 뱃지 (할인율이 있을 때만) -->
+                            <span class="discount-badge" 
+                                  th:if="${product.discountRate != null and product.discountRate > 0}"
+                                  th:text="${product.discountRate + '%'}">
+                            </span>
+                        </div>
+                        
+                        <!-- 상품 정보 -->
+                        <div class="product-info">
+                            <h3 class="product-name" th:text="${product.productName}">상품명</h3>
+                            
+                            <!-- 가격 정보 -->
+                            <div class="product-price-section">
+                                <!-- 할인이 있을 때 -->
+                                <div th:if="${product.discountRate != null and product.discountRate > 0}">
+                                    <span class="original-price" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">50,000원</span>
+                                    <span class="discount-price" 
+                                          th:text="${#numbers.formatInteger(product.price - (product.price * product.discountRate / 100), 0, 'COMMA') + '원'}">
+                                        45,000원
+                                    </span>
+                                </div>
+                                
+                                <!-- 할인이 없을 때 -->
+                                <div th:unless="${product.discountRate != null and product.discountRate > 0}">
+                                    <span class="regular-price" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">50,000원</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 재고 정보 -->
+                            <div class="stock-info" 
+                                 th:classappend="${product.stockQuantity < 10 ? 'low-stock' : ''}">
+                                <span th:if="${product.stockQuantity > 0}">
+                                    재고: <span th:text="${product.stockQuantity}">10</span>개
+                                </span>
+                                <span th:unless="${product.stockQuantity > 0}" style="color: #999;">
+                                    품절
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 상품이 없을 때 -->
+            <div class="no-products" th:if="${#lists.isEmpty(products)}">
+                <i class="fas fa-box-open"></i>
+                <h3>등록된 상품이 없습니다</h3>
+                <p>이 카테고리에는 아직 등록된 상품이 없어요.</p>
+            </div>
+        </div>
+    </main>
+    
+    <th:block layout:fragment="script">
+        <script>
+            // 정렬 기능 (나중에 구현)
+            document.querySelector('.sort-select').addEventListener('change', function() {
+                const sortType = this.value;
+                // TODO: 정렬 로직 구현
+                console.log('정렬:', sortType);
+            });
+        </script>
+    </th:block>
+</body>
+</html>

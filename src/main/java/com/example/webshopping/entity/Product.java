@@ -6,11 +6,15 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "images")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,7 +37,16 @@ public class Product {
     private String description;
 
 
-    private String imageUrl;
+    //    private String imageUrl;
+    //이미지 리스트 추가
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("imageOrder ASC")
+    @Builder.Default
+    private List<ProductImage> images = new ArrayList<>();
+
+
+
+    private Integer discountRate;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -45,5 +58,41 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+
+
+    public Integer getDiscountPrice() {
+        if(discountRate != null && discountRate > 0){
+            return price - (price*discountRate/100);
+        }
+        return price;
+    }
+
+    public String getRepImageUrl(){
+        return images.stream()
+                .filter(img -> "Y".equals(img.getRepImgYn()))
+                .findFirst()
+                .map(ProductImage::getImageUrl)
+                .orElse(null);
+    }
+
+    public List<String> getDetailImageUrls(){
+        return images.stream()
+                .filter(img -> "N".equals(img.getRepImgYn()))
+                .sorted(Comparator.comparing(ProductImage::getImageOrder))
+                .map(ProductImage::getImageUrl)
+                .collect(Collectors.toList());
+
+    }
+
+
+
+    public void addImage(ProductImage image){
+        images.add(image);
+        image.setProduct(this);
+
+    }
+
+
 
 }

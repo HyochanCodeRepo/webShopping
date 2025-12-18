@@ -4,18 +4,21 @@ import com.example.webshopping.dto.ProductDTO;
 import com.example.webshopping.entity.Category;
 import com.example.webshopping.entity.Product;
 import com.example.webshopping.repository.CategoryRepository;
+import com.example.webshopping.repository.ProductRepository;
+import com.example.webshopping.service.FileService;
 import com.example.webshopping.service.ProductService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @Log4j2
@@ -24,6 +27,8 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     private final CategoryRepository categoryRepository;
+    private final FileService fileService;
+    private final ProductRepository productRepository;
 
     @GetMapping("/register")
     public String register(Model model) {
@@ -35,14 +40,64 @@ public class ProductController {
     }
 
     @PostMapping("/register")
-    public String register(ProductDTO productDTO, RedirectAttributes redirectAttributes) {
-        log.info("productDTO : {}",productDTO);
-        productService.create(productDTO);
+    public String register(ProductDTO productDTO,
+                           @RequestParam(required = false) MultipartFile mainImageFile,
+                           @RequestParam(required = false)List<MultipartFile> detailImageFiles,
+                           RedirectAttributes redirectAttributes) {
+        log.info(productDTO);
 
-        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 등록되었습니다!");
+        List<String> imageUrls = new ArrayList<>();
+
+        //대표 이미지 저장
+        if(mainImageFile != null && !mainImageFile.isEmpty()) {
+            String mainUrl = fileService.uploadFile(mainImageFile);
+            imageUrls.add(mainUrl);
+        }
+
+        //상세 이미지 저장
+        if (detailImageFiles != null && !detailImageFiles.isEmpty()) {
+            for (MultipartFile file : detailImageFiles) {
+                if (!file.isEmpty()) {
+                    String url = fileService.uploadFile(file);
+                    imageUrls.add(url);
+                }
+
+            }
+        }
+        //서비스 호출
+        productService.create(productDTO, imageUrls);
+
+        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 등록 되었습니다.");
 
         return "redirect:/product/register";
     }
+
+    @GetMapping("/list")
+    public String list(@RequestParam Long categoryId, Model model) {
+        log.info("categoryId : {}",categoryId);
+
+        List<Product> productList =
+                productRepository.findByCategory_Id(categoryId);
+
+        Category category =
+            categoryRepository.findById(categoryId).orElseThrow(EntityNotFoundException::new);
+
+        model.addAttribute("categoryName", category.getName());
+        model.addAttribute("products", productList);
+
+
+        return "product/list";
+    }
+
+    @GetMapping("/detail/{id}")
+    public String detail(@PathVariable Long id, Model model) {
+        log.info("id : {}",id);
+        Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        model.addAttribute("product", product);
+        return "product/detail";
+    }
+
 
 
 }

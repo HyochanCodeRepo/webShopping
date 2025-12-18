@@ -59,6 +59,13 @@
                             <a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
                         </div>
                     </div>
+                    <!--로그인 확인되면 상품등록페이지 버튼-->
+                    <div sec:authorize="isAuthenticated()">
+                        <div>
+                            <a th:href="@{/product/register}">상품 등록하기</a>
+                        </div>
+
+                    </div>
                     
                     <a th:href="@{/orders}" class="user-menu-item">
                         <span class="menu-label">반품</span>

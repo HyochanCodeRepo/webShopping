@@ -49,7 +49,7 @@
                         <img th:src="@{${category.imageUrl != null ? category.imageUrl : '/images/category-default.jpg'}}"
                              alt="카테고리">
                     </div>
-                    <a th:href="@{/product(categoryId=${category.id})}" class="card-link">더 보기</a>
+                    <a th:href="@{/product/list(categoryId=${category.id})}" class="card-link">더 보기</a>
                 </div>
             </div>
         </section>

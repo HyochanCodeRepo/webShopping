@@ -192,6 +192,70 @@
                 margin-top: 5px;
                 display: none;
             }
+            
+            /* 상세 이미지 미리보기 */
+            .detail-previews {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+            
+            .detail-preview-item {
+                position: relative;
+                width: 100px;
+                height: 100px;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                overflow: hidden;
+                transition: all 0.3s;
+            }
+            
+            .detail-preview-item:hover {
+                border-color: #ff9900;
+                transform: translateY(-2px);
+            }
+            
+            .detail-preview-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .delete-btn {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                background: rgba(227, 24, 55, 0.9);
+                border: none;
+                color: white;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                cursor: pointer;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s;
+            }
+            
+            .delete-btn:hover {
+                background: rgba(227, 24, 55, 1);
+                transform: scale(1.1);
+            }
+            
+            .image-number {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+            }
         </style>
     </th:block>
 </head>
@@ -239,7 +303,7 @@
                     <div class="error-message" id="categoryError"></div>
                 </div>
                 
-                <!-- 가격 & 재고 -->
+                <!-- 가격 & 할인율 -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="price">
@@ -251,25 +315,43 @@
                                name="price" 
                                placeholder="0"
                                min="0"
+                               oninput="calculateDiscount()"
                                required>
                         <div class="help-text">단위: 원</div>
                         <div class="error-message" id="priceError"></div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="stockQuantity">
-                            재고 수량<span class="required">*</span>
+                        <label for="discountRate">
+                            할인율
                         </label>
                         <input type="number" 
                                class="form-control" 
-                               id="stockQuantity" 
-                               name="stockQuantity" 
+                               id="discountRate" 
+                               name="discountRate" 
                                placeholder="0"
                                min="0"
-                               required>
-                        <div class="help-text">단위: 개</div>
-                        <div class="error-message" id="stockError"></div>
+                               max="100"
+                               oninput="calculateDiscount()">
+                        <div class="help-text">단위: % (0-100)</div>
+                        <div id="discountPrice" style="margin-top: 10px; font-size: 16px; font-weight: 600; color: #E31837;"></div>
                     </div>
+                </div>
+                
+                <!-- 재고 수량 -->
+                <div class="form-group">
+                    <label for="stockQuantity">
+                        재고 수량<span class="required">*</span>
+                    </label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="stockQuantity" 
+                           name="stockQuantity" 
+                           placeholder="0"
+                           min="0"
+                           required>
+                    <div class="help-text">단위: 개</div>
+                    <div class="error-message" id="stockError"></div>
                 </div>
                 
                 <!-- 상품 설명 -->
@@ -284,26 +366,46 @@
                     <div class="help-text">최대 1000자</div>
                 </div>
                 
-                <!-- 이미지 업로드 -->
+                <!-- 대표 이미지 업로드 -->
                 <div class="form-group">
-                    <label for="imageFile">
-                        상품 이미지
+                    <label for="mainImageFile">
+                        대표 이미지 (필수)<span class="required">*</span>
                     </label>
                     <div class="file-upload-wrapper">
-                        <label for="imageFile" class="file-upload-btn">
-                            <i class="fas fa-cloud-upload-alt"></i> 파일 선택
+                        <label for="mainImageFile" class="file-upload-btn">
+                            <i class="fas fa-cloud-upload-alt"></i> 대표 이미지 선택
                         </label>
                         <input type="file" 
-                               id="imageFile" 
-                               name="imageFile" 
+                               id="mainImageFile" 
+                               name="mainImageFile" 
                                accept="image/*"
-                               onchange="previewImage(event)">
+                               onchange="previewMainImage(event)"
+                               required>
                     </div>
-                    <div class="file-name" id="fileName">선택된 파일 없음</div>
+                    <div class="file-name" id="mainFileName">선택된 파일 없음</div>
                     <div class="help-text">권장: JPG, PNG (최대 5MB)</div>
                     
-                    <div class="image-preview" id="imagePreview">
-                        <img id="preview" src="" alt="미리보기">
+                    <div class="image-preview" id="mainImagePreview">
+                        <img id="mainPreview" src="" alt="대표 이미지 미리보기">
+                    </div>
+                </div>
+                
+                <!-- 상세 이미지 업로드 -->
+                <div class="form-group">
+                    <label>
+                        상세 이미지 (선택, 최대 4개)
+                    </label>
+                    <input type="file" 
+                           id="detailImageInput" 
+                           accept="image/*"
+                           style="display: none;">
+                    <button type="button" class="file-upload-btn" onclick="document.getElementById('detailImageInput').click()">
+                        <i class="fas fa-plus"></i> 상세 이미지 추가
+                    </button>
+                    <div class="help-text">상세 이미지는 순서대로 표시됩니다</div>
+                    
+                    <div id="detailPreviews" class="detail-previews">
+                        <!-- 상세 이미지 미리보기들이 여기 추가됨 -->
                     </div>
                 </div>
                 
@@ -322,12 +424,41 @@
     
     <th:block layout:fragment="script">
         <script>
-            // 이미지 미리보기
-            function previewImage(event) {
+            // 상세 이미지 배열
+            let detailImagesArray = [];
+            
+            // 할인가 실시간 계산
+            function calculateDiscount() {
+                const price = parseInt(document.getElementById('price').value) || 0;
+                const discountRate = parseInt(document.getElementById('discountRate').value) || 0;
+                const discountPriceElement = document.getElementById('discountPrice');
+                
+                if (price > 0 && discountRate > 0) {
+                    const discountAmount = Math.floor(price * discountRate / 100);
+                    const finalPrice = price - discountAmount;
+                    
+                    discountPriceElement.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <span style="font-size: 14px; color: #666;">원가: ${price.toLocaleString()}원</span>
+                            <span style="font-size: 14px; color: #E31837;">할인: -${discountAmount.toLocaleString()}원</span>
+                            <span style="font-size: 18px; color: #E31837; font-weight: 700;">판매가: ${finalPrice.toLocaleString()}원</span>
+                        </div>
+                    `;
+                } else if (price > 0) {
+                    discountPriceElement.innerHTML = `
+                        <span style="font-size: 16px; color: #333;">판매가: ${price.toLocaleString()}원</span>
+                    `;
+                } else {
+                    discountPriceElement.innerHTML = '';
+                }
+            }
+            
+            // 대표 이미지 미리보기
+            function previewMainImage(event) {
                 const file = event.target.files[0];
-                const fileName = document.getElementById('fileName');
-                const preview = document.getElementById('imagePreview');
-                const previewImg = document.getElementById('preview');
+                const fileName = document.getElementById('mainFileName');
+                const preview = document.getElementById('mainImagePreview');
+                const previewImg = document.getElementById('mainPreview');
                 
                 if (file) {
                     fileName.textContent = file.name;
@@ -344,7 +475,60 @@
                 }
             }
             
-            // 폼 유효성 검사
+            // 상세 이미지 추가
+            document.getElementById('detailImageInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // 최대 4개 체크
+                if (detailImagesArray.length >= 4) {
+                    alert('상세 이미지는 최대 4개까지만 등록 가능합니다.');
+                    return;
+                }
+                
+                // 배열에 추가
+                detailImagesArray.push(file);
+                
+                // 미리보기 렌더링
+                renderDetailPreviews();
+                
+                // input 초기화 (같은 파일 다시 선택 가능하게)
+                e.target.value = '';
+            });
+            
+            // 상세 이미지 미리보기 렌더링
+            function renderDetailPreviews() {
+                const container = document.getElementById('detailPreviews');
+                container.innerHTML = '';
+                
+                detailImagesArray.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'detail-preview-item';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" alt="상세${index+1}">
+                            <button type="button" class="delete-btn" onclick="deleteDetailImage(${index})">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <span class="image-number">${index + 1}</span>
+                        `;
+                        container.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            // 상세 이미지 삭제
+            function deleteDetailImage(index) {
+                // 배열에서 제거
+                detailImagesArray.splice(index, 1);
+                
+                // 미리보기 다시 렌더링 (번호 자동 재정렬)
+                renderDetailPreviews();
+            }
+            
+            // 폼 제출 시 처리
             document.getElementById('productForm').addEventListener('submit', function(e) {
                 let isValid = true;
                 
@@ -384,9 +568,41 @@
                     hideError('categoryError');
                 }
                 
+                // 할인율 검사
+                const discountRate = parseInt(document.getElementById('discountRate').value) || 0;
+                if (discountRate < 0 || discountRate > 100) {
+                    alert('할인율은 0~100 사이의 값이어야 합니다.');
+                    isValid = false;
+                }
+                
                 if (!isValid) {
                     e.preventDefault();
+                    return;
                 }
+                
+                // 상세 이미지들을 hidden input들로 변환
+                const form = this;
+                
+                // 기존 hidden inputs 제거
+                const oldHiddenInputs = form.querySelectorAll('input[name="detailImageFilesHidden"]');
+                oldHiddenInputs.forEach(input => input.remove());
+                
+                // 상세 이미지 파일들을 FormData에 추가하기 위해 새 input 생성
+                detailImagesArray.forEach((file, index) => {
+                    // DataTransfer 객체 사용
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.name = 'detailImageFiles';
+                    input.style.display = 'none';
+                    input.files = dataTransfer.files;
+                    
+                    form.appendChild(input);
+                });
+                
+                // 일반 submit 진행
             });
             
             function showError(elementId, message) {
