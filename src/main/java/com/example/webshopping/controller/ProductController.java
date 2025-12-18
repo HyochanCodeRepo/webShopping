@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -36,7 +37,7 @@ public class ProductController {
 
         model.addAttribute("categories", categories);
 
-        return "product/register";
+        return "product/form";
     }
 
     @PostMapping("/register")
@@ -96,6 +97,35 @@ public class ProductController {
 
         model.addAttribute("product", product);
         return "product/detail";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        Product product =
+            productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        model.addAttribute("product", product);
+        model.addAttribute("categories", categoryRepository.findAll());
+        return "product/form";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String edit(@PathVariable Long id,
+                       ProductDTO productDTO,
+                       @RequestParam(required = false) MultipartFile mainImageFile,
+                       @RequestParam(required = false) List<MultipartFile> detailImageFiles,
+                       @RequestParam(required = false, defaultValue = "false") Boolean keepMainImage,
+                       @RequestParam(required = false) Map<String, String> allParams,
+                       RedirectAttributes redirectAttributes) {
+        log.info("id : {}",id);
+        log.info("productDTO : {}",productDTO);
+        log.info("keepMainImage : {}",keepMainImage);
+
+        productService.update(id, productDTO, mainImageFile, detailImageFiles, keepMainImage, allParams);
+
+        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 수정되었습니다.");
+
+        return "redirect:/product/detail/" + id;
+
     }
 
 

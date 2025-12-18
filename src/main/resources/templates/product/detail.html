@@ -371,7 +371,7 @@
                     </div>
                     
                     <!-- ADMIN 전용 버튼 -->
-                    <div class="admin-actions" sec:authorize="hasRole('ADMIN')">
+                    <div class="admin-actions" sec:authorize="isAuthenticated()">
                         <button class="btn-admin btn-edit" 
                                 th:onclick="|location.href='@{/product/edit/{id}(id=${product.id})}'|">
                             <i class="fas fa-edit"></i> 수정
