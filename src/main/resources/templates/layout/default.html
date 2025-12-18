@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - WebShopping">WebShopping</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 페이지별 CSS -->
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <!-- 상단 네비게이션 -->
+        <div class="header-top">
+            <div class="header-container">
+                <!-- 로고 -->
+                <a th:href="@{/}" class="logo">
+                    <span class="logo-text">WebShopping</span>
+                </a>
+                
+                <!-- 검색바 -->
+                <div class="search-bar">
+                    <select class="search-category">
+                        <option value="all">전체</option>
+                        <option value="electronics">전자제품</option>
+                        <option value="fashion">패션</option>
+                        <option value="books">도서</option>
+                        <option value="home">홈/리빙</option>
+                    </select>
+                    <input type="text" class="search-input" placeholder="검색어를 입력하세요">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <!-- 유저 메뉴 -->
+                <div class="user-menu">
+                    <!-- 비로그인 상태 -->
+                    <a th:href="@{/members/login}" class="user-menu-item" sec:authorize="!isAuthenticated()">
+                        <span class="menu-label">안녕하세요, 로그인</span>
+                        <span class="menu-text">계정 및 주문</span>
+                    </a>
+                    
+                    <!-- 로그인 상태 -->
+                    <div class="user-menu-item user-dropdown" sec:authorize="isAuthenticated()">
+<!--                        <span class="menu-label" th:text="${#authentication.principal.username} + '님'">이메일님</span>-->
+                        <span class="menu-label" th:text="${#authentication.name} + ' 님'"></span>
+                        <span class="menu-text">환영합니다! <i class="fas fa-caret-down"></i></span>
+                        <div class="dropdown-content">
+                            <a th:href="@{/mypage}"><i class="fas fa-user"></i> 마이페이지</a>
+                            <a th:href="@{/orders}"><i class="fas fa-box"></i> 주문내역</a>
+                            <a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
+                        </div>
+                    </div>
+                    
+                    <a th:href="@{/orders}" class="user-menu-item">
+                        <span class="menu-label">반품</span>
+                        <span class="menu-text">& 주문</span>
+                    </a>
+                    <a th:href="@{/cart}" class="user-menu-item cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                        <span class="cart-text">장바구니</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 하단 네비게이션 -->
+        <nav class="header-nav">
+            <div class="header-container">
+                <button class="nav-menu-btn">
+                    <i class="fas fa-bars"></i>
+                    <span>전체</span>
+                </button>
+                <ul class="nav-links">
+                    <li><a th:href="@{/products}">오늘의 딜</a></li>
+                    <li><a th:href="@{/products?category=electronics}">전자제품</a></li>
+                    <li><a th:href="@{/products?category=fashion}">패션</a></li>
+                    <li><a th:href="@{/products?category=books}">도서</a></li>
+                    <li><a th:href="@{/products?category=home}">홈/리빙</a></li>
+                    <li><a th:href="@{/products?category=food}">식품</a></li>
+                    <!-- ADMIN 전용 상품등록 버튼 -->
+                    <li sec:authorize="hasRole('ADMIN')">
+                        <a th:href="@{/product/register}" class="admin-register-btn">
+                            <i class="fas fa-plus-circle"></i> 상품등록
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="main-content" layout:fragment="content">
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-top">
+            <a href="#" class="back-to-top">맨 위로 이동</a>
+        </div>
+        
+        <div class="footer-middle">
+            <div class="footer-container">
+                <div class="footer-column">
+                    <h4>WebShopping 알아보기</h4>
+                    <ul>
+                        <li><a href="#">회사 소개</a></li>
+                        <li><a href="#">채용 정보</a></li>
+                        <li><a href="#">공지사항</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>고객 서비스</h4>
+                    <ul>
+                        <li><a href="#">고객센터</a></li>
+                        <li><a href="#">배송 조회</a></li>
+                        <li><a href="#">반품/교환</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>판매자 서비스</h4>
+                    <ul>
+                        <li><a href="#">입점 안내</a></li>
+                        <li><a href="#">광고 안내</a></li>
+                        <li><a href="#">판매자 센터</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>제휴/협력</h4>
+                    <ul>
+                        <li><a href="#">제휴 문의</a></li>
+                        <li><a href="#">대량 구매</a></li>
+                        <li><a href="#">API 연동</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-container">
+                <div class="footer-logo">WebShopping</div>
+                <p class="footer-copyright">
+                    © 2024 WebShopping. 포트폴리오 프로젝트입니다.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script th:src="@{/js/common.js}"></script>
+    <th:block layout:fragment="script"></th:block>
+</body>
+</html>
