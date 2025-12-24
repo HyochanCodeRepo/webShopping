@@ -1,5 +1,6 @@
 package com.example.webshopping.service;
 
+import com.example.webshopping.constant.Role;
 import com.example.webshopping.dto.MembersDTO;
 import com.example.webshopping.entity.Members;
 import com.example.webshopping.repository.MembersRepository;
@@ -27,6 +28,8 @@ public class MembersServiceImpl implements MembersService {
         Members members = modelMapper.map(memberDTO, Members.class);
 
         members.setPassword(passwordEncoder.encode(members.getPassword()));
+        members.setRole(Role.ADMIN);
+
 
         membersRepository.save(members);
 
