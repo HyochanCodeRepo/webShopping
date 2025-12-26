@@ -44,6 +44,17 @@ public class Product {
     @Builder.Default
     private List<ProductImage> images = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Members members;
+
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;  // 등록일
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDateTime.now();
+    }
 
 
     private Integer discountRate;

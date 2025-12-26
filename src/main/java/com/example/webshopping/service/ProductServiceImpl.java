@@ -3,9 +3,11 @@ package com.example.webshopping.service;
 import com.example.webshopping.dto.CategoryDTO;
 import com.example.webshopping.dto.ProductDTO;
 import com.example.webshopping.entity.Category;
+import com.example.webshopping.entity.Members;
 import com.example.webshopping.entity.Product;
 import com.example.webshopping.entity.ProductImage;
 import com.example.webshopping.repository.CategoryRepository;
+import com.example.webshopping.repository.MembersRepository;
 import com.example.webshopping.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -31,11 +33,19 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper modelMapper = new ModelMapper();
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
+    private final MembersRepository membersRepository;
+
 
 
 
     @Override
-    public void create(ProductDTO productDTO, List<String> imageUrls) {
+    public void create(ProductDTO productDTO, List<String> imageUrls, String email) {
+
+        // ✅ 회원 조회
+        Members member = membersRepository.findByEmail(email);
+        if (member == null) {
+            throw new EntityNotFoundException("회원을 찾을 수 없습니다.");
+        }
 
         Product product = Product.builder()
                 .productName(productDTO.getProductName())
@@ -43,6 +53,7 @@ public class ProductServiceImpl implements ProductService {
                 .stockQuantity(productDTO.getStockQuantity())
                 .description(productDTO.getDescription())
                 .discountRate(productDTO.getDiscountRate())
+                .members(member)  // ✅ 회원 정보 저장
                 .build();
 
         //카테고리 설정
@@ -150,10 +161,24 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-
-
     }
 
+    @Override
+    public List<Product> getProductsByEmail(String email) {
+        // Members 조회
+        Members member = membersRepository.findByEmail(email);
 
+        // 해당 회원이 등록한 상품 목록 조회 (최신순)
+        return productRepository.findByMembers_IdOrderByCreatedDateDesc(member.getId());
+    }
 
+    @Override
+    public void delete(Long id) {
+        // 상품 존재 확인
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
+
+        // 상품 삭제 (연관된 이미지도 Cascade로 자동 삭제)
+        productRepository.delete(product);
+    }
 }

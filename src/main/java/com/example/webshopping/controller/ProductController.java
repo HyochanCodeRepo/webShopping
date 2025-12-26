@@ -10,6 +10,8 @@ import com.example.webshopping.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +46,16 @@ public class ProductController {
     public String register(ProductDTO productDTO,
                            @RequestParam(required = false) MultipartFile mainImageFile,
                            @RequestParam(required = false)List<MultipartFile> detailImageFiles,
+                           @AuthenticationPrincipal UserDetails userDetails,  // ✅ 추가
                            RedirectAttributes redirectAttributes) {
         log.info(productDTO);
+
+        // ✅ 로그인 체크
+        if (userDetails == null) {
+            return "redirect:/members/login";
+        }
+
+        String email = userDetails.getUsername();  // ✅ 이메일 가져오기
 
         List<String> imageUrls = new ArrayList<>();
 
@@ -66,7 +76,7 @@ public class ProductController {
             }
         }
         //서비스 호출
-        productService.create(productDTO, imageUrls);
+        productService.create(productDTO, imageUrls, email);  // ✅ email 추가
 
         redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 등록 되었습니다.");
 

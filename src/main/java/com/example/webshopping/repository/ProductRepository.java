@@ -11,4 +11,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     public List<Product> findByCategory_Id(Long categoryId);
 
+    List<Product> findByMembers_IdOrderByCreatedDateDesc(Long memberId);
+
 }

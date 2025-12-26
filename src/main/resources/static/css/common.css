@@ -196,16 +196,28 @@ ul {
     color: #333;
 }
 
+/* ✅ 장바구니 뱃지 - 빨간 동그란 스타일 */
 .cart-count {
     position: absolute;
-    top: 0;
-    left: 22px;
+    top: -2px;
+    left: 18px;
     background-color: #E31837;
     color: #fff;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
+    min-width: 20px;
+    height: 20px;
     padding: 0 6px;
     border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 장바구니가 비어있을 때 뱃지 숨기기 */
+.cart-count.empty {
+    display: none;
 }
 
 .cart-text {

@@ -153,6 +153,65 @@
                 color: #999;
             }
             
+            /* 수량 선택 영역 */
+            .quantity-section {
+                padding: 20px 0;
+                border-bottom: 1px solid #e8e8e8;
+            }
+            
+            .quantity-label {
+                font-size: 15px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 10px;
+                display: block;
+            }
+            
+            .quantity-controls {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .qty-btn {
+                width: 40px;
+                height: 40px;
+                border: 1px solid #ddd;
+                background: #fff;
+                border-radius: 4px;
+                font-size: 18px;
+                font-weight: 600;
+                color: #333;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .qty-btn:hover {
+                background: #f7f7f7;
+                border-color: #ff9900;
+            }
+            
+            .qty-btn:disabled {
+                background: #f7f7f7;
+                color: #ccc;
+                cursor: not-allowed;
+            }
+            
+            .quantity-input {
+                width: 80px;
+                height: 40px;
+                text-align: center;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 16px;
+                font-weight: 600;
+            }
+            
+            .quantity-input:focus {
+                outline: none;
+                border-color: #ff9900;
+            }
+            
             .description-section {
                 margin: 20px 0;
             }
@@ -352,6 +411,22 @@
                         </span>
                     </div>
                     
+                    <!-- 수량 선택 -->
+                    <div class="quantity-section" th:if="${product.stockQuantity > 0}">
+                        <label class="quantity-label">수량</label>
+                        <div class="quantity-controls">
+                            <button type="button" class="qty-btn" onclick="decreaseQty()">-</button>
+                            <input type="number" 
+                                   id="quantity" 
+                                   class="quantity-input"
+                                   value="1" 
+                                   min="1" 
+                                   th:max="${product.stockQuantity}"
+                                   readonly>
+                            <button type="button" class="qty-btn" onclick="increaseQty()">+</button>
+                        </div>
+                    </div>
+                    
                     <!-- 상품 설명 -->
                     <div class="description-section" th:if="${product.description != null and !product.description.isEmpty()}">
                         <div class="description-title">상품 설명</div>
@@ -361,11 +436,13 @@
                     <!-- 일반 사용자 액션 버튼 -->
                     <div class="action-buttons">
                         <button class="btn btn-cart" 
-                                th:disabled="${product.stockQuantity <= 0}">
+                                th:disabled="${product.stockQuantity <= 0}"
+                                onclick="addToCart()">
                             <i class="fas fa-shopping-cart"></i> 장바구니
                         </button>
                         <button class="btn btn-buy"
-                                th:disabled="${product.stockQuantity <= 0}">
+                                th:disabled="${product.stockQuantity <= 0}"
+                                onclick="buyNow()">
                             <i class="fas fa-bolt"></i> 바로 구매
                         </button>
                     </div>
@@ -387,6 +464,116 @@
     
     <th:block layout:fragment="script">
         <script th:inline="javascript">
+            const productId = /*[[${product.id}]]*/ 0;
+            const maxStock = /*[[${product.stockQuantity}]]*/ 0;
+            
+            // 수량 감소
+            function decreaseQty() {
+                const qtyInput = document.getElementById('quantity');
+                let currentQty = parseInt(qtyInput.value);
+                
+                if (currentQty > 1) {
+                    qtyInput.value = currentQty - 1;
+                }
+            }
+            
+            // 수량 증가
+            function increaseQty() {
+                const qtyInput = document.getElementById('quantity');
+                let currentQty = parseInt(qtyInput.value);
+                
+                if (currentQty < maxStock) {
+                    qtyInput.value = currentQty + 1;
+                } else {
+                    alert('재고 수량을 초과할 수 없습니다.');
+                }
+            }
+            
+            // 장바구니 추가
+            async function addToCart() {
+                // 로그인 체크
+                const isAuthenticated = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
+                
+                if (!isAuthenticated) {
+                    if (confirm('로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?')) {
+                        location.href = '/members/login';
+                    }
+                    return;
+                }
+                
+                const quantity = parseInt(document.getElementById('quantity').value);
+                
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            productId: productId,
+                            quantity: quantity
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // ✅ 장바구니 개수 업데이트
+                        updateCartCount();
+                        
+                        if (confirm(result.message + '\n장바구니로 이동하시겠습니까?')) {
+                            location.href = '/cart';
+                        }
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('장바구니 추가 중 오류가 발생했습니다.');
+                }
+            }
+            
+            // 바로 구매하기
+            async function buyNow() {
+                // 로그인 체크
+                const isAuthenticated = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
+                
+                if (!isAuthenticated) {
+                    if (confirm('로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?')) {
+                        location.href = '/members/login';
+                    }
+                    return;
+                }
+                
+                const quantity = parseInt(document.getElementById('quantity').value);
+                
+                try {
+                    // 장바구니에 먼저 추가
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            productId: productId,
+                            quantity: quantity
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // 주문 페이지로 이동 (추후 구현)
+                        location.href = '/order/checkout';
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('주문 처리 중 오류가 발생했습니다.');
+                }
+            }
+            
             // 메인 이미지 변경
             function changeMainImage(element) {
                 const imageUrl = element.getAttribute('data-image');
@@ -402,7 +589,6 @@
             // 상품 삭제
             function deleteProduct() {
                 if (confirm('정말로 이 상품을 삭제하시겠습니까?')) {
-                    const productId = /*[[${product.id}]]*/ 0;
                     location.href = '/product/delete/' + productId;
                 }
             }

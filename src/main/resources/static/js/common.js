@@ -4,6 +4,9 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
+    // 페이지 로드 시 장바구니 개수 가져오기
+    updateCartCount();
+    
     // 맨 위로 이동
     const backToTop = document.querySelector('.back-to-top');
     if (backToTop) {
@@ -42,15 +45,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // 장바구니 수량 업데이트 (나중에 구현)
-    function updateCartCount(count) {
-        const cartCount = document.querySelector('.cart-count');
-        if (cartCount) {
-            cartCount.textContent = count;
-        }
-    }
-    
 });
+
+// ========================================
+// 장바구니 관련 함수
+// ========================================
+
+/**
+ * 장바구니 개수 업데이트
+ */
+async function updateCartCount() {
+    try {
+        const response = await fetch('/cart/count');
+        
+        if (response.ok) {
+            const data = await response.json();
+            const cartCountElement = document.querySelector('.cart-count');
+            
+            if (cartCountElement) {
+                const count = data.count || 0;
+                cartCountElement.textContent = count;
+                
+                // 장바구니가 비어있으면 뱃지 숨기기
+                if (count === 0) {
+                    cartCountElement.classList.add('empty');
+                } else {
+                    cartCountElement.classList.remove('empty');
+                }
+            }
+        }
+    } catch (error) {
+        console.error('장바구니 개수 조회 실패:', error);
+        // 에러가 나도 UI는 유지 (조용히 실패)
+    }
+}
 
 // ========================================
 // Utility Functions

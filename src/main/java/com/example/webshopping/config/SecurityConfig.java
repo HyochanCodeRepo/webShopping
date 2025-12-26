@@ -29,6 +29,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         authorize -> authorize
                                 .requestMatchers("/", "/members/**", "/css/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers("/admin/**").permitAll()  // ✅ 일단 모두 접근 가능
                                 .anyRequest().authenticated()
                 ).csrf((csrf) -> csrf.disable())
 
