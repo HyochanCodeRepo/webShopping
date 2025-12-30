@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>주문하기</title>
+    <th:block layout:fragment="css">
+        <style>
+            .checkout-container {
+                max-width: 1200px;
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+            
+            .checkout-header {
+                padding: 20px 0;
+                border-bottom: 2px solid #232f3e;
+                margin-bottom: 40px;
+            }
+            
+            .checkout-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: #232f3e;
+            }
+            
+            .checkout-main {
+                display: grid;
+                grid-template-columns: 1fr 400px;
+                gap: 30px;
+            }
+            
+            .section {
+                background: #fff;
+                border-radius: 8px;
+                padding: 30px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            
+            .section-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #e8e8e8;
+            }
+            
+            .order-item {
+                display: flex;
+                gap: 20px;
+                padding: 20px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            
+            .order-item:last-child {
+                border-bottom: none;
+            }
+            
+            .item-image {
+                width: 100px;
+                height: 100px;
+                border: 1px solid #e8e8e8;
+                border-radius: 4px;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+            
+            .item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .item-info {
+                flex: 1;
+            }
+            
+            .item-name {
+                font-size: 16px;
+                font-weight: 600;
+                color: #232f3e;
+                margin-bottom: 8px;
+            }
+            
+            .item-quantity {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 8px;
+            }
+            
+            .item-price {
+                font-size: 18px;
+                font-weight: 700;
+                color: #E31837;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-label {
+                display: block;
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 8px;
+            }
+            
+            .form-label .required {
+                color: #E31837;
+                margin-left: 2px;
+            }
+            
+            .form-input {
+                width: 100%;
+                padding: 12px 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+            }
+            
+            .form-input:focus {
+                outline: none;
+                border-color: #ff9900;
+            }
+            
+            .form-textarea {
+                width: 100%;
+                padding: 12px 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                resize: vertical;
+                min-height: 80px;
+            }
+            
+            .form-textarea:focus {
+                outline: none;
+                border-color: #ff9900;
+            }
+            
+            .order-summary {
+                position: sticky;
+                top: 20px;
+            }
+            
+            .summary-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 12px 0;
+                font-size: 15px;
+            }
+            
+            .summary-label {
+                color: #666;
+            }
+            
+            .summary-value {
+                font-weight: 600;
+                color: #333;
+            }
+            
+            .summary-total {
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 2px solid #e8e8e8;
+            }
+            
+            .summary-total .summary-label {
+                font-size: 18px;
+                font-weight: 700;
+                color: #333;
+            }
+            
+            .summary-total .summary-value {
+                font-size: 24px;
+                font-weight: 700;
+                color: #E31837;
+            }
+            
+            .btn-order {
+                width: 100%;
+                padding: 18px;
+                background: #ff9900;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 18px;
+                font-weight: 600;
+                cursor: pointer;
+                margin-top: 20px;
+                transition: all 0.3s;
+            }
+            
+            .btn-order:hover {
+                background: #e88b00;
+            }
+            
+            .btn-order:disabled {
+                background: #ddd;
+                cursor: not-allowed;
+            }
+            
+            .loading {
+                text-align: center;
+                padding: 40px;
+                color: #666;
+            }
+            
+            .loading-spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #ff9900;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 20px;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            @media (max-width: 768px) {
+                .checkout-main {
+                    grid-template-columns: 1fr;
+                }
+                
+                .order-summary {
+                    position: static;
+                }
+                
+                .order-item {
+                    flex-direction: column;
+                }
+                
+                .item-image {
+                    width: 100%;
+                    height: 200px;
+                }
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="checkout-container">
+            <div class="checkout-header">
+                <h1 class="checkout-title">주문하기</h1>
+            </div>
+            
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <p>장바구니 정보를 불러오는 중...</p>
+            </div>
+            
+            <div id="checkoutContent" class="checkout-main" style="display: none;">
+                <div>
+                    <div class="section">
+                        <h2 class="section-title">주문 상품</h2>
+                        <div id="orderItemsList"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2 class="section-title">배송 정보</h2>
+                        <form id="orderForm">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    받는 사람 <span class="required">*</span>
+                                </label>
+                                <input type="text" name="recipientName" class="form-input" 
+                                       id="recipientName"
+                                       placeholder="받는 분의 이름을 입력하세요" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    연락처 <span class="required">*</span>
+                                </label>
+                                <input type="tel" name="recipientPhone" class="form-input" 
+                                       id="recipientPhone"
+                                       placeholder="01012345678"
+                                       pattern="[0-9]{10,11}"
+                                       maxlength="11"
+                                       required>
+                                <small style="color: #666; font-size: 12px;">숫자만 입력하세요 (- 없이)</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    배송지 <span class="required">*</span>
+                                </label>
+                                <input type="text" name="deliveryAddress" class="form-input" 
+                                       placeholder="배송받을 주소를 입력하세요" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">배송 메시지</label>
+                                <textarea name="deliveryMessage" class="form-textarea" 
+                                          placeholder="배송 시 요청사항을 입력하세요 (선택)"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="section order-summary">
+                        <h2 class="section-title">결제 정보</h2>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">상품 수</span>
+                            <span class="summary-value" id="itemCount">0개</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">총 수량</span>
+                            <span class="summary-value" id="totalQuantity">0개</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">상품 금액</span>
+                            <span class="summary-value" id="productPrice">0원</span>
+                        </div>
+                        
+                        <div class="summary-row">
+                            <span class="summary-label">배송비</span>
+                            <span class="summary-value">무료</span>
+                        </div>
+                        
+                        <div class="summary-row summary-total">
+                            <span class="summary-label">총 결제금액</span>
+                            <span class="summary-value" id="totalPrice">0원</span>
+                        </div>
+                        
+                        <button type="button" class="btn-order" onclick="submitOrder()">
+                            <i class="fas fa-credit-card"></i> 주문하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            let cartData = null;
+            let memberName = /*[[${memberName}]]*/ '';
+            let memberPhone = /*[[${memberPhone}]]*/ '';
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                loadCartData();
+                loadMemberInfo();
+            });
+            
+            // 회원 정보 자동 입력
+            function loadMemberInfo() {
+                if (memberName) {
+                    document.getElementById('recipientName').value = memberName;
+                }
+                if (memberPhone) {
+                    // - 제거하고 숫자만
+                    const phoneOnly = memberPhone.replace(/[^0-9]/g, '');
+                    document.getElementById('recipientPhone').value = phoneOnly;
+                }
+            }
+            
+            async function loadCartData() {
+                try {
+                    const response = await fetch('/cart/items');
+                    
+                    if (!response.ok) {
+                        throw new Error('장바구니 정보를 불러올 수 없습니다.');
+                    }
+                    
+                    cartData = await response.json();
+                    
+                    if (!cartData.items || cartData.items.length === 0) {
+                        alert('장바구니가 비어있습니다.');
+                        location.href = '/cart';
+                        return;
+                    }
+                    
+                    renderOrderItems();
+                    renderSummary();
+                    
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('checkoutContent').style.display = 'grid';
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('장바구니 정보를 불러오는 중 오류가 발생했습니다.');
+                    location.href = '/cart';
+                }
+            }
+            
+            function renderOrderItems() {
+                const container = document.getElementById('orderItemsList');
+                container.innerHTML = '';
+                
+                cartData.items.forEach(item => {
+                    const itemHtml = `
+                        <div class="order-item">
+                            <div class="item-image">
+                                <img src="${item.imageUrl}" alt="${item.productName}"
+                                     onerror="this.src='/images/product-sample.jpg'">
+                            </div>
+                            <div class="item-info">
+                                <div class="item-name">${item.productName}</div>
+                                <div class="item-quantity">수량: ${item.quantity}개</div>
+                                <div class="item-price">${formatPrice(item.totalPrice)}원</div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += itemHtml;
+                });
+            }
+            
+            function renderSummary() {
+                document.getElementById('itemCount').textContent = cartData.items.length + '개';
+                document.getElementById('totalQuantity').textContent = cartData.totalQuantity + '개';
+                document.getElementById('productPrice').textContent = formatPrice(cartData.totalPrice) + '원';
+                document.getElementById('totalPrice').textContent = formatPrice(cartData.totalPrice) + '원';
+            }
+            
+            async function submitOrder() {
+                const form = document.getElementById('orderForm');
+                
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                const formData = new FormData(form);
+                
+                if (!confirm('주문하시겠습니까?')) {
+                    return;
+                }
+                
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = '주문 처리 중...';
+                
+                try {
+                    const response = await fetch('/order/create', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.redirected) {
+                        location.href = response.url;
+                    } else if (response.ok) {
+                        alert('주문이 완료되었습니다!');
+                        location.href = '/order/list';
+                    } else {
+                        throw new Error('주문 처리 중 오류가 발생했습니다.');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('주문 처리 중 오류가 발생했습니다.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-credit-card"></i> 주문하기';
+                }
+            }
+            
+            function formatPrice(price) {
+                return new Intl.NumberFormat('ko-KR').format(price);
+            }
+        </script>
+    </th:block>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>주문 내역</title>
+    <th:block layout:fragment="css">
+        <style>
+            .order-list-container {
+                max-width: 1200px;
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+
+            .page-header {
+                padding: 20px 0;
+                border-bottom: 2px solid #232f3e;
+                margin-bottom: 40px;
+            }
+
+            .page-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: #232f3e;
+            }
+
+            /* 빈 목록 */
+            .empty-list {
+                text-align: center;
+                padding: 80px 20px;
+                background: #fff;
+                border-radius: 8px;
+            }
+
+            .empty-icon {
+                font-size: 80px;
+                color: #ddd;
+                margin-bottom: 20px;
+            }
+
+            .empty-text {
+                font-size: 18px;
+                color: #666;
+                margin-bottom: 30px;
+            }
+
+            .btn-shop {
+                display: inline-block;
+                padding: 14px 30px;
+                background: #ff9900;
+                color: #fff;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s;
+            }
+
+            .btn-shop:hover {
+                background: #e88b00;
+            }
+
+            /* 주문 카드 */
+            .order-card {
+                background: #fff;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                overflow: hidden;
+            }
+
+            /* 주문 헤더 */
+            .order-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 25px;
+                background: #f7f7f7;
+                border-bottom: 1px solid #e8e8e8;
+            }
+
+            .order-date {
+                font-size: 14px;
+                color: #666;
+            }
+
+            .order-number {
+                font-size: 14px;
+                color: #666;
+            }
+
+            .order-number strong {
+                color: #232f3e;
+                margin-left: 5px;
+            }
+
+            .order-status {
+                display: inline-block;
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 600;
+            }
+
+            .status-pending {
+                background: #fff3cd;
+                color: #856404;
+            }
+
+            .status-confirmed {
+                background: #d1ecf1;
+                color: #0c5460;
+            }
+
+            .status-preparing {
+                background: #d1ecf1;
+                color: #0c5460;
+            }
+
+            .status-shipped {
+                background: #cce5ff;
+                color: #004085;
+            }
+
+            .status-delivered {
+                background: #d4edda;
+                color: #155724;
+            }
+
+            .status-cancelled {
+                background: #f8d7da;
+                color: #721c24;
+            }
+
+            /* 주문 상품 */
+            .order-items {
+                padding: 25px;
+            }
+
+            .order-item {
+                display: flex;
+                gap: 20px;
+                padding: 15px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .order-item:last-child {
+                border-bottom: none;
+            }
+
+            .item-image {
+                width: 80px;
+                height: 80px;
+                border: 1px solid #e8e8e8;
+                border-radius: 4px;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+
+            .item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .item-info {
+                flex: 1;
+            }
+
+            .item-name {
+                font-size: 16px;
+                font-weight: 600;
+                color: #232f3e;
+                margin-bottom: 8px;
+            }
+
+            .item-quantity {
+                font-size: 14px;
+                color: #666;
+            }
+
+            .item-price {
+                font-size: 16px;
+                font-weight: 700;
+                color: #E31837;
+                text-align: right;
+            }
+
+            /* 주문 푸터 */
+            .order-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 25px;
+                background: #f7f7f7;
+                border-top: 1px solid #e8e8e8;
+            }
+
+            .order-total {
+                font-size: 16px;
+                color: #666;
+            }
+
+            .order-total strong {
+                font-size: 20px;
+                color: #E31837;
+                margin-left: 10px;
+            }
+
+            .order-actions {
+                display: flex;
+                gap: 10px;
+            }
+
+            .btn-action {
+                padding: 10px 20px;
+                border-radius: 4px;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                cursor: pointer;
+                transition: all 0.3s;
+                border: none;
+            }
+
+            .btn-detail {
+                background: #fff;
+                color: #232f3e;
+                border: 2px solid #232f3e;
+            }
+
+            .btn-detail:hover {
+                background: #232f3e;
+                color: #fff;
+            }
+
+            .btn-cancel {
+                background: #fff;
+                color: #E31837;
+                border: 2px solid #E31837;
+            }
+
+            .btn-cancel:hover {
+                background: #E31837;
+                color: #fff;
+            }
+
+            /* 반응형 */
+            @media (max-width: 768px) {
+                .order-header {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: flex-start;
+                }
+
+                .order-footer {
+                    flex-direction: column;
+                    gap: 15px;
+                    align-items: flex-start;
+                }
+
+                .order-actions {
+                    width: 100%;
+                }
+
+                .btn-action {
+                    flex: 1;
+                }
+
+                .order-item {
+                    flex-direction: column;
+                }
+
+                .item-image {
+                    width: 100%;
+                    height: 200px;
+                }
+
+                .item-price {
+                    text-align: left;
+                }
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="order-list-container">
+        <div class="page-header">
+            <h1 class="page-title">주문 내역</h1>
+        </div>
+
+        <!-- 빈 목록 -->
+        <div class="empty-list" th:if="${orders.isEmpty()}">
+            <div class="empty-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <p class="empty-text">주문 내역이 없습니다.</p>
+            <a th:href="@{/}" class="btn-shop">
+                <i class="fas fa-shopping-bag"></i> 쇼핑 시작하기
+            </a>
+        </div>
+
+        <!-- 주문 목록 -->
+        <div th:unless="${orders.isEmpty()}">
+            <div th:each="order : ${orders}" class="order-card">
+                <!-- 주문 헤더 -->
+                <div class="order-header">
+                    <div>
+                        <div class="order-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">2024-12-29 14:30</span>
+                        </div>
+                        <div class="order-number">
+                            주문번호: <strong th:text="${order.orderId}">123456</strong>
+                        </div>
+                    </div>
+                    <div>
+                            <span class="order-status"
+                                  th:classappend="${'status-' + #strings.toLowerCase(order.orderStatus)}"
+                                  th:text="${order.orderStatusDescription}">
+                                주문 확정
+                            </span>
+                    </div>
+                </div>
+
+                <!-- 주문 상품 -->
+                <div class="order-items">
+                    <div th:each="item : ${order.items}" class="order-item">
+                        <div class="item-image">
+                            <img th:src="${item.imageUrl}"
+                                 th:alt="${item.productName}"
+                                 onerror="this.src='/images/product-sample.jpg'">
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name" th:text="${item.productName}">상품명</div>
+                            <div class="item-quantity">
+                                수량: <span th:text="${item.quantity}">1</span>개
+                            </div>
+                        </div>
+                        <div class="item-price">
+                            <span th:text="${#numbers.formatInteger(item.totalPrice, 0, 'COMMA')}">45,000</span>원
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 주문 푸터 -->
+                <div class="order-footer">
+                    <div class="order-total">
+                        총 결제금액:
+                        <strong>
+                            <span th:text="${#numbers.formatInteger(order.totalPrice, 0, 'COMMA')}">45,000</span>원
+                        </strong>
+                    </div>
+                    <div class="order-actions">
+                        <a th:href="@{/order/detail/{id}(id=${order.orderId})}"
+                           class="btn-action btn-detail">
+                            <i class="fas fa-info-circle"></i> 상세보기
+                        </a>
+                        <button th:if="${order.orderStatus.name() == 'PENDING' or order.orderStatus.name() == 'CONFIRMED'}"
+                                th:onclick="|cancelOrder(${order.orderId})|"
+                                class="btn-action btn-cancel">
+                            <i class="fas fa-times-circle"></i> 주문취소
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block layout:fragment="script">
+    <script>
+        function cancelOrder(orderId) {
+            if (!confirm('정말 주문을 취소하시겠습니까?')) {
+                return;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/order/cancel/' + orderId;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+</th:block>
+</body>
+</html>
