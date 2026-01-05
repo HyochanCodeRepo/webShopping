@@ -1,9 +1,12 @@
 package com.example.webshopping.controller;
 
+import com.example.webshopping.constant.Role;
 import com.example.webshopping.dto.ProductDTO;
 import com.example.webshopping.entity.Category;
+import com.example.webshopping.entity.Members;
 import com.example.webshopping.entity.Product;
 import com.example.webshopping.repository.CategoryRepository;
+import com.example.webshopping.repository.MembersRepository;
 import com.example.webshopping.repository.ProductRepository;
 import com.example.webshopping.service.FileService;
 import com.example.webshopping.service.ProductService;
@@ -34,6 +37,7 @@ public class ProductController {
     private final FileService fileService;
     private final ProductRepository productRepository;
     private final ReviewService reviewService;
+    private final MembersRepository membersRepository;
 
     @GetMapping("/register")
     public String register(Model model) {
@@ -116,12 +120,15 @@ public class ProductController {
         model.addAttribute("averageRating", reviewService.getAverageRating(id));
         model.addAttribute("reviewCount", reviewService.getReviewCount(id));
         
-        // 리뷰 작성 가능 여부
+        // 리뷰 작성 가능 여부 및 현재 사용자 ID
         if (userDetails != null) {
             String email = userDetails.getUsername();
+            Members currentMember = membersRepository.findByEmail(email);
             model.addAttribute("canWriteReview", reviewService.canWriteReview(id, email));
+            model.addAttribute("currentMemberId", currentMember != null ? currentMember.getId() : null);
         } else {
             model.addAttribute("canWriteReview", false);
+            model.addAttribute("currentMemberId", null);
         }
         
         log.info("상품 상세 조회 완료 - Product ID: {}, ProductDetail: {}", 
@@ -131,9 +138,21 @@ public class ProductController {
     }
 
     @GetMapping("/edit/{id}")
-    public String edit(@PathVariable Long id, Model model) {
+    public String edit(@PathVariable Long id,
+                       @AuthenticationPrincipal UserDetails userDetails,
+                       Model model,
+                       RedirectAttributes redirectAttributes) {
         Product product =
             productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        Members currentMember = membersRepository.findByEmail(userDetails.getUsername());
+
+        if (currentMember.getRole() != Role.ROLE_ADMIN && !product.getMembers().getId().equals(currentMember.getId())) {
+
+            redirectAttributes.addFlashAttribute("error", "수정 권한이 없습니다.");
+            return "redirect:/product/detail/" + id;
+        }
+
         model.addAttribute("product", product);
         model.addAttribute("categories", categoryRepository.findAll());
         return "product/form";
@@ -146,10 +165,21 @@ public class ProductController {
                        @RequestParam(required = false) List<MultipartFile> detailImageFiles,
                        @RequestParam(required = false, defaultValue = "false") Boolean keepMainImage,
                        @RequestParam(required = false) Map<String, String> allParams,
+                       @AuthenticationPrincipal UserDetails userDetails,
                        RedirectAttributes redirectAttributes) {
-        log.info("id : {}",id);
-        log.info("productDTO : {}",productDTO);
-        log.info("keepMainImage : {}",keepMainImage);
+        if (userDetails == null) {
+            return "redirect:/members/login";
+        }
+
+        Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        Members currentMember = membersRepository.findByEmail(userDetails.getUsername());
+
+        if (currentMember.getRole() != Role.ROLE_ADMIN && !product.getMembers().getId().equals(currentMember.getId())) {
+            redirectAttributes.addFlashAttribute("error", "수정 권한이 없습니다.");
+            return "redirect:/product/detail/" + id;
+        }
+
 
         productService.update(id, productDTO, mainImageFile, detailImageFiles, keepMainImage, allParams);
 
@@ -160,12 +190,24 @@ public class ProductController {
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        log.info("delete mapping id : {}",id);
+    public String delete(@PathVariable Long id,
+                         @AuthenticationPrincipal UserDetails userDetails,
+                         RedirectAttributes redirectAttributes) {
+        if(userDetails == null) {
+            return "redirect:/members/login";
+        }
 
         Product product =
             productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        Members currentMember = membersRepository.findByEmail(userDetails.getUsername());
         Long categoryId = product.getCategory().getId();
+
+        if (currentMember.getRole() != Role.ROLE_ADMIN && !product.getMembers().getId().equals(currentMember.getId())) {
+            redirectAttributes.addFlashAttribute("error", "삭제 권한이 없습니다.");
+            return "redirect:/product/detail/" + id;
+        }
+
 
         productRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");

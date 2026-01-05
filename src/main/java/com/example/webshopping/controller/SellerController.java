@@ -32,21 +32,31 @@ public class SellerController {
      */
     @GetMapping("/apply")
     public String applyPage(@AuthenticationPrincipal UserDetails userDetails,
-                            Model model) {
+                            Model model,
+                            RedirectAttributes redirectAttributes) {
 
         if (userDetails == null) {
             return "redirect:/members/login";
         }
 
         String email = userDetails.getUsername();
+        
+        // 회원 정보 조회
+        Members member = membersRepository.findByEmail(email);
+        
+        // 이미 SELLER 이상이면 차단
+        if (member.getRole() == com.example.webshopping.constant.Role.ROLE_SELLER || 
+            member.getRole() == com.example.webshopping.constant.Role.ROLE_ADMIN) {
+            redirectAttributes.addFlashAttribute("error", "이미 판매자입니다.");
+            return "redirect:/";
+        }
 
         // 이미 승인 대기 중인 신청이 있는지 확인
         if (sellerService.hasPendingApplication(email)) {
             return "redirect:/seller/status";
         }
         
-        // 회원 정보 조회해서 Model에 담기
-        Members member = membersRepository.findByEmail(email);
+        // 회원 정보를 Model에 담기
         if (member != null) {
             model.addAttribute("memberName", member.getName());
             model.addAttribute("memberPhone", member.getPhone());

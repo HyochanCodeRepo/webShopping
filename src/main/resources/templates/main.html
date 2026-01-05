@@ -14,20 +14,27 @@
         <!-- 메인 배너 슬라이더 -->
         <section class="hero-banner">
             <div class="banner-slider">
-                <div class="banner-slide active" style="background-image: url('/images/banner01.png');">
+                <div class="banner-slide active" style="background-image: url('/images/sec01_04.jpg');">
                     <div class="banner-content">
 <!--                        <h2>겨울 시즌 세일</h2>-->
 <!--                        <p>최대 50% 할인</p>-->
                     </div>
                 </div>
-<!--                <div class="banner-slide" style="background-image: url('/images/ca.jpg');">-->
-<!--                    <div class="banner-content">-->
-<!--                    </div>-->
-<!--                </div>-->
-                <div class="banner-slide" style="background-image: url('/images/banner03.jpg');">
+                <div class="banner-slide" style="background-image: url('/images/sec01_01.jpg');">
+                    <div class="banner-content">
+                    </div>
+                </div>
+                <div class="banner-slide" style="background-image: url('/images/sec01_02.jpg');">
                     <div class="banner-content">
 <!--                        <h2>무료 배송</h2>-->
 <!--                        <p>5만원 이상 구매시</p>-->
+                    </div>
+                </div>
+
+                <div class="banner-slide" style="background-image: url('/images/sec01_03.jpg');">
+                    <div class="banner-content">
+                        <!--                        <h2>무료 배송</h2>-->
+                        <!--                        <p>5만원 이상 구매시</p>-->
                     </div>
                 </div>
             </div>
@@ -112,6 +119,23 @@
                                 </div>
                                 <div class="product-info">
                                     <h4 class="product-name" th:text="${product.productName}">상품명</h4>
+                                    
+                                    <!-- 별점 표시 -->
+                                    <div class="product-rating" style="margin: 8px 0;">
+                                        <span th:if="${productReviewCounts[product.id] > 0}" style="display: flex; align-items: center; gap: 5px; font-size: 13px;">
+                                            <span style="color: #ff9900;">
+                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                                    <i th:class="${i <= productRatings[product.id] ? 'fas fa-star' : 
+                                                                  (i - 0.5 <= productRatings[product.id] ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
+                                                </span>
+                                            </span>
+                                            <span style="color: #666;">
+                                                <strong th:text="${productRatings[product.id]}">4.5</strong>
+                                                (<span th:text="${productReviewCounts[product.id]}">25</span>)
+                                            </span>
+                                        </span>
+                                    </div>
+                                    
                                     <div class="product-price">
                                         <!-- 할인이 있을 때 -->
                                         <div th:if="${product.discountRate != null and product.discountRate > 0}">
@@ -172,6 +196,23 @@
                                 </div>
                                 <div class="product-info">
                                     <h4 class="product-name" th:text="${product.productName}">상품명</h4>
+                                    
+                                    <!-- 별점 표시 -->
+                                    <div class="product-rating" style="margin: 8px 0;">
+                                        <span th:if="${productReviewCounts[product.id] > 0}" style="display: flex; align-items: center; gap: 5px; font-size: 13px;">
+                                            <span style="color: #ff9900;">
+                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                                    <i th:class="${i <= productRatings[product.id] ? 'fas fa-star' : 
+                                                                  (i - 0.5 <= productRatings[product.id] ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
+                                                </span>
+                                            </span>
+                                            <span style="color: #666;">
+                                                <strong th:text="${productRatings[product.id]}">4.5</strong>
+                                                (<span th:text="${productReviewCounts[product.id]}">25</span>)
+                                            </span>
+                                        </span>
+                                    </div>
+                                    
                                     <div class="product-price">
                                         <!-- 할인이 있을 때 -->
                                         <div th:if="${product.discountRate != null and product.discountRate > 0}">
