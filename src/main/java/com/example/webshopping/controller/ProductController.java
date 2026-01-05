@@ -7,6 +7,7 @@ import com.example.webshopping.repository.CategoryRepository;
 import com.example.webshopping.repository.ProductRepository;
 import com.example.webshopping.service.FileService;
 import com.example.webshopping.service.ProductService;
+import com.example.webshopping.service.ReviewService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -32,6 +33,7 @@ public class ProductController {
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
     private final ProductRepository productRepository;
+    private final ReviewService reviewService;
 
     @GetMapping("/register")
     public String register(Model model) {
@@ -101,11 +103,26 @@ public class ProductController {
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Long id, Model model) {
+    public String detail(@PathVariable Long id, 
+                        @AuthenticationPrincipal UserDetails userDetails,
+                        Model model) {
         log.info("id : {}",id);
         Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         model.addAttribute("product", product);
+        
+        // 리뷰 데이터
+        model.addAttribute("reviews", reviewService.getReviewsByProductId(id));
+        model.addAttribute("averageRating", reviewService.getAverageRating(id));
+        model.addAttribute("reviewCount", reviewService.getReviewCount(id));
+        
+        // 리뷰 작성 가능 여부
+        if (userDetails != null) {
+            String email = userDetails.getUsername();
+            model.addAttribute("canWriteReview", reviewService.canWriteReview(id, email));
+        } else {
+            model.addAttribute("canWriteReview", false);
+        }
         
         log.info("상품 상세 조회 완료 - Product ID: {}, ProductDetail: {}", 
                 id, product.getProductDetail() != null ? "있음" : "없음");

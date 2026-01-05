@@ -584,13 +584,96 @@
                 
                 <!-- 리뷰 탭 -->
                 <div id="review-tab" class="tab-content">
-                    <div class="empty-detail">
+                    <!-- 리뷰 작성 버튼 -->
+                    <div th:if="${canWriteReview}" style="margin-bottom: 30px;">
+                        <a th:href="@{/review/write/{id}(id=${product.id})}" 
+                           class="btn-action edit"
+                           style="display: inline-block; padding: 12px 24px; text-decoration: none;">
+                            <i class="fas fa-pen"></i> 리뷰 작성하기
+                        </a>
+                    </div>
+                    
+                    <!-- 리뷰 통계 -->
+                    <div th:if="${reviewCount > 0}" style="padding: 20px; background: #f7f7f7; border-radius: 8px; margin-bottom: 30px;">
+                        <div style="display: flex; align-items: center; gap: 30px;">
+                            <div>
+                                <div style="font-size: 48px; font-weight: 700; color: #ff9900;" th:text="${averageRating}">4.5</div>
+                                <div style="font-size: 24px; color: #ff9900;">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i th:class="${i <= averageRating ? 'fas fa-star' : (i - 0.5 <= averageRating ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 16px; color: #666;">
+                                    전체 리뷰 <strong th:text="${reviewCount}">10</strong>개
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 리뷰 목록 -->
+                    <div th:if="${!reviews.isEmpty()}">
+                        <div th:each="review : ${reviews}" 
+                             style="padding: 25px 0; border-bottom: 1px solid #e8e8e8;">
+                            <!-- 리뷰 헤더 -->
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                                <div>
+                                    <div style="color: #ff9900; margin-bottom: 5px;">
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                            <i th:class="${i <= review.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                                        </span>
+                                    </div>
+                                    <div style="font-size: 14px; color: #666;">
+                                        <strong th:text="${review.memberName}">작성자</strong>
+                                        <span style="margin: 0 8px;">|</span>
+                                        <span th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd')}">2026-01-05</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 본인 리뷰일 때 수정/삭제 버튼 -->
+                                <div th:if="${#authentication.principal.username == review.memberName}" 
+                                     style="display: flex; gap: 10px;">
+                                    <a th:href="@{/review/edit/{id}(id=${review.id})}" 
+                                       style="padding: 6px 12px; background: #f0f0f0; border-radius: 4px; font-size: 13px; text-decoration: none; color: #333;">
+                                        <i class="fas fa-edit"></i> 수정
+                                    </a>
+                                    <form th:action="@{/review/delete/{id}(id=${review.id})}" 
+                                          method="post" 
+                                          style="display: inline;"
+                                          onsubmit="return confirm('리뷰를 삭제하시겠습니까?');">
+                                        <input type="hidden" name="productId" th:value="${product.id}">
+                                        <button type="submit" 
+                                                style="padding: 6px 12px; background: #f0f0f0; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; color: #E31837;">
+                                            <i class="fas fa-trash"></i> 삭제
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- 리뷰 내용 -->
+                            <div style="line-height: 1.8; color: #333; margin-bottom: 15px;" th:text="${review.content}">
+                                리뷰 내용이 여기에 표시됩니다.
+                            </div>
+                            
+                            <!-- 리뷰 이미지 -->
+                            <div th:if="${review.imageUrl != null}" 
+                                 style="max-width: 400px; border: 1px solid #e8e8e8; border-radius: 4px; overflow: hidden;">
+                                <img th:src="${review.imageUrl}" 
+                                     alt="리뷰 이미지" 
+                                     style="width: 100%; height: auto; display: block;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 리뷰가 없을 때 -->
+                    <div th:if="${reviews.isEmpty()}" class="empty-detail">
                         <div class="empty-detail-icon">
                             <i class="fas fa-comment-dots"></i>
                         </div>
                         <p>아직 등록된 리뷰가 없습니다.</p>
                         <p style="font-size: 14px; color: #999; margin-top: 10px;">
-                            (리뷰 기능은 추후 구현 예정입니다)
+                            첫 번째 리뷰를 작성해보세요!
                         </p>
                     </div>
                 </div>
