@@ -16,6 +16,10 @@ public interface ProductService {
     /*이메일로 사용자가 등록한 상품 목록 조회
      * */
     List<Product> getProductsByEmail(String email);
+    
+    /*모든 상품 조회 (ADMIN용)
+     * */
+    List<Product> getAllProducts();
 
     void delete(Long id);
 }

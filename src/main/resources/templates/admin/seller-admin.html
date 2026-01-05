@@ -5,7 +5,7 @@
       layout:decorate="~{layout/default}"
       lang="ko">
 <head>
-    <title>관리자 페이지</title>
+    <title>판매자 페이지</title>
     <th:block layout:fragment="css">
         <style>
             .admin-container {
@@ -210,14 +210,14 @@
             <!-- 헤더 -->
             <div class="admin-header">
                 <h1 class="admin-title">
-                    <i class="fas fa-user-shield"></i> 관리자 페이지
+                    <i class="fas fa-store"></i> 판매자 페이지
                 </h1>
-                <p class="admin-subtitle">쇼핑몰 관리 및 운영을 위한 관리자 전용 페이지입니다.</p>
+                <p class="admin-subtitle">상품 등록 및 판매 관리를 위한 판매자 전용 페이지입니다.</p>
             </div>
             
             <!-- 관리 메뉴 -->
             <div class="admin-menu-grid">
-                <!-- 상품 관리 -->
+                <!-- 상품 등록 -->
                 <div class="menu-card" onclick="location.href='/admin/product/register'">
                     <div class="menu-icon">
                         <i class="fas fa-box-open"></i>
@@ -250,28 +250,6 @@
                     </p>
                 </div>
                 
-                <!-- 판매자 신청 관리 -->
-                <div class="menu-card" onclick="location.href='/admin/sellers'">
-                    <div class="menu-icon">
-                        <i class="fas fa-store"></i>
-                    </div>
-                    <h3 class="menu-title">판매자 신청 관리</h3>
-                    <p class="menu-description">
-                        판매자 신청을 승인하거나 거부하고 판매자 권한을 관리할 수 있습니다.
-                    </p>
-                </div>
-                
-                <!-- 회원 관리 -->
-                <div class="menu-card" onclick="alert('준비 중인 기능입니다.')">
-                    <div class="menu-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3 class="menu-title">회원 관리</h3>
-                    <p class="menu-description">
-                        회원 정보를 조회하고 권한을 관리할 수 있습니다. (준비중)
-                    </p>
-                </div>
-                
                 <!-- 통계 -->
                 <div class="menu-card" onclick="alert('준비 중인 기능입니다.')">
                     <div class="menu-icon">
@@ -280,17 +258,6 @@
                     <h3 class="menu-title">통계 분석</h3>
                     <p class="menu-description">
                         매출 통계, 인기 상품, 고객 분석 등의 데이터를 확인할 수 있습니다. (준비중)
-                    </p>
-                </div>
-                
-                <!-- 설정 -->
-                <div class="menu-card" onclick="alert('준비 중인 기능입니다.')">
-                    <div class="menu-icon">
-                        <i class="fas fa-cog"></i>
-                    </div>
-                    <h3 class="menu-title">시스템 설정</h3>
-                    <p class="menu-description">
-                        쇼핑몰 기본 설정, 배송비, 결제 수단 등을 관리할 수 있습니다. (준비중)
                     </p>
                 </div>
             </div>
@@ -318,10 +285,10 @@
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-label">전체 회원</div>
+                        <div class="stat-label">진행중 주문</div>
                         <div class="stat-value">
                             -
-                            <span class="stat-unit">명</span>
+                            <span class="stat-unit">건</span>
                         </div>
                     </div>
                     
@@ -347,9 +314,9 @@
                     <a href="/admin/product/list" class="action-btn">
                         <i class="fas fa-edit"></i> 상품 수정
                     </a>
-                    <button class="action-btn" onclick="alert('준비 중인 기능입니다.')">
+                    <a href="/admin/orders" class="action-btn">
                         <i class="fas fa-box"></i> 주문 확인
-                    </button>
+                    </a>
                     <button class="action-btn" onclick="alert('준비 중인 기능입니다.')">
                         <i class="fas fa-truck"></i> 배송 관리
                     </button>
@@ -362,7 +329,7 @@
         <script>
             // 페이지 로드 시 환영 메시지 (선택사항)
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('관리자 페이지 로드 완료');
+                console.log('판매자 페이지 로드 완료');
             });
         </script>
     </th:block>

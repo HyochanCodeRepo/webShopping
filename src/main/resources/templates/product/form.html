@@ -387,17 +387,32 @@
                     <div class="error-message" id="stockError"></div>
                 </div>
                 
-                <!-- 상품 설명 -->
+                <!-- 상품 설명 (간단) -->
                 <div class="form-group">
                     <label for="description">
-                        상품 설명
+                        상품 간단 설명
                     </label>
                     <textarea class="form-control textarea" 
                               id="description" 
                               name="description" 
+                              rows="3"
                               th:text="${product?.description}"
-                              placeholder="상품에 대한 상세 설명을 입력하세요"></textarea>
-                    <div class="help-text">최대 1000자</div>
+                              placeholder="상품 목록에 표시될 간단한 설명을 입력하세요"></textarea>
+                    <div class="help-text">최대 200자 (상품 목록 페이지에 표시)</div>
+                </div>
+                
+                <!-- 상품 상세 설명 (HTML) -->
+                <div class="form-group">
+                    <label for="detailHtml">
+                        상품 상세 설명
+                    </label>
+                    <textarea class="form-control textarea" 
+                              id="detailHtml" 
+                              name="detailHtml" 
+                              rows="15"
+                              th:text="${product?.productDetail?.detailHtml}"
+                              placeholder="상품 상세 페이지에 표시될 내용을 입력하세요. HTML 태그 사용 가능합니다."></textarea>
+                    <div class="help-text">상세 페이지 하단 탭에 표시될 내용입니다. HTML 태그를 사용하여 자유롭게 작성하세요.</div>
                 </div>
                 
                 <!-- 대표 이미지 -->

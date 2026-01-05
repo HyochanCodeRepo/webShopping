@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>판매자 신청 현황</title>
+    <th:block layout:fragment="css">
+        <style>
+            .status-container {
+                max-width: 1000px;
+                margin: 60px auto;
+                padding: 0 20px;
+            }
+            
+            .status-header {
+                text-align: center;
+                margin-bottom: 50px;
+            }
+            
+            .status-title {
+                font-size: 32px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 10px;
+            }
+            
+            .status-subtitle {
+                font-size: 16px;
+                color: #666;
+            }
+            
+            /* 알림 메시지 */
+            .alert {
+                padding: 15px 20px;
+                border-radius: 8px;
+                margin-bottom: 30px;
+                font-size: 14px;
+            }
+            
+            .alert-success {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+            
+            /* 신청 카드 */
+            .application-card {
+                background: #fff;
+                border-radius: 12px;
+                padding: 40px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+                margin-bottom: 20px;
+            }
+            
+            .status-badge {
+                display: inline-block;
+                padding: 10px 20px;
+                border-radius: 20px;
+                font-size: 16px;
+                font-weight: 700;
+                margin-bottom: 20px;
+            }
+            
+            .status-pending {
+                background: #fff3cd;
+                color: #856404;
+            }
+            
+            .status-approved {
+                background: #d4edda;
+                color: #155724;
+            }
+            
+            .status-rejected {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
+            .info-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin: 30px 0;
+            }
+            
+            .info-item {
+                padding: 15px;
+                background: #f9f9f9;
+                border-radius: 8px;
+            }
+            
+            .info-label {
+                font-size: 13px;
+                color: #666;
+                margin-bottom: 5px;
+            }
+            
+            .info-value {
+                font-size: 16px;
+                color: #232f3e;
+                font-weight: 600;
+            }
+            
+            .btn {
+                display: inline-block;
+                padding: 14px 30px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                text-align: center;
+                transition: all 0.3s;
+            }
+            
+            .btn-primary {
+                background: #ff9900;
+                color: #fff;
+            }
+            
+            .btn-primary:hover {
+                background: #e88b00;
+            }
+            
+            .empty-state {
+                text-align: center;
+                padding: 80px 20px;
+            }
+            
+            .empty-icon {
+                font-size: 80px;
+                color: #ddd;
+                margin-bottom: 20px;
+            }
+            
+            .empty-text {
+                font-size: 18px;
+                color: #666;
+                margin-bottom: 30px;
+            }
+            
+            @media (max-width: 768px) {
+                .info-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="status-container">
+            <!-- 헤더 -->
+            <div class="status-header">
+                <h1 class="status-title">📋 판매자 신청 현황</h1>
+                <p class="status-subtitle">신청하신 내역을 확인하실 수 있습니다</p>
+            </div>
+            
+            <!-- 성공 메시지 -->
+            <div th:if="${message}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}">신청이 완료되었습니다</span>
+            </div>
+            
+            <!-- 신청 내역이 있는 경우 -->
+            <div th:if="${sellers != null and !sellers.isEmpty()}">
+                <div th:each="seller : ${sellers}" class="application-card">
+                    <!-- 상태 뱃지 -->
+                    <div>
+                        <span class="status-badge"
+                              th:classappend="${'status-' + #strings.toLowerCase(seller.status)}"
+                              th:text="${seller.statusDescription}">
+                            승인 대기
+                        </span>
+                    </div>
+                    
+                    <!-- 신청 정보 -->
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">사업자등록번호</div>
+                            <div class="info-value" th:text="${seller.businessNumber}">123-45-67890</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">상호명</div>
+                            <div class="info-value" th:text="${seller.businessName}">상호명</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">대표자명</div>
+                            <div class="info-value" th:text="${seller.representativeName}">홍길동</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">연락처</div>
+                            <div class="info-value" th:text="${seller.phone}">010-1234-5678</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">판매 카테고리</div>
+                            <div class="info-value" th:text="${seller.category}">전자제품</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">신청일</div>
+                            <div class="info-value" 
+                                 th:text="${#temporals.format(seller.appliedDate, 'yyyy-MM-dd HH:mm')}">
+                                2024-12-30 14:30
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 승인 대기 안내 -->
+                    <div th:if="${seller.status.name() == 'PENDING'}" 
+                         style="margin-top: 30px; padding: 20px; background: #e7f3ff; border-radius: 8px;">
+                        <p style="margin: 0 0 15px 0; color: #004085;">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>관리자 승인 대기 중입니다.</strong><br>
+                            승인까지 1-2일 소요될 수 있습니다. 승인 완료 시 알림을 보내드립니다.
+                        </p>
+                        <a th:href="@{/seller/edit/{id}(id=${seller.id})}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> 신청 내용 수정하기
+                        </a>
+                    </div>
+                    
+                    <!-- 승인 완료 안내 -->
+                    <div th:if="${seller.status.name() == 'APPROVED'}" 
+                         style="margin-top: 30px; padding: 20px; background: #d4edda; border-radius: 8px;">
+                        <p style="margin: 0 0 15px 0; color: #155724;">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>판매자 승인이 완료되었습니다!</strong><br>
+                            이제 상품을 등록하고 판매를 시작하실 수 있습니다.
+                        </p>
+                        <a th:href="@{/product/register}" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> 상품 등록하기
+                        </a>
+                    </div>
+                    
+                    <!-- 승인 거부 안내 -->
+                    <div th:if="${seller.status.name() == 'REJECTED'}" 
+                         style="margin-top: 30px; padding: 20px; background: #f8d7da; border-radius: 8px;">
+                        <p style="margin: 0 0 10px 0; color: #721c24;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <strong>판매자 신청이 거부되었습니다.</strong>
+                        </p>
+                        <p th:if="${seller.rejectReason}" 
+                           style="margin: 0; color: #721c24;">
+                            <strong>거부 사유:</strong> <span th:text="${seller.rejectReason}">-</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 신청 내역이 없는 경우 -->
+            <div th:if="${sellers == null or sellers.isEmpty()}" class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <p class="empty-text">아직 판매자 신청 내역이 없습니다.</p>
+                <a th:href="@{/seller/apply}" class="btn btn-primary">
+                    <i class="fas fa-store"></i> 판매자 신청하기
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

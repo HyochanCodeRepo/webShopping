@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>판매자 등록 신청</title>
+    <th:block layout:fragment="css">
+        <style>
+            .apply-container {
+                max-width: 800px;
+                margin: 60px auto;
+                padding: 0 20px;
+            }
+            
+            .apply-header {
+                text-align: center;
+                margin-bottom: 50px;
+            }
+            
+            .apply-title {
+                font-size: 32px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 10px;
+            }
+            
+            .apply-subtitle {
+                font-size: 16px;
+                color: #666;
+            }
+            
+            .apply-form {
+                background: #fff;
+                border-radius: 12px;
+                padding: 40px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            }
+            
+            .section-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 25px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #ff9900;
+            }
+            
+            .form-section {
+                margin-bottom: 40px;
+            }
+            
+            .form-group {
+                margin-bottom: 25px;
+            }
+            
+            .form-label {
+                display: block;
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 8px;
+            }
+            
+            .form-label .required {
+                color: #E31837;
+                margin-left: 3px;
+            }
+            
+            .form-input {
+                width: 100%;
+                padding: 14px 16px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 15px;
+                transition: all 0.3s;
+            }
+            
+            .form-input:focus {
+                outline: none;
+                border-color: #ff9900;
+                box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+            }
+            
+            .form-input:disabled {
+                background: #f5f5f5;
+                color: #999;
+                cursor: not-allowed;
+            }
+            
+            .form-select {
+                width: 100%;
+                padding: 14px 16px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 15px;
+                cursor: pointer;
+                transition: all 0.3s;
+                background: #fff;
+            }
+            
+            .form-select:focus {
+                outline: none;
+                border-color: #ff9900;
+                box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+            }
+            
+            .form-textarea {
+                width: 100%;
+                padding: 14px 16px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 15px;
+                resize: vertical;
+                min-height: 100px;
+                transition: all 0.3s;
+            }
+            
+            .form-textarea:focus {
+                outline: none;
+                border-color: #ff9900;
+                box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+            }
+            
+            .form-help {
+                font-size: 13px;
+                color: #666;
+                margin-top: 6px;
+            }
+            
+            .form-error {
+                font-size: 13px;
+                color: #E31837;
+                margin-top: 6px;
+                display: none;
+            }
+            
+            /* 약관 동의 */
+            .terms-section {
+                background: #f9f9f9;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+            
+            .terms-box {
+                background: #fff;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                padding: 15px;
+                max-height: 150px;
+                overflow-y: auto;
+                margin-bottom: 15px;
+            }
+            
+            .terms-content {
+                font-size: 13px;
+                color: #666;
+                line-height: 1.6;
+            }
+            
+            .checkbox-group {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .checkbox-input {
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+            }
+            
+            .checkbox-label {
+                font-size: 15px;
+                font-weight: 600;
+                color: #333;
+                cursor: pointer;
+            }
+            
+            /* 버튼 */
+            .button-group {
+                display: flex;
+                gap: 15px;
+                margin-top: 40px;
+            }
+            
+            .btn {
+                flex: 1;
+                padding: 16px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s;
+                border: none;
+            }
+            
+            .btn-submit {
+                background: #ff9900;
+                color: #fff;
+            }
+            
+            .btn-submit:hover {
+                background: #e88b00;
+            }
+            
+            .btn-submit:disabled {
+                background: #ddd;
+                cursor: not-allowed;
+            }
+            
+            .btn-cancel {
+                background: #fff;
+                color: #666;
+                border: 2px solid #ddd;
+            }
+            
+            .btn-cancel:hover {
+                border-color: #999;
+                color: #333;
+            }
+            
+            /* 알림 메시지 */
+            .alert {
+                padding: 15px 20px;
+                border-radius: 8px;
+                margin-bottom: 30px;
+                font-size: 14px;
+            }
+            
+            .alert-info {
+                background: #e7f3ff;
+                color: #004085;
+                border: 1px solid #b8daff;
+            }
+            
+            /* 반응형 */
+            @media (max-width: 768px) {
+                .apply-form {
+                    padding: 30px 20px;
+                }
+                
+                .button-group {
+                    flex-direction: column;
+                }
+                
+                .apply-title {
+                    font-size: 26px;
+                }
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="apply-container">
+            <!-- 헤더 -->
+            <div class="apply-header">
+                <h1 class="apply-title">🏪 판매자 등록 신청</h1>
+                <p class="apply-subtitle">WebShopping에서 판매자로 활동하기 위한 정보를 입력해주세요</p>
+            </div>
+            
+            <!-- 안내 메시지 -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>안내:</strong> 신청하신 정보는 관리자 검토 후 승인됩니다. 승인까지 1-2일 소요될 수 있습니다.
+            </div>
+            
+            <!-- 신청 폼 -->
+            <form class="apply-form" id="applyForm" method="post" th:action="@{/seller/apply}">
+                
+                <!-- 사업자 정보 -->
+                <div class="form-section">
+                    <h2 class="section-title">📋 사업자 정보</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            사업자등록번호 <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               name="businessNumber" 
+                               class="form-input" 
+                               placeholder="123-45-67890"
+                               pattern="[0-9]{3}-[0-9]{2}-[0-9]{5}"
+                               maxlength="12"
+                               required>
+                        <p class="form-help">'-'를 포함하여 입력해주세요 (예: 123-45-67890)</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            상호명 <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               name="businessName" 
+                               class="form-input" 
+                               placeholder="상호명을 입력하세요"
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            대표자명 <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               name="representativeName" 
+                               id="representativeName"
+                               class="form-input" 
+                               placeholder="대표자명을 입력하세요"
+                               required>
+                    </div>
+                </div>
+                
+                <!-- 사업장 정보 -->
+                <div class="form-section">
+                    <h2 class="section-title">🏢 사업장 정보</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            사업장 주소 <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               name="businessAddress" 
+                               class="form-input" 
+                               placeholder="사업장 주소를 입력하세요"
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            연락처 <span class="required">*</span>
+                        </label>
+                        <input type="tel" 
+                               name="phone" 
+                               id="phone"
+                               class="form-input" 
+                               placeholder="01012345678"
+                               pattern="[0-9]{10,11}"
+                               maxlength="11"
+                               required>
+                        <p class="form-help">'-' 없이 숫자만 입력하세요</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            이메일 <span class="required">*</span>
+                        </label>
+                        <input type="email" 
+                               name="email" 
+                               id="email"
+                               class="form-input" 
+                               readonly
+                               disabled>
+                        <p class="form-help">로그인한 이메일이 자동으로 입력됩니다</p>
+                    </div>
+                </div>
+                
+                <!-- 판매 정보 -->
+                <div class="form-section">
+                    <h2 class="section-title">🛍️ 판매 정보</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            주 판매 카테고리 <span class="required">*</span>
+                        </label>
+                        <select name="category" class="form-select" required>
+                            <option value="">카테고리를 선택하세요</option>
+                            <option th:each="category : ${categories}" 
+                                    th:value="${category.name}" 
+                                    th:text="${category.name}">
+                                카테고리
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            판매 계획 및 소개
+                        </label>
+                        <textarea name="introduction" 
+                                  class="form-textarea" 
+                                  placeholder="어떤 상품을 판매할 계획이신가요? 간단히 소개해주세요 (선택사항)"></textarea>
+                    </div>
+                </div>
+                
+                <!-- 약관 동의 -->
+                <div class="terms-section">
+                    <div class="terms-box">
+                        <div class="terms-content">
+                            <h4>판매자 약관</h4>
+                            <p>1. 판매자는 허위 정보를 제공하지 않습니다.</p>
+                            <p>2. 판매자는 양질의 상품과 서비스를 제공합니다.</p>
+                            <p>3. 판매자는 관련 법규를 준수합니다.</p>
+                            <p>4. 등록된 정보는 관리자 승인 후 판매 활동이 가능합니다.</p>
+                            <p>5. 부적절한 판매 활동 시 계정이 정지될 수 있습니다.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" 
+                               id="agreeTerms" 
+                               class="checkbox-input" 
+                               required>
+                        <label for="agreeTerms" class="checkbox-label">
+                            판매자 약관에 동의합니다 <span class="required">*</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 버튼 -->
+                <div class="button-group">
+                    <button type="button" class="btn btn-cancel" onclick="history.back()">
+                        <i class="fas fa-times"></i> 취소
+                    </button>
+                    <button type="submit" class="btn btn-submit" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> 신청하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            // 회원 정보 (Controller에서 Model로 전달받음)
+            let memberName = /*[[${memberName}]]*/ '';
+            let memberPhone = /*[[${memberPhone}]]*/ '';
+            let memberEmail = /*[[${memberEmail}]]*/ '';
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                // 회원 정보 자동 입력
+                if (memberName) {
+                    document.getElementById('representativeName').value = memberName;
+                }
+                if (memberPhone) {
+                    const phoneOnly = memberPhone.replace(/[^0-9]/g, '');
+                    document.getElementById('phone').value = phoneOnly;
+                }
+                if (memberEmail) {
+                    document.getElementById('email').value = memberEmail;
+                }
+                
+                // 폼 제출 처리
+                document.getElementById('applyForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    if (!document.getElementById('agreeTerms').checked) {
+                        alert('약관에 동의해주세요.');
+                        return;
+                    }
+                    
+                    if (confirm('판매자 신청을 제출하시겠습니까?\n관리자 승인까지 1-2일 소요될 수 있습니다.')) {
+                        this.submit();
+                    }
+                });
+                
+                // 사업자등록번호 자동 하이픈 추가
+                const businessNumberInput = document.querySelector('input[name="businessNumber"]');
+                businessNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/[^0-9]/g, '');
+                    
+                    if (value.length > 3 && value.length <= 5) {
+                        value = value.slice(0, 3) + '-' + value.slice(3);
+                    } else if (value.length > 5) {
+                        value = value.slice(0, 3) + '-' + value.slice(3, 5) + '-' + value.slice(5, 10);
+                    }
+                    
+                    e.target.value = value;
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

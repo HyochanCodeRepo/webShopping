@@ -2,12 +2,10 @@ package com.example.webshopping.service;
 
 import com.example.webshopping.dto.CategoryDTO;
 import com.example.webshopping.dto.ProductDTO;
-import com.example.webshopping.entity.Category;
-import com.example.webshopping.entity.Members;
-import com.example.webshopping.entity.Product;
-import com.example.webshopping.entity.ProductImage;
+import com.example.webshopping.entity.*;
 import com.example.webshopping.repository.CategoryRepository;
 import com.example.webshopping.repository.MembersRepository;
+import com.example.webshopping.repository.ProductDetailRepository;
 import com.example.webshopping.repository.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -34,6 +32,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final FileService fileService;
     private final MembersRepository membersRepository;
+    private final ProductDetailRepository productDetailRepository;
 
 
 
@@ -74,7 +73,20 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        productRepository.save(product);
+        // ✅ 상품 저장
+        Product savedProduct = productRepository.save(product);
+        
+        // ✅ 상세 정보 저장 (detailHtml이 있을 경우에만)
+        if (productDTO.getDetailHtml() != null && !productDTO.getDetailHtml().trim().isEmpty()) {
+            ProductDetail productDetail = ProductDetail.builder()
+                    .product(savedProduct)
+                    .detailHtml(productDTO.getDetailHtml())
+                    .build();
+            
+            productDetailRepository.save(productDetail);
+            
+            log.info("상품 상세 정보 저장 완료 - Product ID: {}", savedProduct.getId());
+        }
     }
 
     @Override
@@ -170,6 +182,12 @@ public class ProductServiceImpl implements ProductService {
 
         // 해당 회원이 등록한 상품 목록 조회 (최신순)
         return productRepository.findByMembers_IdOrderByCreatedDateDesc(member.getId());
+    }
+    
+    @Override
+    public List<Product> getAllProducts() {
+        // 모든 상품 조회 (최신순)
+        return productRepository.findAllByOrderByCreatedDateDesc();
     }
 
     @Override

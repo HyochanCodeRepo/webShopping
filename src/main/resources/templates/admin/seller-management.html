@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>판매자 신청 관리</title>
+    <th:block layout:fragment="css">
+        <style>
+            .management-container {
+                max-width: 1400px;
+                margin: 60px auto;
+                padding: 0 20px;
+            }
+            
+            .page-header {
+                margin-bottom: 40px;
+            }
+            
+            .page-title {
+                font-size: 32px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 10px;
+            }
+            
+            .page-subtitle {
+                font-size: 16px;
+                color: #666;
+            }
+            
+            /* 알림 메시지 */
+            .alert {
+                padding: 15px 20px;
+                border-radius: 8px;
+                margin-bottom: 30px;
+                font-size: 14px;
+            }
+            
+            .alert-success {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+            
+            .alert-error {
+                background: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+            
+            /* 통계 카드 */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin-bottom: 40px;
+            }
+            
+            .stat-card {
+                background: #fff;
+                border-radius: 12px;
+                padding: 25px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            
+            .stat-label {
+                font-size: 14px;
+                color: #666;
+                margin-bottom: 10px;
+            }
+            
+            .stat-value {
+                font-size: 32px;
+                font-weight: 700;
+                color: #232f3e;
+            }
+            
+            .stat-pending {
+                color: #ff9900;
+            }
+            
+            .stat-approved {
+                color: #28a745;
+            }
+            
+            .stat-rejected {
+                color: #dc3545;
+            }
+            
+            /* 섹션 */
+            .section {
+                background: #fff;
+                border-radius: 12px;
+                padding: 30px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                margin-bottom: 30px;
+            }
+            
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #f0f0f0;
+            }
+            
+            .section-title {
+                font-size: 22px;
+                font-weight: 700;
+                color: #232f3e;
+            }
+            
+            .section-count {
+                font-size: 16px;
+                color: #666;
+            }
+            
+            /* 테이블 */
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            .applications-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            .applications-table thead {
+                background: #f9f9f9;
+            }
+            
+            .applications-table th {
+                padding: 15px;
+                text-align: left;
+                font-weight: 600;
+                color: #232f3e;
+                border-bottom: 2px solid #e0e0e0;
+            }
+            
+            .applications-table td {
+                padding: 15px;
+                border-bottom: 1px solid #f0f0f0;
+                vertical-align: top;
+            }
+            
+            .applications-table tbody tr:hover {
+                background: #f9f9f9;
+            }
+            
+            /* 상태 뱃지 */
+            .status-badge {
+                display: inline-block;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 600;
+            }
+            
+            .status-pending {
+                background: #fff3cd;
+                color: #856404;
+            }
+            
+            .status-approved {
+                background: #d4edda;
+                color: #155724;
+            }
+            
+            .status-rejected {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            
+            /* 버튼 */
+            .btn {
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s;
+                text-decoration: none;
+                display: inline-block;
+            }
+            
+            .btn-approve {
+                background: #28a745;
+                color: #fff;
+            }
+            
+            .btn-approve:hover {
+                background: #218838;
+            }
+            
+            .btn-reject {
+                background: #dc3545;
+                color: #fff;
+            }
+            
+            .btn-reject:hover {
+                background: #c82333;
+            }
+            
+            .btn-group {
+                display: flex;
+                gap: 10px;
+            }
+            
+            /* 빈 상태 */
+            .empty-state {
+                text-align: center;
+                padding: 60px 20px;
+                color: #999;
+            }
+            
+            .empty-icon {
+                font-size: 60px;
+                margin-bottom: 15px;
+            }
+            
+            .empty-text {
+                font-size: 16px;
+            }
+            
+            /* 상세 정보 */
+            .detail-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                font-size: 13px;
+                margin-top: 10px;
+            }
+            
+            .detail-item {
+                color: #666;
+            }
+            
+            .detail-label {
+                font-weight: 600;
+                color: #333;
+            }
+            
+            /* 모달 */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+            }
+            
+            .modal-content {
+                background: #fff;
+                margin: 15% auto;
+                padding: 30px;
+                border-radius: 12px;
+                width: 90%;
+                max-width: 500px;
+            }
+            
+            .modal-header {
+                font-size: 20px;
+                font-weight: 700;
+                margin-bottom: 20px;
+            }
+            
+            .modal-body {
+                margin-bottom: 20px;
+            }
+            
+            .modal-footer {
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+            }
+            
+            .form-input {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+            
+            @media (max-width: 768px) {
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .detail-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="management-container">
+            <!-- 페이지 헤더 -->
+            <div class="page-header">
+                <h1 class="page-title">🏪 판매자 신청 관리</h1>
+                <p class="page-subtitle">판매자 신청을 승인하거나 거부할 수 있습니다</p>
+            </div>
+            
+            <!-- 성공/에러 메시지 -->
+            <div th:if="${message}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
+            
+            <!-- 통계 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">승인 대기</div>
+                    <div class="stat-value stat-pending" th:text="${pendingApplications.size()}">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">전체 신청</div>
+                    <div class="stat-value" th:text="${allApplications.size()}">0</div>
+                </div>
+            </div>
+            
+            <!-- 승인 대기 중인 신청 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">⏳ 승인 대기 중</h2>
+                    <span class="section-count" th:text="${pendingApplications.size()} + '건'">0건</span>
+                </div>
+                
+                <div th:if="${!pendingApplications.isEmpty()}" class="table-container">
+                    <table class="applications-table">
+                        <thead>
+                            <tr>
+                                <th>신청일</th>
+                                <th>신청자</th>
+                                <th>사업자 정보</th>
+                                <th>카테고리</th>
+                                <th>상태</th>
+                                <th>처리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="app : ${pendingApplications}">
+                                <td th:text="${#temporals.format(app.appliedDate, 'yyyy-MM-dd HH:mm')}">2024-12-30</td>
+                                <td>
+                                    <div style="font-weight: 600;" th:text="${app.memberName}">홍길동</div>
+                                    <div style="font-size: 13px; color: #666;" th:text="${app.memberEmail}">email@example.com</div>
+                                </td>
+                                <td>
+                                    <div><strong th:text="${app.businessName}">상호명</strong></div>
+                                    <div class="detail-grid">
+                                        <div class="detail-item">
+                                            <span class="detail-label">번호:</span> <span th:text="${app.businessNumber}">123-45-67890</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">대표:</span> <span th:text="${app.representativeName}">대표자</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">연락처:</span> <span th:text="${app.phone}">010-1234-5678</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${app.category}">전자제품</td>
+                                <td>
+                                    <span class="status-badge status-pending" th:text="${app.statusDescription}">승인 대기</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <form th:action="@{/admin/sellers/{id}/approve(id=${app.id})}" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-approve" 
+                                                    onclick="return confirm('이 신청을 승인하시겠습니까?\n승인 시 판매자 권한이 부여됩니다.')">
+                                                <i class="fas fa-check"></i> 승인
+                                            </button>
+                                        </form>
+                                        <button type="button" class="btn btn-reject" 
+                                                th:onclick="'showRejectModal(' + ${app.id} + ')'">
+                                            <i class="fas fa-times"></i> 거부
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div th:if="${pendingApplications.isEmpty()}" class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p class="empty-text">승인 대기 중인 신청이 없습니다</p>
+                </div>
+            </div>
+            
+            <!-- 전체 신청 내역 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">📋 전체 신청 내역</h2>
+                    <span class="section-count" th:text="${allApplications.size()} + '건'">0건</span>
+                </div>
+                
+                <div th:if="${!allApplications.isEmpty()}" class="table-container">
+                    <table class="applications-table">
+                        <thead>
+                            <tr>
+                                <th>신청일</th>
+                                <th>신청자</th>
+                                <th>사업자 정보</th>
+                                <th>카테고리</th>
+                                <th>상태</th>
+                                <th>처리일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="app : ${allApplications}">
+                                <td th:text="${#temporals.format(app.appliedDate, 'yyyy-MM-dd HH:mm')}">2024-12-30</td>
+                                <td>
+                                    <div style="font-weight: 600;" th:text="${app.memberName}">홍길동</div>
+                                    <div style="font-size: 13px; color: #666;" th:text="${app.memberEmail}">email@example.com</div>
+                                </td>
+                                <td>
+                                    <div><strong th:text="${app.businessName}">상호명</strong></div>
+                                    <div style="font-size: 13px; color: #666;" th:text="${app.businessNumber}">123-45-67890</div>
+                                </td>
+                                <td th:text="${app.category}">전자제품</td>
+                                <td>
+                                    <span class="status-badge" 
+                                          th:classappend="${'status-' + #strings.toLowerCase(app.status)}"
+                                          th:text="${app.statusDescription}">상태</span>
+                                </td>
+                                <td>
+                                    <span th:if="${app.processedDate != null}" 
+                                          th:text="${#temporals.format(app.processedDate, 'yyyy-MM-dd')}">-</span>
+                                    <span th:if="${app.processedDate == null}">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div th:if="${allApplications.isEmpty()}" class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p class="empty-text">신청 내역이 없습니다</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 거부 모달 -->
+        <div id="rejectModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                    판매자 신청 거부
+                </div>
+                <form id="rejectForm" method="post">
+                    <div class="modal-body">
+                        <p style="margin-bottom: 15px;">거부 사유를 입력해주세요 (선택사항)</p>
+                        <textarea name="reason" class="form-input" rows="4" 
+                                  placeholder="예: 사업자등록번호 확인 불가, 서류 미비 등"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn" onclick="closeRejectModal()" 
+                                style="background: #f0f0f0; color: #666;">취소</button>
+                        <button type="submit" class="btn btn-reject">거부 확정</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <th:block layout:fragment="script">
+        <script>
+            function showRejectModal(sellerId) {
+                const modal = document.getElementById('rejectModal');
+                const form = document.getElementById('rejectForm');
+                form.action = '/admin/sellers/' + sellerId + '/reject';
+                modal.style.display = 'block';
+            }
+            
+            function closeRejectModal() {
+                const modal = document.getElementById('rejectModal');
+                modal.style.display = 'none';
+            }
+            
+            // 모달 외부 클릭시 닫기
+            window.onclick = function(event) {
+                const modal = document.getElementById('rejectModal');
+                if (event.target == modal) {
+                    closeRejectModal();
+                }
+            }
+        </script>
+    </th:block>
+</body>
+</html>

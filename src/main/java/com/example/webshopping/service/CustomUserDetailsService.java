@@ -36,11 +36,16 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("회원 조회 성공" + members.getEmail());
 
 
+        //권한 설정
+        List<GrantedAuthority>authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority((members.getRole().name())));
+
 
 
         return User.builder()
                 .username(members.getEmail())
                 .password(members.getPassword())
+                .authorities(authorities)
                 .build();
     }
 }

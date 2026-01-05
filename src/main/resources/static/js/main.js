@@ -4,6 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     initBannerSlider();
+    initCarousels();
 });
 
 // 배너 슬라이더
@@ -73,4 +74,63 @@ function initBannerSlider() {
         banner.addEventListener('mouseenter', stopAutoSlide);
         banner.addEventListener('mouseleave', startAutoSlide);
     }
+}
+
+// 캐러셀 초기화
+const carouselStates = {
+    popular: { currentPage: 0 },
+    new: { currentPage: 0 }
+};
+
+function initCarousels() {
+    // 캐러셀 페이지 표시 업데이트
+    updateCarouselDisplay('popular');
+    updateCarouselDisplay('new');
+}
+
+// 캐러셀 이동
+function moveCarousel(type, direction) {
+    const carousel = document.getElementById(type + '-carousel');
+    if (!carousel) return;
+    
+    const cards = carousel.querySelectorAll('.product-card');
+    const totalCards = cards.length;
+    const cardsPerPage = 4; // 한 번에 보여줄 카드 수
+    const maxPage = Math.ceil(totalCards / cardsPerPage) - 1;
+    
+    // 현재 페이지 업데이트
+    carouselStates[type].currentPage += direction;
+    
+    // 경계 체크
+    if (carouselStates[type].currentPage < 0) {
+        carouselStates[type].currentPage = maxPage;
+    } else if (carouselStates[type].currentPage > maxPage) {
+        carouselStates[type].currentPage = 0;
+    }
+    
+    // 표시 업데이트
+    updateCarouselDisplay(type);
+}
+
+// 캐러셀 표시 업데이트
+function updateCarouselDisplay(type) {
+    const carousel = document.getElementById(type + '-carousel');
+    if (!carousel) return;
+    
+    const cards = carousel.querySelectorAll('.product-card');
+    const totalCards = cards.length;
+    const cardsPerPage = 4;
+    const currentPage = carouselStates[type].currentPage;
+    
+    // 모든 카드 숨김
+    cards.forEach((card, index) => {
+        const startIndex = currentPage * cardsPerPage;
+        const endIndex = startIndex + cardsPerPage;
+        
+        if (index >= startIndex && index < endIndex) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }

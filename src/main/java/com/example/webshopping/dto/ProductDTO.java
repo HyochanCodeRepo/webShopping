@@ -29,4 +29,10 @@ public class ProductDTO {
     //상세 이미지 조회용
     @Builder.Default
     private List<String> detailImageUrls = new ArrayList<>();
+    
+    // ========== 상세 정보 (CKEditor) ==========
+    private String detailHtml;  // CKEditor로 작성한 HTML
+    
+    @Builder.Default
+    private List<String> additionalDetailImages = new ArrayList<>();  // 추가 상세 이미지
 }

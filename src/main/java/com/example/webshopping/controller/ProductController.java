@@ -106,6 +106,10 @@ public class ProductController {
         Product product = productRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 
         model.addAttribute("product", product);
+        
+        log.info("상품 상세 조회 완료 - Product ID: {}, ProductDetail: {}", 
+                id, product.getProductDetail() != null ? "있음" : "없음");
+        
         return "product/detail";
     }
 

@@ -59,13 +59,27 @@
                             <a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
                         </div>
                     </div>
-                    <!--ADMIN 전용 관리자 페이지 버튼-->
-                    <a th:href="@{/admin}" class="user-menu-item admin-btn">
+                    
+                    <!-- 권한별 버튼 분기 -->
+                    <!-- USER: 판매자 등록 버튼 -->
+                    <a th:href="@{/seller/apply}" class="user-menu-item" sec:authorize="hasRole('USER')">
+                        <span class="menu-label">판매자</span>
+                        <span class="menu-text">등록</span>
+                    </a>
+                    
+                    <!-- SELLER: 판매자 페이지 -->
+                    <a th:href="@{/admin}" class="user-menu-item" sec:authorize="hasRole('SELLER')">
+                        <span class="menu-label">판매자</span>
+                        <span class="menu-text">페이지</span>
+                    </a>
+                    
+                    <!-- ADMIN: 관리자 페이지 -->
+                    <a th:href="@{/admin}" class="user-menu-item admin-btn" sec:authorize="hasRole('ADMIN')">
                         <span class="menu-label">관리자</span>
                         <span class="menu-text">페이지</span>
                     </a>
                     
-                    <a th:href="@{/orders}" class="user-menu-item">
+                    <a th:href="@{/order/list}" class="user-menu-item">
                         <span class="menu-label">반품</span>
                         <span class="menu-text">& 주문</span>
                     </a>

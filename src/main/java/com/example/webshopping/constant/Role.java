@@ -2,6 +2,7 @@ package com.example.webshopping.constant;
 
 public enum Role {
 
-    ADMIN,
-    USER
+    ROLE_ADMIN,
+    ROLE_SELLER,
+    ROLE_USER
 }

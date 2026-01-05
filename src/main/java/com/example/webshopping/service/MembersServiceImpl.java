@@ -28,7 +28,7 @@ public class MembersServiceImpl implements MembersService {
         Members members = modelMapper.map(memberDTO, Members.class);
 
         members.setPassword(passwordEncoder.encode(members.getPassword()));
-        members.setRole(Role.ADMIN);
+        members.setRole(Role.ROLE_USER);
 
 
         membersRepository.save(members);

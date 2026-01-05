@@ -1,10 +1,15 @@
 package com.example.webshopping.controller;
 
 import com.example.webshopping.constant.OrderStatus;
+import com.example.webshopping.constant.Role;
 import com.example.webshopping.dto.OrderResponseDTO;
+import com.example.webshopping.dto.SellerDTO;
+import com.example.webshopping.entity.Members;
 import com.example.webshopping.entity.Product;
+import com.example.webshopping.repository.MembersRepository;
 import com.example.webshopping.service.OrderService;
 import com.example.webshopping.service.ProductService;
+import com.example.webshopping.service.SellerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,13 +29,30 @@ public class AdminController {
     
     private final ProductService productService;
     private final OrderService orderService;
+    private final SellerService sellerService;
+    private final MembersRepository membersRepository;
     
     /**
      * 관리자 메인 페이지
      */
     @GetMapping
-    public String adminPage(Model model) {
-        log.info("관리자 페이지 접속");
+    public String adminPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        
+        if (userDetails == null) {
+            return "redirect:/members/login";
+        }
+        
+        String email = userDetails.getUsername();
+        Members member = membersRepository.findByEmail(email);
+        
+        log.info("관리자 페이지 접속 - Role: {}", member.getRole());
+        
+        // SELLER인 경우 판매자 전용 페이지로
+        if (member.getRole() == Role.ROLE_SELLER) {
+            return "admin/seller-admin";
+        }
+        
+        // ADMIN인 경우 관리자 페이지로
         return "admin/admin";
     }
     
@@ -45,13 +67,31 @@ public class AdminController {
         }
         
         String email = userDetails.getUsername();
+        log.info("======== 상품 목록 페이지 접속 ========");
+        log.info("로그인 이메일: {}", email);
         
-        // 해당 사용자가 등록한 상품 목록 조회
-        List<Product> products = productService.getProductsByEmail(email);
+        // 회원 정보 조회
+        Members member = membersRepository.findByEmail(email);
+        
+        List<Product> products;
+        
+        // ADMIN: 모든 상품 조회
+        if (member.getRole() == Role.ROLE_ADMIN) {
+            products = productService.getAllProducts();
+            log.info("관리자 - 전체 상품 조회: {}건", products.size());
+            model.addAttribute("isAdmin", true);
+        } 
+        // SELLER: 본인 상품만 조회
+        else {
+            products = productService.getProductsByEmail(email);
+            log.info("판매자 - 본인 상품 조회: {}건", products.size());
+            model.addAttribute("isAdmin", false);
+        }
         
         model.addAttribute("products", products);
+        log.info("======================================");
         
-        return "admin/product-list";  // ✅ 관리자 전용 페이지
+        return "admin/product-list";
     }
     
     /**
@@ -142,5 +182,76 @@ public class AdminController {
         }
         
         return "redirect:/admin/orders";
+    }
+    
+    
+    // ========== 판매자 신청 관리 ==========
+    
+    /**
+     * 판매자 신청 관리 페이지
+     */
+    @GetMapping("/sellers")
+    public String sellerApplications(Model model) {
+        log.info("======== 판매자 신청 관리 페이지 접속 ========");
+        
+        // 승인 대기 중인 신청 목록
+        List<SellerDTO> pendingApplications = sellerService.getPendingApplications();
+        
+        // 모든 신청 목록
+        List<SellerDTO> allApplications = sellerService.getAllApplications();
+        
+        log.info("승인 대기: {}건", pendingApplications.size());
+        log.info("전체 신청: {}건", allApplications.size());
+        
+        model.addAttribute("pendingApplications", pendingApplications);
+        model.addAttribute("allApplications", allApplications);
+        log.info("==========================================");
+        
+        return "admin/seller-management";
+    }
+    
+    /**
+     * 판매자 신청 승인
+     */
+    @PostMapping("/sellers/{sellerId}/approve")
+    public String approveApplication(@PathVariable Long sellerId,
+                                     RedirectAttributes redirectAttributes) {
+        try {
+            sellerService.approveApplication(sellerId);
+            
+            redirectAttributes.addFlashAttribute("message", "판매자 신청이 승인되었습니다.");
+            log.info("판매자 신청 승인 완료 - 신청ID: {}", sellerId);
+            
+        } catch (Exception e) {
+            log.error("판매자 신청 승인 실패: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        return "redirect:/admin/sellers";
+    }
+    
+    /**
+     * 판매자 신청 거부
+     */
+    @PostMapping("/sellers/{sellerId}/reject")
+    public String rejectApplication(@PathVariable Long sellerId,
+                                    @RequestParam(required = false) String reason,
+                                    RedirectAttributes redirectAttributes) {
+        try {
+            String rejectReason = (reason != null && !reason.trim().isEmpty()) 
+                ? reason 
+                : "관리자에 의해 거부됨";
+            
+            sellerService.rejectApplication(sellerId, rejectReason);
+            
+            redirectAttributes.addFlashAttribute("message", "판매자 신청이 거부되었습니다.");
+            log.info("판매자 신청 거부 완료 - 신청ID: {}, 사유: {}", sellerId, rejectReason);
+            
+        } catch (Exception e) {
+            log.error("판매자 신청 거부 실패: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        return "redirect:/admin/sellers";
     }
 }
