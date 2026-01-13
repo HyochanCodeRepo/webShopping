@@ -22,8 +22,8 @@
             <div class="header-container">
                 <!-- 로고 -->
                 <a th:href="@{/}" class="logo">
-                    <img src="/images/main_logo%20(1).png">
-<!--                    <span class="logo-text">WebShopping</span>-->
+<!--                    <img src="/images/main_logo%20(1).png">-->
+                    <span class="logo-text">WebShopping</span>
                 </a>
                 
                 <!-- 검색바 -->
@@ -92,21 +92,39 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- 하단 네비게이션 -->
         <nav class="header-nav">
             <div class="header-container">
                 <button class="nav-menu-btn">
                     <i class="fas fa-bars"></i>
-                    <span>전체</span>
+                    <span>전체 카테고리</span>
                 </button>
                 <ul class="nav-links">
-                    <li><a th:href="@{/products}">오늘의 딜</a></li>
-                    <li><a th:href="@{/products?category=electronics}">전자제품</a></li>
-                    <li><a th:href="@{/products?category=fashion}">패션</a></li>
-                    <li><a th:href="@{/products?category=books}">도서</a></li>
-                    <li><a th:href="@{/products?category=home}">홈/리빙</a></li>
-                    <li><a th:href="@{/products?category=food}">식품</a></li>
+                    <!-- 드롭다운 카테고리 메뉴 -->
+                    <li th:each="large : ${globalCategories}" class="nav-dropdown">
+                        <a th:href="@{/product/list(categoryId=${large.id})}"
+                           th:text="${large.name}"
+                           class="nav-link-main">스포츠/레저</a>
+
+                        <!-- 중분류 드롭다운 -->
+                        <div class="dropdown-menu" th:if="${!large.children.isEmpty()}">
+                            <div class="dropdown-column" th:each="medium : ${large.children}">
+                                <a th:href="@{/product/list(categoryId=${medium.id})}"
+                                   class="dropdown-title"
+                                   th:text="${medium.name}">러닝</a>
+
+                                <!-- 소분류 목록 -->
+                                <ul class="dropdown-list" th:if="${!medium.children.isEmpty()}">
+                                    <li th:each="small : ${medium.children}">
+                                        <a th:href="@{/product/list(categoryId=${small.id})}"
+                                           th:text="${small.name}">러닝화</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+
                     <!-- ADMIN 전용 상품등록 버튼 -->
                     <li sec:authorize="hasRole('ADMIN')">
                         <a th:href="@{/product/register}" class="admin-register-btn">

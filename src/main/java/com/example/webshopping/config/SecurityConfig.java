@@ -42,6 +42,7 @@ public class SecurityConfig {
                                 
                                 // ========== ADMIN 전용 경로 ==========
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/category/**").hasRole("ADMIN")  // 카테고리 관리
                                 
                                 // ========== 상품 등록/수정/삭제 ==========
                                 .requestMatchers("/product/register", "/product/new").hasAnyRole("SELLER", "ADMIN")

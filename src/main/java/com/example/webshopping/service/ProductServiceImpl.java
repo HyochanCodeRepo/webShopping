@@ -2,6 +2,7 @@ package com.example.webshopping.service;
 
 import com.example.webshopping.dto.CategoryDTO;
 import com.example.webshopping.dto.ProductDTO;
+import com.example.webshopping.dto.ProductOptionDTO;
 import com.example.webshopping.entity.*;
 import com.example.webshopping.repository.CategoryRepository;
 import com.example.webshopping.repository.MembersRepository;
@@ -52,12 +53,12 @@ public class ProductServiceImpl implements ProductService {
                 .stockQuantity(productDTO.getStockQuantity())
                 .description(productDTO.getDescription())
                 .discountRate(productDTO.getDiscountRate())
-                .members(member)  // ✅ 회원 정보 저장
+                .productType(productDTO.getProductType())  // ✅ 상품 타입 추가
+                .members(member)
                 .build();
 
         //카테고리 설정
         Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(EntityNotFoundException::new);
-
         product.setCategory(category);
 
         //이미지 추가
@@ -69,7 +70,21 @@ public class ProductServiceImpl implements ProductService {
                         .imageOrder(i)
                         .build();
                 product.addImage(image);
+            }
+        }
 
+        // ✅ 상품 옵션 추가 (사이즈, 색상 등)
+        if (productDTO.getOptions() != null && !productDTO.getOptions().isEmpty()) {
+            for (ProductOptionDTO optionDTO : productDTO.getOptions()) {
+                ProductOption option = ProductOption.builder()
+                        .optionType(optionDTO.getOptionType())
+                        .optionValue(optionDTO.getOptionValue())
+                        .stockQuantity(optionDTO.getStockQuantity())
+                        .additionalPrice(optionDTO.getAdditionalPrice() != null ? optionDTO.getAdditionalPrice() : 0)
+                        .displayOrder(optionDTO.getDisplayOrder() != null ? optionDTO.getDisplayOrder() : 0)
+                        .isActive(true)
+                        .build();
+                product.addOption(option);
             }
         }
 
@@ -87,6 +102,11 @@ public class ProductServiceImpl implements ProductService {
             
             log.info("상품 상세 정보 저장 완료 - Product ID: {}", savedProduct.getId());
         }
+        
+        log.info("상품 등록 완료 - ID: {}, 타입: {}, 옵션 수: {}", 
+                savedProduct.getId(), 
+                savedProduct.getProductType(),
+                savedProduct.getOptions().size());
     }
 
     @Override
@@ -191,12 +211,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         // 상품 존재 확인
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
 
-        // 상품 삭제 (연관된 이미지도 Cascade로 자동 삭제)
+        // 1. 장바구니 아이템에서 해당 상품 참조 제거
+        // (CartItem -> Product 외래키)
+        
+        // 2. 주문 아이템은 이력이므로 유지 (삭제하지 않음)
+        // (OrderItem -> Product 참조는 남겨둠)
+        
+        // 3. 리뷰는 Cascade로 자동 삭제 (Product Entity에 설정됨)
+        
+        // 4. 상품 이미지는 Cascade로 자동 삭제
+        
+        // 5. 상품 상세는 Cascade로 자동 삭제
+        
+        // 상품 삭제
         productRepository.delete(product);
+        
+        log.info("상품 삭제 완료 - Product ID: {}, 상품명: {}", id, product.getProductName());
     }
 }

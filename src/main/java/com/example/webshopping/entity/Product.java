@@ -1,5 +1,6 @@
 package com.example.webshopping.entity;
 
+import com.example.webshopping.constant.ProductType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @Setter
-@ToString(exclude = "images")
+@ToString(exclude = {"images", "options"})
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -69,9 +70,22 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    // 상품 타입 (의류, 신발, 가방 등)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private ProductType productType;
+
+    // 상품 옵션 (사이즈, 색상 등)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductOption> options = new ArrayList<>();
     
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private ProductDetail productDetail;
+    
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
 
 
@@ -104,9 +118,11 @@ public class Product {
     public void addImage(ProductImage image){
         images.add(image);
         image.setProduct(this);
-
     }
 
-
-
+    // 옵션 추가 헬퍼 메서드
+    public void addOption(ProductOption option){
+        options.add(option);
+        option.setProduct(this);
+    }
 }

@@ -44,6 +44,32 @@ public class FileService {
 
     }
 
+    public String uploadCategoryImage(MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return null;
+            }
+
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            //파일명 생성 (UUID + 원본파일명)
+            String originalFilename = file.getOriginalFilename();
+            String fileName = UUID.randomUUID().toString() + "-" + originalFilename;
+
+            //파일저장
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return "/images/product/" + fileName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("카테고리 이미지 저장 실패: " + e.getMessage());
+        }
+    }
+
     public void deleteFile(String fileUrl) {
         try {
             if (fileUrl != null && fileUrl.startsWith("/images/product")) {

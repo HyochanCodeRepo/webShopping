@@ -1,6 +1,8 @@
 package com.example.webshopping.controller;
 
+import com.example.webshopping.constant.ProductType;
 import com.example.webshopping.constant.Role;
+import com.example.webshopping.dto.CategoryDTO;
 import com.example.webshopping.dto.ProductDTO;
 import com.example.webshopping.entity.Category;
 import com.example.webshopping.entity.Members;
@@ -14,6 +16,7 @@ import com.example.webshopping.service.ReviewService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
@@ -41,18 +45,49 @@ public class ProductController {
 
     @GetMapping("/register")
     public String register(Model model) {
-        List<Category> categories = categoryRepository.findAll();
-
+        // 대분류 카테고리만 조회
+        List<Category> categories = categoryRepository.findByParentIsNullAndIsActiveTrueOrderByDisplayOrderAsc();
+        
+        // ProductType enum 전달
         model.addAttribute("categories", categories);
+        model.addAttribute("productTypes", ProductType.values());
 
         return "product/form";
     }
+    
+    /**
+     * 중분류 카테고리 조회 API
+     */
+    @GetMapping("/api/categories/{parentId}/children")
+    @ResponseBody
+    public ResponseEntity<List<CategoryDTO>> getChildCategories(@PathVariable Long parentId) {
+        List<Category> children = categoryRepository.findByParent_IdAndIsActiveTrueOrderByDisplayOrderAsc(parentId);
+        
+        List<CategoryDTO> categoryDTOs = children.stream()
+                .map(cat -> CategoryDTO.builder()
+                        .id(cat.getId())
+                        .name(cat.getName())
+                        .depth(cat.getDepth())
+                        .build())
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(categoryDTOs);
+    }
+    
+    /**
+     * 상품 타입별 기본 사이즈 조회 API
+     */
+    @GetMapping("/api/product-types/{productType}/sizes")
+    @ResponseBody
+    public ResponseEntity<String[]> getDefaultSizes(@PathVariable ProductType productType) {
+        return ResponseEntity.ok(productType.getDefaultSizeArray());
+    }
 
     @PostMapping("/register")
-    public String register(ProductDTO productDTO,
+    public String register(@ModelAttribute ProductDTO productDTO,
                            @RequestParam(required = false) MultipartFile mainImageFile,
                            @RequestParam(required = false)List<MultipartFile> detailImageFiles,
-                           @AuthenticationPrincipal UserDetails userDetails,  // ✅ 추가
+                           @AuthenticationPrincipal UserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
         log.info(productDTO);
 
@@ -99,6 +134,7 @@ public class ProductController {
         Category category =
             categoryRepository.findById(categoryId).orElseThrow(EntityNotFoundException::new);
 
+        model.addAttribute("categoryId", categoryId);  // ✅ 추가
         model.addAttribute("categoryName", category.getName());
         model.addAttribute("products", productList);
 
@@ -153,8 +189,51 @@ public class ProductController {
             return "redirect:/product/detail/" + id;
         }
 
-        model.addAttribute("product", product);
-        model.addAttribute("categories", categoryRepository.findAll());
+        // ✅ Product를 ProductDTO로 변환
+        ProductDTO productDTO = ProductDTO.builder()
+                .id(product.getId())
+                .productName(product.getProductName())
+                .price(product.getPrice())
+                .stockQuantity(product.getStockQuantity())
+                .description(product.getDescription())
+                .discountRate(product.getDiscountRate())
+                .categoryId(product.getCategory().getId())
+                .productType(product.getProductType())
+                .build();
+        
+        // ✅ 이미지 URL 리스트 생성
+        if (product.getImages() != null && !product.getImages().isEmpty()) {
+            product.getImages().stream()
+                    .filter(img -> "Y".equals(img.getRepImgYn()))
+                    .findFirst()
+                    .ifPresent(img -> productDTO.setRepImageUrl(img.getImageUrl()));
+            
+            List<String> detailUrls = product.getImages().stream()
+                    .filter(img -> "N".equals(img.getRepImgYn()))
+                    .map(img -> img.getImageUrl())
+                    .collect(Collectors.toList());
+            productDTO.setDetailImageUrls(detailUrls);
+        }
+        
+        // ✅ 옵션 리스트 변환
+        if (product.getOptions() != null && !product.getOptions().isEmpty()) {
+            List<com.example.webshopping.dto.ProductOptionDTO> optionDTOs = product.getOptions().stream()
+                    .map(option -> com.example.webshopping.dto.ProductOptionDTO.builder()
+                            .id(option.getId())
+                            .optionType(option.getOptionType())
+                            .optionValue(option.getOptionValue())
+                            .stockQuantity(option.getStockQuantity())
+                            .additionalPrice(option.getAdditionalPrice())
+                            .displayOrder(option.getDisplayOrder())
+                            .build())
+                    .collect(Collectors.toList());
+            productDTO.setOptions(optionDTOs);
+        }
+
+        model.addAttribute("product", productDTO);
+        model.addAttribute("categories", categoryRepository.findByParentIsNullAndIsActiveTrueOrderByDisplayOrderAsc());
+        model.addAttribute("productTypes", ProductType.values());
+        
         return "product/form";
     }
 
@@ -179,6 +258,11 @@ public class ProductController {
             redirectAttributes.addFlashAttribute("error", "수정 권한이 없습니다.");
             return "redirect:/product/detail/" + id;
         }
+
+
+        //TODO
+        //main이미지 수정을 안했으면 기존 keepMainImage url을 가져와야되는데 그게 안되서 이미지가 안넘어옴.
+        //url을 hidden으로 form에서 보내주면 여기서 받아서 로직처리하는거 해야할듯함.
 
 
         productService.update(id, productDTO, mainImageFile, detailImageFiles, keepMainImage, allParams);
@@ -208,9 +292,14 @@ public class ProductController {
             return "redirect:/product/detail/" + id;
         }
 
-
-        productRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
+        // ProductService를 통해 삭제
+        try {
+            productService.delete(id);
+            redirectAttributes.addFlashAttribute("message", "상품이 성공적으로 삭제되었습니다.");
+        } catch (Exception e) {
+            log.error("상품 삭제 실패 - Product ID: {}, Error: {}", id, e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "상품 삭제에 실패했습니다: " + e.getMessage());
+        }
 
         return "redirect:/product/list?categoryId=" + categoryId;
     }

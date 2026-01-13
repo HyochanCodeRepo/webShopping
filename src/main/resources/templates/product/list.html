@@ -12,6 +12,122 @@
                 max-width: 1400px;
                 margin: 40px auto;
                 padding: 0 20px;
+                display: flex;
+                gap: 30px;
+            }
+
+            /* ========== 사이드바 ========== */
+            .sidebar {
+                flex: 0 0 250px;
+                background: #fff;
+                border-radius: 8px;
+                padding: 20px;
+                height: fit-content;
+                position: sticky;
+                top: 120px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+
+            .sidebar-title {
+                font-size: 18px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #E31837;
+            }
+
+            /* 카테고리 트리 */
+            .category-tree {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .category-tree > li {
+                margin-bottom: 20px;
+            }
+
+            /* 대분류 */
+            .category-large {
+                font-size: 15px;
+                font-weight: 700;
+                color: #E31837;
+                padding: 10px;
+                display: block;
+                border-radius: 4px;
+                transition: all 0.2s;
+            }
+
+            .category-large:hover {
+                background: #fff3f3;
+            }
+
+            .category-large.active {
+                background: #E31837;
+                color: #fff;
+            }
+
+            /* 중분류 */
+            .category-medium-list {
+                list-style: none;
+                padding-left: 15px;
+                margin-top: 10px;
+            }
+
+            .category-medium {
+                font-size: 14px;
+                font-weight: 600;
+                color: #555;
+                padding: 8px 10px;
+                display: block;
+                border-radius: 4px;
+                transition: all 0.2s;
+            }
+
+            .category-medium:hover {
+                background: #f5f5f5;
+                color: #E31837;
+                padding-left: 15px;
+            }
+
+            .category-medium.active {
+                background: #fff3f3;
+                color: #E31837;
+                font-weight: 700;
+            }
+
+            /* 소분류 */
+            .category-small-list {
+                list-style: none;
+                padding-left: 15px;
+                margin-top: 5px;
+            }
+
+            .category-small {
+                font-size: 13px;
+                color: #777;
+                padding: 6px 10px;
+                display: block;
+                border-radius: 4px;
+                transition: all 0.2s;
+            }
+            
+            .category-small:hover {
+                background: #f5f5f5;
+                color: #E31837;
+                padding-left: 15px;
+            }
+            
+            .category-small.active {
+                background: #fff3f3;
+                color: #E31837;
+                font-weight: 600;
+            }
+            
+            /* ========== 메인 컨텐츠 ========== */
+            .content-area {
+                flex: 1;
             }
 
             /* 헤더 */
@@ -251,6 +367,16 @@
 
             /* 반응형 */
             @media (max-width: 1200px) {
+                .product-list-container {
+                    flex-direction: column;
+                }
+                
+                .sidebar {
+                    flex: none;
+                    width: 100%;
+                    position: static;
+                }
+                
                 .product-grid {
                     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
                 }
@@ -290,111 +416,153 @@
 <body>
 <main layout:fragment="content">
     <div class="product-list-container">
-        <!-- 카테고리 헤더 -->
-        <div class="category-header">
-            <h1 class="category-title" th:text="${categoryName}">카테고리명</h1>
-            <p class="category-subtitle">
-                총 <span class="product-count" th:text="${products.size()}">0</span>개의 상품
-            </p>
-        </div>
-
-        <!-- 정렬 옵션 -->
-        <div class="sort-section" th:unless="${products.isEmpty()}">
-            <div>
-                <span class="sort-label">정렬:</span>
-                <select class="sort-select" onchange="sortProducts(this.value)">
-                    <option value="latest">최신순</option>
-                    <option value="price-low">가격 낮은순</option>
-                    <option value="price-high">가격 높은순</option>
-                    <option value="name">이름순</option>
-                </select>
+        <!-- ========== 사이드바 카테고리 트리 ========== -->
+        <aside class="sidebar">
+            <h2 class="sidebar-title">카테고리</h2>
+            <ul class="category-tree">
+                <li th:each="large : ${globalCategories}">
+                    <!-- 대분류 -->
+                    <a th:href="@{/product/list(categoryId=${large.id})}" 
+                       class="category-large"
+                       th:classappend="${categoryId == large.id} ? 'active' : ''">
+                        <i class="fas fa-folder"></i>
+                        <span th:text="${large.name}">스포츠/레저</span>
+                    </a>
+                    
+                    <!-- 중분류 -->
+                    <ul class="category-medium-list" th:if="${!large.children.isEmpty()}">
+                        <li th:each="medium : ${large.children}">
+                            <a th:href="@{/product/list(categoryId=${medium.id})}"
+                               class="category-medium"
+                               th:classappend="${categoryId == medium.id} ? 'active' : ''">
+                                <i class="fas fa-angle-right"></i>
+                                <span th:text="${medium.name}">러닝</span>
+                            </a>
+                            
+                            <!-- 소분류 -->
+                            <ul class="category-small-list" th:if="${!medium.children.isEmpty()}">
+                                <li th:each="small : ${medium.children}">
+                                    <a th:href="@{/product/list(categoryId=${small.id})}"
+                                       class="category-small"
+                                       th:classappend="${categoryId == small.id} ? 'active' : ''">
+                                        <span th:text="${small.name}">러닝화</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+        
+        <!-- ========== 메인 컨텐츠 영역 ========== -->
+        <div class="content-area">
+            <!-- 카테고리 헤더 -->
+            <div class="category-header">
+                <h1 class="category-title" th:text="${categoryName}">카테고리명</h1>
+                <p class="category-subtitle">
+                    총 <span class="product-count" th:text="${products.size()}">0</span>개의 상품
+                </p>
             </div>
-        </div>
 
-        <!-- 상품 목록이 비어있을 때 -->
-        <div class="empty-list" th:if="${products.isEmpty()}">
-            <div class="empty-icon">
-                <i class="fas fa-box-open"></i>
-            </div>
-            <p class="empty-text">
-                이 카테고리에는 아직 상품이 없습니다.
-            </p>
-            <a th:href="@{/}" class="btn-home">
-                <i class="fas fa-home"></i> 홈으로 이동
-            </a>
-        </div>
-
-        <!-- 상품 그리드 -->
-        <div class="product-grid" th:unless="${products.isEmpty()}">
-            <div class="product-card"
-                 th:each="product : ${products}"
-                 th:onclick="|location.href='@{/product/detail/{id}(id=${product.id})}'|">
-
-                <!-- 상품 이미지 -->
-                <div class="product-image-wrapper">
-                    <!-- 할인 뱃지 -->
-                    <div class="discount-badge"
-                         th:if="${product.discountRate != null and product.discountRate > 0}"
-                         th:text="${product.discountRate + '%'}">
-                        10%
-                    </div>
-
-                    <!-- 품절 오버레이 -->
-                    <div class="sold-out-overlay" th:if="${product.stockQuantity <= 0}">
-                        <span class="sold-out-text">품절</span>
-                    </div>
-
-                    <img class="product-image"
-                         th:src="${product.repImageUrl}"
-                         th:alt="${product.productName}"
-                         onerror="this.src='/images/product-sample.jpg'">
+            <!-- 정렬 옵션 -->
+            <div class="sort-section" th:unless="${products.isEmpty()}">
+                <div>
+                    <span class="sort-label">정렬:</span>
+                    <select class="sort-select" onchange="sortProducts(this.value)">
+                        <option value="latest">최신순</option>
+                        <option value="price-low">가격 낮은순</option>
+                        <option value="price-high">가격 높은순</option>
+                        <option value="name">이름순</option>
+                    </select>
                 </div>
+            </div>
 
-                <!-- 상품 정보 -->
-                <div class="product-info">
-                    <h3 class="product-name" th:text="${product.productName}">
-                        상품명
-                    </h3>
+            <!-- 상품 목록이 비어있을 때 -->
+            <div class="empty-list" th:if="${products.isEmpty()}">
+                <div class="empty-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <p class="empty-text">
+                    이 카테고리에는 아직 상품이 없습니다.
+                </p>
+                <a th:href="@{/}" class="btn-home">
+                    <i class="fas fa-home"></i> 홈으로 이동
+                </a>
+            </div>
 
-                    <!-- 가격 -->
-                    <div class="price-section">
-                        <!-- 할인이 있을 때 -->
-                        <div th:if="${product.discountRate != null and product.discountRate > 0}">
-                            <div class="original-price"
-                                 th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">
-                                50,000원
+            <!-- 상품 그리드 -->
+            <div class="product-grid" th:unless="${products.isEmpty()}">
+                <div class="product-card"
+                     th:each="product : ${products}"
+                     th:onclick="|location.href='@{/product/detail/{id}(id=${product.id})}'|">
+
+                    <!-- 상품 이미지 -->
+                    <div class="product-image-wrapper">
+                        <!-- 할인 뱃지 -->
+                        <div class="discount-badge"
+                             th:if="${product.discountRate != null and product.discountRate > 0}"
+                             th:text="${product.discountRate + '%'}">
+                            10%
+                        </div>
+
+                        <!-- 품절 오버레이 -->
+                        <div class="sold-out-overlay" th:if="${product.stockQuantity <= 0}">
+                            <span class="sold-out-text">품절</span>
+                        </div>
+
+                        <img class="product-image"
+                             th:src="${product.repImageUrl}"
+                             th:alt="${product.productName}"
+                             onerror="this.src='/images/product-sample.jpg'">
+                    </div>
+
+                    <!-- 상품 정보 -->
+                    <div class="product-info">
+                        <h3 class="product-name" th:text="${product.productName}">
+                            상품명
+                        </h3>
+
+                        <!-- 가격 -->
+                        <div class="price-section">
+                            <!-- 할인이 있을 때 -->
+                            <div th:if="${product.discountRate != null and product.discountRate > 0}">
+                                <div class="original-price"
+                                     th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">
+                                    50,000원
+                                </div>
+                                <div class="price-wrapper">
+                                        <span class="discount-rate"
+                                              th:text="${product.discountRate + '%'}">
+                                            10%
+                                        </span>
+                                    <span class="sale-price"
+                                          th:text="${#numbers.formatInteger(product.discountPrice, 0, 'COMMA') + '원'}">
+                                            45,000원
+                                        </span>
+                                </div>
                             </div>
-                            <div class="price-wrapper">
-                                    <span class="discount-rate"
-                                          th:text="${product.discountRate + '%'}">
-                                        10%
-                                    </span>
-                                <span class="sale-price"
-                                      th:text="${#numbers.formatInteger(product.discountPrice, 0, 'COMMA') + '원'}">
-                                        45,000원
+
+                            <!-- 할인이 없을 때 -->
+                            <div th:unless="${product.discountRate != null and product.discountRate > 0}">
+                                    <span class="regular-price"
+                                          th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">
+                                        50,000원
                                     </span>
                             </div>
                         </div>
 
-                        <!-- 할인이 없을 때 -->
-                        <div th:unless="${product.discountRate != null and product.discountRate > 0}">
-                                <span class="regular-price"
-                                      th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">
-                                    50,000원
+                        <!-- 재고 상태 -->
+                        <div class="stock-status">
+                                <span th:if="${product.stockQuantity > 10}"
+                                      class="stock-available">
+                                    <i class="fas fa-check-circle"></i> 재고 있음
+                                </span>
+                            <span th:if="${product.stockQuantity > 0 and product.stockQuantity <= 10}"
+                                  class="stock-low">
+                                    <i class="fas fa-exclamation-circle"></i> 재고 <span th:text="${product.stockQuantity}">5</span>개 남음
                                 </span>
                         </div>
-                    </div>
-
-                    <!-- 재고 상태 -->
-                    <div class="stock-status">
-                            <span th:if="${product.stockQuantity > 10}"
-                                  class="stock-available">
-                                <i class="fas fa-check-circle"></i> 재고 있음
-                            </span>
-                        <span th:if="${product.stockQuantity > 0 and product.stockQuantity <= 10}"
-                              class="stock-low">
-                                <i class="fas fa-exclamation-circle"></i> 재고 <span th:text="${product.stockQuantity}">5</span>개 남음
-                            </span>
                     </div>
                 </div>
             </div>

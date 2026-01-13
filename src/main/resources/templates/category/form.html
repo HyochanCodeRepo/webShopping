@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title th:text="${category != null ? '카테고리 수정' : '카테고리 등록'}">카테고리 등록</title>
+    <th:block layout:fragment="css">
+        <style>
+            .form-container {
+                max-width: 800px;
+                margin: 50px auto;
+                padding: 40px;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .form-header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+            
+            .form-header h1 {
+                font-size: 28px;
+                font-weight: 700;
+                color: #232f3e;
+            }
+            
+            .form-group {
+                margin-bottom: 25px;
+            }
+            
+            .form-group label {
+                display: block;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+            
+            .form-group label .required {
+                color: #f44336;
+            }
+            
+            .form-control {
+                width: 100%;
+                padding: 12px 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                transition: all 0.3s;
+                box-sizing: border-box;
+            }
+            
+            .form-control:focus {
+                outline: none;
+                border-color: #ff9900;
+                box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+            }
+            
+            .help-text {
+                font-size: 12px;
+                color: #666;
+                margin-top: 5px;
+            }
+            
+            .form-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            
+            .form-actions {
+                display: flex;
+                gap: 15px;
+                margin-top: 40px;
+                justify-content: center;
+            }
+            
+            .btn {
+                padding: 14px 40px;
+                border: none;
+                border-radius: 4px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .btn-primary {
+                background: #ff9900;
+                color: #fff;
+            }
+            
+            .btn-primary:hover {
+                background: #e88b00;
+            }
+            
+            .btn-secondary {
+                background: #e7e9ec;
+                color: #333;
+            }
+            
+            .btn-secondary:hover {
+                background: #d5d9dd;
+            }
+            
+            .depth-info {
+                padding: 15px;
+                background: #e3f2fd;
+                border-left: 4px solid #2196F3;
+                border-radius: 4px;
+                margin-bottom: 20px;
+            }
+            
+            .depth-info p {
+                margin: 5px 0;
+                font-size: 14px;
+                color: #1976D2;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <main layout:fragment="content">
+        <div class="form-container">
+            <div class="form-header">
+                <h1 th:text="${category != null ? '카테고리 수정' : '카테고리 등록'}">카테고리 등록</h1>
+            </div>
+            
+            <div class="depth-info">
+                <p><strong>📌 카테고리 구조 안내</strong></p>
+                <p>• 대분류: 부모 카테고리 없이 등록</p>
+                <p>• 중분류: 대분류를 부모로 선택</p>
+                <p>• 소분류: 중분류를 부모로 선택</p>
+            </div>
+            
+            <form th:action="${category != null ? '/category/edit/' + category.id : '/category/register'}"
+                  method="post"
+                  id="categoryForm"
+                  enctype="multipart/form-data">
+                
+                <!-- 카테고리명 -->
+                <div class="form-group">
+                    <label for="name">
+                        카테고리명<span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="name" 
+                           name="name" 
+                           th:value="${category?.name}"
+                           placeholder="카테고리명을 입력하세요"
+                           required>
+                    <div class="help-text">예: 스포츠/레저, 러닝, 러닝화</div>
+                </div>
+                
+                <!-- 부모 카테고리 선택 -->
+                <div class="form-group">
+                    <label for="categoryDepth">카테고리 분류<span class="required">*</span></label>
+                    <select class="form-control" id="categoryDepth" onchange="updateParentSelection()" required>
+                        <option value="1">대분류 (최상위)</option>
+                        <option value="2">중분류 (대분류 하위)</option>
+                        <option value="3">소분류 (중분류 하위)</option>
+                    </select>
+                    <div class="help-text">등록할 카테고리 레벨을 선택하세요</div>
+                </div>
+                
+                <!-- 대분류 선택 (중분류/소분류 등록 시) -->
+                <div class="form-group" id="parentLargeGroup" style="display: none;">
+                    <label for="parentLargeId">상위 대분류 선택<span class="required">*</span></label>
+                    <select class="form-control" id="parentLargeId" onchange="loadMediumForParent()">
+                        <option value="">대분류를 선택하세요</option>
+                        <option th:each="large : ${largeCategories}" 
+                                th:value="${large.id}" 
+                                th:text="${large.name}">
+                        </option>
+                    </select>
+                </div>
+                
+                <!-- 중분류 선택 (소분류 등록 시) -->
+                <div class="form-group" id="parentMediumGroup" style="display: none;">
+                    <label for="parentMediumId">상위 중분류 선택<span class="required">*</span></label>
+                    <select class="form-control" id="parentMediumId">
+                        <option value="">중분류를 선택하세요</option>
+                    </select>
+                </div>
+                
+                <!-- 실제 전송되는 parentId (hidden) -->
+                <input type="hidden" id="parentId" name="parentId">
+                
+                <!-- 카테고리 코드 & 정렬 순서 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="code">카테고리 코드</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="code" 
+                               name="code" 
+                               th:value="${category?.code}"
+                               placeholder="SPORTS_RUN_SHOES">
+                        <div class="help-text">영문 대문자와 언더스코어만 사용</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="displayOrder">정렬 순서</label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="displayOrder" 
+                               name="displayOrder" 
+                               th:value="${category?.displayOrder}"
+                               value="0"
+                               min="0">
+                        <div class="help-text">낮을수록 먼저 표시</div>
+                    </div>
+                </div>
+                
+                <!-- 이미지 업로드 -->
+                <div class="form-group">
+                    <label for="imageFile">카테고리 이미지 (선택)</label>
+                    <input type="file" 
+                           class="form-control" 
+                           id="imageFile" 
+                           name="imageFile" 
+                           accept="image/*"
+                           onchange="previewImage(event)">
+                    <div class="help-text">카테고리 대표 이미지를 업로드하세요 (최대 10MB)</div>
+                    
+                    <!-- 이미지 미리보기 -->
+                    <div id="imagePreview" style="margin-top: 15px;">
+                        <img th:if="${category?.imageUrl}" 
+                             th:src="${category.imageUrl}" 
+                             alt="현재 이미지" 
+                             style="max-width: 200px; border-radius: 4px; border: 1px solid #ddd;">
+                    </div>
+                </div>
+                
+                <!-- 기존 이미지 URL (숨김, 수정 시 유지용) -->
+                <input type="hidden" 
+                       id="imageUrl" 
+                       name="imageUrl" 
+                       th:value="${category?.imageUrl}">
+                
+                <!-- Depth는 자동 계산 (hidden) -->
+                <input type="hidden" id="depth" name="depth" th:value="${category?.depth}" value="1">
+                
+                <!-- 버튼 -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> 
+                        <span th:text="${category != null ? '수정하기' : '등록하기'}">등록하기</span>
+                    </button>
+                    <a href="/category/manage" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> 취소
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <th:block layout:fragment="script">
+        <script th:inline="javascript">
+            // 이미지 미리보기 함수
+            function previewImage(event) {
+                const file = event.target.files[0];
+                const preview = document.getElementById('imagePreview');
+                
+                if (file) {
+                    // 파일 크기 체크 (10MB)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('이미지 파일 크기는 10MB를 초과할 수 없습니다.');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.innerHTML = `<img src="${e.target.result}" alt="미리보기" style="max-width: 200px; border-radius: 4px; border: 1px solid #ddd;">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            // 카테고리 분류 변경 시
+            function updateParentSelection() {
+                const depth = document.getElementById('categoryDepth').value;
+                const parentLargeGroup = document.getElementById('parentLargeGroup');
+                const parentMediumGroup = document.getElementById('parentMediumGroup');
+                
+                document.getElementById('depth').value = depth;
+                
+                // 초기화
+                parentLargeGroup.style.display = 'none';
+                parentMediumGroup.style.display = 'none';
+                document.getElementById('parentId').value = '';
+                
+                if (depth === '1') {
+                    // 대분류: 부모 없음
+                    parentLargeGroup.style.display = 'none';
+                    parentMediumGroup.style.display = 'none';
+                } else if (depth === '2') {
+                    // 중분류: 대분류 선택 필요
+                    parentLargeGroup.style.display = 'block';
+                    parentMediumGroup.style.display = 'none';
+                } else if (depth === '3') {
+                    // 소분류: 대분류 → 중분류 선택 필요
+                    parentLargeGroup.style.display = 'block';
+                    parentMediumGroup.style.display = 'block';
+                }
+            }
+            
+            // 대분류 선택 시 중분류 로드
+            async function loadMediumForParent() {
+                const largeCategoryId = document.getElementById('parentLargeId').value;
+                const mediumSelect = document.getElementById('parentMediumId');
+                const depth = document.getElementById('categoryDepth').value;
+                
+                // 초기화
+                mediumSelect.innerHTML = '<option value="">중분류를 선택하세요</option>';
+                
+                if (!largeCategoryId) {
+                    document.getElementById('parentId').value = '';
+                    return;
+                }
+                
+                // 중분류로 등록하는 경우 - 대분류를 부모로 설정
+                if (depth === '2') {
+                    document.getElementById('parentId').value = largeCategoryId;
+                    return;
+                }
+                
+                // 소분류로 등록하는 경우 - 중분류 목록 로드
+                try {
+                    const response = await fetch(`/category/api/children/${largeCategoryId}`);
+                    const categories = await response.json();
+                    
+                    if (categories.length > 0) {
+                        categories.forEach(cat => {
+                            const option = document.createElement('option');
+                            option.value = cat.id;
+                            option.textContent = cat.name;
+                            mediumSelect.appendChild(option);
+                        });
+                    } else {
+                        alert('선택한 대분류에 중분류가 없습니다. 먼저 중분류를 등록해주세요.');
+                    }
+                } catch (error) {
+                    console.error('중분류 로드 실패:', error);
+                }
+            }
+            
+            // 중분류 선택 시 parentId 설정
+            document.getElementById('parentMediumId').addEventListener('change', function() {
+                const depth = document.getElementById('categoryDepth').value;
+                if (depth === '3' && this.value) {
+                    document.getElementById('parentId').value = this.value;
+                }
+            });
+            
+            // 폼 제출 시 validation
+            document.getElementById('categoryForm').addEventListener('submit', function(e) {
+                const name = document.getElementById('name').value.trim();
+                const depth = document.getElementById('categoryDepth').value;
+                const parentId = document.getElementById('parentId').value;
+                
+                if (name.length < 2) {
+                    e.preventDefault();
+                    alert('카테고리명은 2글자 이상 입력해주세요.');
+                    return false;
+                }
+                
+                // 중분류/소분류인데 부모가 선택 안 된 경우
+                if (depth === '2' && !parentId) {
+                    e.preventDefault();
+                    alert('상위 대분류를 선택해주세요.');
+                    return false;
+                }
+                
+                if (depth === '3' && !parentId) {
+                    e.preventDefault();
+                    alert('상위 중분류를 선택해주세요.');
+                    return false;
+                }
+                
+                console.log('제출 데이터:', {
+                    name: name,
+                    depth: depth,
+                    parentId: parentId,
+                    code: document.getElementById('code').value
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>
