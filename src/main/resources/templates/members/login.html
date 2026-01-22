@@ -50,6 +50,42 @@
                     <button type="submit" class="btn-auth">로그인</button>
                 </form>
                 
+                <!-- 시연용 계정 섹션 -->
+                <div class="demo-login-section">
+                    <div class="auth-divider">
+                        <span>시연용 계정으로 빠르게 체험하기</span>
+                    </div>
+                    
+                    <div class="demo-accounts-info">
+                        <p class="demo-info-text">회원가입 없이 바로 체험해보세요</p>
+                        <div class="demo-buttons">
+                            <form th:action="@{/members/demo-login}" method="post" style="display:inline;">
+                                <input type="hidden" name="role" value="admin">
+                                <button type="submit" class="btn-demo btn-demo-admin">
+                                    <span class="demo-icon">👤</span>
+                                    <span class="demo-text">관리자로 체험</span>
+                                </button>
+                            </form>
+                            
+                            <form th:action="@{/members/demo-login}" method="post" style="display:inline;">
+                                <input type="hidden" name="role" value="seller">
+                                <button type="submit" class="btn-demo btn-demo-seller">
+                                    <span class="demo-icon">🛍️</span>
+                                    <span class="demo-text">판매자로 체험</span>
+                                </button>
+                            </form>
+                            
+                            <form th:action="@{/members/demo-login}" method="post" style="display:inline;">
+                                <input type="hidden" name="role" value="user">
+                                <button type="submit" class="btn-demo btn-demo-user">
+                                    <span class="demo-icon">👨</span>
+                                    <span class="demo-text">구매자로 체험</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- 구분선 -->
                 <div class="auth-divider">
                     <span>WebShopping이 처음이신가요?</span>

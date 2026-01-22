@@ -29,5 +29,8 @@ public interface OrderService {
     List<OrderResponseDTO> getMyActiveOrders(String email);
 
     List<OrderResponseDTO> getMyCompletedOrders(String email);
+    
+    // Order 엔티티를 DTO로 변환
+    OrderResponseDTO convertToDTO(com.example.webshopping.entity.Order order);
 
 }

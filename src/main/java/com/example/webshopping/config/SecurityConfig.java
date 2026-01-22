@@ -22,6 +22,11 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
 
 
     @Bean
@@ -29,7 +34,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         authorize -> authorize
                                 // ========== 공개 경로 (누구나 접근 가능) ==========
-                                .requestMatchers("/", "/members/login", "/members/register", "/members/new").permitAll()
+                                .requestMatchers("/", "/members/login", "/members/register", "/members/new", "/members/demo-login").permitAll()
                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**").permitAll()
                                 .requestMatchers("/products", "/products/**", "/product/detail/**").permitAll()
                                 
@@ -58,6 +63,9 @@ public class SecurityConfig {
                                 .requestMatchers("/cart/**").authenticated()
                                 .requestMatchers("/orders/**").authenticated()
                                 .requestMatchers("/checkout/**").authenticated()
+                                
+                                // ========== 마이페이지 (로그인 필요) ==========
+                                .requestMatchers("/members/mypage", "/members/mypage/**").authenticated()
                                 
                                 // ========== 마이페이지 (로그인 필요) ==========
                                 .requestMatchers("/mypage/**").authenticated()

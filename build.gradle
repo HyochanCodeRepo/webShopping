@@ -42,6 +42,8 @@ dependencies {
 
     implementation 'org.modelmapper:modelmapper:3.1.0'
 
+    implementation 'com.h2database:h2'
+
     //thymeleaf-Security
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     //Security

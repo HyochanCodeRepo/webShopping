@@ -5,13 +5,19 @@ import com.example.webshopping.constant.Role;
 import com.example.webshopping.dto.OrderResponseDTO;
 import com.example.webshopping.dto.SellerDTO;
 import com.example.webshopping.entity.Members;
+import com.example.webshopping.entity.Order;
 import com.example.webshopping.entity.Product;
 import com.example.webshopping.repository.MembersRepository;
+import com.example.webshopping.repository.OrderRepository;
 import com.example.webshopping.service.OrderService;
 import com.example.webshopping.service.ProductService;
 import com.example.webshopping.service.SellerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -19,7 +25,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -29,6 +40,7 @@ public class AdminController {
     
     private final ProductService productService;
     private final OrderService orderService;
+    private final OrderRepository orderRepository;
     private final SellerService sellerService;
     private final MembersRepository membersRepository;
     
@@ -123,11 +135,19 @@ public class AdminController {
     // ========== 주문 관리 ==========
     
     /**
-     * 관리자 주문 관리 페이지
+     * 관리자 주문 관리 페이지 (검색/필터/페이징)
      */
     @GetMapping("/orders")
-    public String orderManagement(@AuthenticationPrincipal UserDetails userDetails, 
-                                  Model model) {
+    public String orderManagement(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(required = false) String dateFilter,  // today, week, month
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false, defaultValue = "latest") String sortBy,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            Model model) {
         
         if (userDetails == null) {
             return "redirect:/members/login";
@@ -136,23 +156,90 @@ public class AdminController {
         String email = userDetails.getUsername();
         log.info("======== 주문 관리 페이지 접속 ========");
         log.info("로그인 이메일: {}", email);
+        log.info("검색어: {}, 상태: {}, 날짜필터: {}, 시작일: {}, 종료일: {}, 정렬: {}, 페이지: {}", 
+                 keyword, status, dateFilter, startDate, endDate, sortBy, page);
         
-        // 내 상품에 대한 진행 중인 주문과 완료된 주문 조회
-        List<OrderResponseDTO> activeOrders = orderService.getMyActiveOrders(email);
-        List<OrderResponseDTO> completedOrders = orderService.getMyCompletedOrders(email);
+        // 날짜 빠른 필터 처리
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
         
-        log.info("진행중 주문: {}건", activeOrders.size());
-        log.info("완료 주문: {}건", completedOrders.size());
-        
-        if (!activeOrders.isEmpty()) {
-            log.info("진행중 주문 목록:");
-            activeOrders.forEach(order -> 
-                log.info("  - 주문번호: {}, 상태: {}", order.getOrderId(), order.getOrderStatus())
-            );
+        if (dateFilter != null) {
+            LocalDate today = LocalDate.now();
+            switch (dateFilter) {
+                case "today":
+                    startDate = today;
+                    endDate = today;
+                    break;
+                case "week":
+                    startDate = today.minusDays(7);
+                    endDate = today;
+                    break;
+                case "month":
+                    startDate = today.minusDays(30);
+                    endDate = today;
+                    break;
+            }
         }
         
-        model.addAttribute("activeOrders", activeOrders);
-        model.addAttribute("completedOrders", completedOrders);
+        // LocalDate → LocalDateTime 변환
+        if (startDate != null) {
+            startDateTime = startDate.atStartOfDay();
+        }
+        if (endDate != null) {
+            endDateTime = endDate.atTime(23, 59, 59);
+        }
+        
+        // Pageable 생성
+        Pageable pageable = PageRequest.of(page, 20);
+        
+        // 정렬 기준에 따라 주문 검색
+        Page<Order> orderPage;
+        switch (sortBy) {
+            case "amount_desc":
+                orderPage = orderRepository.searchOrdersByAmountDesc(
+                    email, keyword, status, startDateTime, endDateTime, pageable);
+                break;
+            case "amount_asc":
+                orderPage = orderRepository.searchOrdersByAmountAsc(
+                    email, keyword, status, startDateTime, endDateTime, pageable);
+                break;
+            case "latest":
+            default:
+                orderPage = orderRepository.searchOrdersLatest(
+                    email, keyword, status, startDateTime, endDateTime, pageable);
+                break;
+        }
+        
+        // 주문 → DTO 변환
+        List<OrderResponseDTO> orders = orderPage.getContent().stream()
+                .map(orderService::convertToDTO)
+                .collect(Collectors.toList());
+        
+        // 상태별 카운트 조회
+        List<Object[]> statusCounts = orderRepository.countOrdersByStatus(email, startDateTime, endDateTime);
+        Map<String, Long> countMap = new HashMap<>();
+        long totalCount = 0;
+        
+        for (Object[] row : statusCounts) {
+            OrderStatus orderStatus = (OrderStatus) row[0];
+            Long count = (Long) row[1];
+            countMap.put(orderStatus.name(), count);
+            totalCount += count;
+        }
+        
+        log.info("검색 결과: {}개 (전체: {}개)", orders.size(), orderPage.getTotalElements());
+        log.info("상태별 카운트: {}", countMap);
+        
+        model.addAttribute("orders", orders);
+        model.addAttribute("orderPage", orderPage);
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("statusCounts", countMap);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("status", status);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("sortBy", sortBy);
+        
         log.info("======================================");
         
         return "admin/order-management";
@@ -164,6 +251,7 @@ public class AdminController {
     @PostMapping("/orders/{orderId}/status")
     public String updateOrderStatus(@PathVariable Long orderId,
                                     @RequestParam String status,
+                                    @RequestParam(required = false) String redirect,
                                     RedirectAttributes redirectAttributes) {
         try {
             OrderStatus newStatus = OrderStatus.valueOf(status);
@@ -179,6 +267,11 @@ public class AdminController {
         } catch (Exception e) {
             log.error("주문 상태 변경 실패: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        
+        // redirect 파라미터가 있으면 해당 URL로, 없으면 기본 페이지로
+        if (redirect != null && !redirect.trim().isEmpty()) {
+            return "redirect:" + redirect;
         }
         
         return "redirect:/admin/orders";

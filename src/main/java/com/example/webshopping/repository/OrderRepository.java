@@ -1,10 +1,14 @@
 package com.example.webshopping.repository;
 
+import com.example.webshopping.constant.OrderStatus;
 import com.example.webshopping.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -32,4 +36,95 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "WHERE p.members.email = :email " +
             "ORDER BY o.orderDate DESC")
     List<Order> findOrdersByProductOwnerEmail(@Param("email") String email);
+    
+    
+    // ========== 관리자 주문 검색/필터 ==========
+    
+    /**
+     * 관리자 주문 검색 (통합 검색 + 상태 + 날짜 필터) - 최신순
+     */
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "JOIN oi.product p " +
+           "WHERE p.members.email = :email " +
+           "AND (:keyword IS NULL OR " +
+           "     CAST(o.id AS string) LIKE %:keyword% OR " +
+           "     o.member.name LIKE %:keyword% OR " +
+           "     p.productName LIKE %:keyword%) " +
+           "AND (:status IS NULL OR o.orderStatus = :status) " +
+           "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +
+           "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
+           "ORDER BY o.orderDate DESC")
+    Page<Order> searchOrdersLatest(
+        @Param("email") String email,
+        @Param("keyword") String keyword,
+        @Param("status") OrderStatus status,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        Pageable pageable
+    );
+    
+    /**
+     * 관리자 주문 검색 - 금액 높은순
+     */
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "JOIN oi.product p " +
+           "WHERE p.members.email = :email " +
+           "AND (:keyword IS NULL OR " +
+           "     CAST(o.id AS string) LIKE %:keyword% OR " +
+           "     o.member.name LIKE %:keyword% OR " +
+           "     p.productName LIKE %:keyword%) " +
+           "AND (:status IS NULL OR o.orderStatus = :status) " +
+           "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +
+           "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
+           "ORDER BY o.totalPrice DESC")
+    Page<Order> searchOrdersByAmountDesc(
+        @Param("email") String email,
+        @Param("keyword") String keyword,
+        @Param("status") OrderStatus status,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        Pageable pageable
+    );
+    
+    /**
+     * 관리자 주문 검색 - 금액 낮은순
+     */
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "JOIN oi.product p " +
+           "WHERE p.members.email = :email " +
+           "AND (:keyword IS NULL OR " +
+           "     CAST(o.id AS string) LIKE %:keyword% OR " +
+           "     o.member.name LIKE %:keyword% OR " +
+           "     p.productName LIKE %:keyword%) " +
+           "AND (:status IS NULL OR o.orderStatus = :status) " +
+           "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +
+           "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
+           "ORDER BY o.totalPrice ASC")
+    Page<Order> searchOrdersByAmountAsc(
+        @Param("email") String email,
+        @Param("keyword") String keyword,
+        @Param("status") OrderStatus status,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        Pageable pageable
+    );
+    
+    /**
+     * 상태별 주문 개수 조회 (통계용)
+     */
+    @Query("SELECT o.orderStatus, COUNT(o) FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "JOIN oi.product p " +
+           "WHERE p.members.email = :email " +
+           "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +
+           "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
+           "GROUP BY o.orderStatus")
+    List<Object[]> countOrdersByStatus(
+        @Param("email") String email,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
 }

@@ -1,7 +1,14 @@
-# 🛒 webShopping (쇼핑몰)
+# 🛒 webShopping (아웃도어 쇼핑몰)
 
-> **아웃도어 전문 쇼핑몰 플랫폼 🚧 진행 중**  
-> 상품 관리부터 주문/결제 시스템까지 단계적으로 구현하는 E-commerce 프로젝트!
+> **완성도 높은 E-commerce 플랫폼 ✨ 프로젝트 완료**  
+> 상품 관리부터 주문/결제, 관리자 페이지까지 실무 수준으로 구현한 종합 쇼핑몰!
+
+<br>
+
+[![Java](https://img.shields.io/badge/Java_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.5.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
+[![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)](https://gradle.org/)
 
 <br>
 
@@ -23,31 +30,39 @@
 
 ### 📌 개요
 - **프로젝트명**: webShopping (아웃도어 쇼핑몰)
-- **개발 기간**: 2024.11 ~ 진행 중 ⚙️
+- **개발 기간**: 2024.11 ~ 2025.01 (약 3개월)
 - **개발 인원**: 1명 (개인 프로젝트)
-- **개발 상태**: 🚧 **지속 개발 중** - 상품 관리 완료, 주문/결제 시스템 구현 예정
+- **개발 상태**: ✅ **1차 완료** (주요 기능 구현 완료)
 - **프로젝트 목적**: 
-  - 실무 수준의 쇼핑몰 플랫폼 구축 경험
-  - Spring Boot & JPA 기반 상품 관리 시스템 개발
-  - 다중 이미지 업로드 및 파일 관리 시스템 구현
-  - 완전한 E-commerce 플랫폼으로 확장
+  - 실무 수준의 E-commerce 플랫폼 구축
+  - Spring Boot 생태계 전반 학습
+  - 대용량 파일 업로드 & 주문 시스템 구현
+  - 관리자 페이지 & 예외 처리 등 완성도 높은 개발
 
 ### 🎯 기획 배경
-실제 운영 가능한 E-commerce 플랫폼을 단계적으로 구축하며 Spring Boot 실무 역량을 강화하고자 시작한 프로젝트입니다.
+단순 CRUD를 넘어 **실제 운영 가능한 쇼핑몰**을 목표로, 회원 관리부터 상품 등록, 장바구니, 주문/결제, 관리자 페이지까지 전체 프로세스를 경험하고자 시작한 프로젝트입니다.
 
-**✅ 현재 완료된 기능:**
-- 상품 등록/조회/수정/삭제 (CRUD)
-- 다중 이미지 업로드 시스템 (대표 이미지 + 상세 이미지 최대 5개)
-- 카테고리별 상품 분류 및 필터링
-- 할인율 자동 계산 및 실시간 가격 표시
-- Spring Security 기반 회원 인증/인가
+### ✅ **완료된 핵심 기능**
 
-**🚀 진행 예정 기능:**
-- 장바구니 시스템 (Session 기반 → Redis 전환 예정)
-- 주문/결제 시스템 (PortOne API 연동)
-- 상품 검색 기능 (키워드 검색, 가격/카테고리 필터링)
-- 주문 내역 조회 및 배송 추적
-- AWS S3 이미지 업로드 전환
+#### 🛍️ **사용자 기능**
+- 회원가입/로그인 (Spring Security)
+- 상품 검색/정렬/필터링 (가격대, 카테고리)
+- 장바구니 (Session 기반)
+- 주문/결제 (배송지 입력, Daum 주소 API)
+- 주문 내역 조회 및 취소
+- 마이페이지 (대시보드, 기본정보 수정, 주문내역)
+
+#### 👨‍💼 **관리자 기능**
+- 상품 CRUD (다중 이미지 업로드 최대 6개)
+- 주문 관리 (검색/필터/페이징, 상태 변경)
+- 판매자 신청 승인/거부
+- 역할 기반 접근 제어 (ADMIN, SELLER, USER)
+
+#### 🎨 **UX/UI**
+- Toast 알림 시스템
+- 로딩 스피너
+- 반응형 디자인
+- 에러 페이지 (404, 500)
 
 <br>
 
@@ -56,14 +71,21 @@
 ## ✨ 주요 기능
 
 ### 👥 **1. 회원 관리**
-- **회원가입 / 로그인**: Spring Security 기반 인증
-- **역할 기반 접근 제어**: ADMIN, USER 권한 분리
+- **회원가입 / 로그인**: 
+  - Spring Security 기반 인증/인가
+  - 비밀번호 암호화 (BCrypt)
+  - 역할 기반 접근 제어 (ADMIN, SELLER, USER)
+- **마이페이지 (리뉴얼)**:
+  - 📊 대시보드: 주문 통계 (배송중/배송완료/배송준비)
+  - 👤 기본정보: 이름, 전화번호, 주소 수정
+  - 📦 주문내역: 전체 주문 내역 조회
+  - 🔒 비밀번호 변경
 
 ### 📦 **2. 상품 관리 (관리자)**
 - **상품 등록**: 
   - 대표 이미지 1개 + 상세 이미지 최대 5개 업로드
   - 카테고리, 가격, 재고, 할인율 설정
-  - 상품 설명 HTML 에디터 지원
+  - 파일명 중복 방지 (UUID)
 - **상품 수정**: 
   - 기존 이미지 유지/삭제 선택 가능
   - 이미지 순서 변경 지원
@@ -74,28 +96,62 @@
 
 ### 🛍️ **3. 상품 조회 (사용자)**
 - **카테고리별 상품 목록**: 
-  - 하이킹, 캠핑, 낚시, 러닝, 사이클링 등
-  - 대표 이미지 썸네일 표시
-  - 할인가 자동 계산 및 표시
+  - 3단계 계층 구조 (대분류 → 중분류 → 소분류)
+  - 페이징 처리 (20개씩)
+- **검색 & 필터링**:
+  - 키워드 검색 (상품명, 설명)
+  - 가격대 필터 (최소가 ~ 최대가)
+  - 정렬 (최신순, 가격 낮은순/높은순, 인기순)
 - **상품 상세 페이지**: 
-  - 대표 이미지 크게 표시
-  - 상세 이미지 갤러리 형식 나열
+  - 대표 이미지 + 상세 이미지 갤러리
   - 재고 상태 실시간 표시
+  - 장바구니 담기
 
-### 💰 **4. 할인 시스템**
-- **할인율 적용**: 
-  - 원가 대비 할인율 자동 계산
-  - 할인가 실시간 표시
-  - 할인율 0% 시 정상가 표시
+### 🛒 **4. 장바구니 & 주문**
+- **장바구니**: 
+  - Session 기반 장바구니
+  - 수량 변경, 상품 삭제
+  - 선택 삭제 기능
+  - 총 금액 자동 계산
+- **주문/결제**:
+  - Daum 주소 API 연동
+  - 전화번호 자동 포맷팅
+  - 약관 동의 체크
+  - 주문 완료 시 재고 자동 차감
+  - 장바구니 자동 비우기
+- **주문 내역**:
+  - 주문 목록 조회 (최신순)
+  - 주문 상세 정보
+  - 주문 취소 기능
 
-### 🖼️ **5. 다중 이미지 관리**
-- **대표 이미지 (RepImg)**: 
-  - `repImgYn = 'Y'` 플래그로 구분
-  - 목록 페이지 썸네일용
-- **상세 이미지**: 
-  - `imageOrder` 필드로 순서 관리
-  - 최대 5개까지 업로드
-  - 상품 상세 페이지 갤러리 표시
+### 👨‍💼 **5. 관리자 페이지 (신규)**
+- **주문 관리**:
+  - 🔍 통합 검색 (주문번호, 주문자명, 상품명)
+  - 📅 날짜 필터 (오늘/7일/30일/직접선택)
+  - 🏷️ 상태별 탭 필터 (전체/결제대기/주문확정/배송준비/배송중/배송완료/취소)
+  - 🔽 정렬 (최신순, 금액 높은순/낮은순)
+  - 📄 페이징 (20개씩)
+  - ▶️ 다음단계 버튼 (원클릭 상태 변경)
+  - 📊 상태별 카운트 실시간 표시
+- **판매자 신청 관리**:
+  - 신청 목록 조회
+  - 승인/거부 처리
+  - 거부 사유 입력
+
+### 🎨 **6. UX 개선 (신규)**
+- **Toast 알림 시스템**:
+  - 성공/에러/경고/정보 4가지 타입
+  - 애니메이션 효과 (슬라이드 인/아웃)
+  - 자동 사라짐 (3초)
+  - 클릭으로 닫기
+- **예외 처리**:
+  - GlobalExceptionHandler
+  - CustomException + ErrorCode
+  - 404/500 에러 페이지
+  - 사용자 친화적 에러 메시지
+- **로딩 스피너**:
+  - 전체 화면 로딩 스피너
+  - 폼 제출 시 자동 표시
 
 <br>
 
@@ -103,38 +159,45 @@
 
 ## 📸 화면 구성
 
-### 🔐 **로그인 페이지**
-> Spring Security 기반 인증
-
-![로그인](docs/login-page.png)
-
-<br>
-
-### 📝 **회원가입 페이지**
-> 신규 회원 등록
-
-![회원가입](docs/members-register-page.png)
-
-<br>
-
 ### 🏠 **메인 페이지**
-> 카테고리별 상품 진입
+> 카테고리별 상품 진입, 검색 기능
 
 ![메인 페이지](docs/main-page.png)
 
 <br>
 
 ### 🛍️ **상품 목록 페이지**
-> 카테고리별 상품 목록 및 할인가 표시
+> 검색/필터/정렬/페이징 기능
 
 ![상품 목록](docs/product-list-page.png)
 
 <br>
 
-### ✍️ **상품 등록 페이지 (관리자)**
-> 다중 이미지 업로드 및 상품 정보 입력
+### 🛒 **장바구니 페이지**
+> 상품 수량 조절, 선택 삭제
 
-![상품 등록](docs/product-register-page.png)
+![장바구니](docs/cart-page.png)
+
+<br>
+
+### 💳 **주문/결제 페이지**
+> Daum 주소 API, 전화번호 포맷팅
+
+![주문/결제](docs/checkout-page.png)
+
+<br>
+
+### 👤 **마이페이지 (리뉴얼)**
+> 대시보드, 기본정보, 주문내역 탭
+
+![마이페이지](docs/mypage.png)
+
+<br>
+
+### 👨‍💼 **관리자 주문 관리**
+> 검색/필터/페이징, 다음단계 버튼
+
+![관리자 주문 관리](docs/admin-orders.png)
 
 <br>
 
@@ -175,36 +238,80 @@ webShopping/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/example/webshopping/
-│   │   │   ├── config/              # Spring Security, 파일 업로드 설정
-│   │   │   ├── constant/            # Role 등 상수 정의
-│   │   │   ├── controller/          # MVC 컨트롤러
-│   │   │   │   ├── MainController.java
-│   │   │   │   ├── ProductController.java
-│   │   │   │   └── MembersController.java
-│   │   │   ├── dto/                 # 데이터 전송 객체
-│   │   │   │   └── ProductDTO.java
-│   │   │   ├── entity/              # JPA 엔티티
-│   │   │   │   ├── Product.java         # 상품 엔티티
-│   │   │   │   ├── ProductImage.java    # 상품 이미지 엔티티
-│   │   │   │   ├── Category.java        # 카테고리 엔티티
-│   │   │   │   └── Members.java         # 회원 엔티티
-│   │   │   ├── repository/          # Spring Data JPA 리포지토리
-│   │   │   ├── service/             # 비즈니스 로직
+│   │   │   ├── config/                    # 설정
+│   │   │   │   ├── SecurityConfig.java       # Spring Security 설정
+│   │   │   │   └── FileUploadConfig.java     # 파일 업로드 설정
+│   │   │   ├── constant/                  # 상수
+│   │   │   │   ├── Role.java                 # 회원 역할 (ADMIN, SELLER, USER)
+│   │   │   │   └── OrderStatus.java          # 주문 상태
+│   │   │   ├── controller/                # 컨트롤러
+│   │   │   │   ├── MainController.java       # 메인 페이지
+│   │   │   │   ├── ProductController.java    # 상품 관리
+│   │   │   │   ├── CartController.java       # 장바구니
+│   │   │   │   ├── OrderController.java      # 주문/결제
+│   │   │   │   ├── MembersController.java    # 회원 관리
+│   │   │   │   └── AdminController.java      # 관리자 페이지
+│   │   │   ├── dto/                       # 데이터 전송 객체
+│   │   │   │   ├── ProductDTO.java
+│   │   │   │   ├── OrderRequestDTO.java
+│   │   │   │   └── OrderResponseDTO.java
+│   │   │   ├── entity/                    # JPA 엔티티
+│   │   │   │   ├── Product.java              # 상품
+│   │   │   │   ├── ProductImage.java         # 상품 이미지
+│   │   │   │   ├── Category.java             # 카테고리
+│   │   │   │   ├── Members.java              # 회원
+│   │   │   │   ├── Cart.java                 # 장바구니
+│   │   │   │   ├── CartItem.java             # 장바구니 상품
+│   │   │   │   ├── Order.java                # 주문
+│   │   │   │   └── OrderItem.java            # 주문 상품
+│   │   │   ├── exception/                 # 예외 처리 (신규)
+│   │   │   │   ├── GlobalExceptionHandler.java
+│   │   │   │   ├── CustomException.java
+│   │   │   │   └── ErrorCode.java
+│   │   │   ├── repository/                # Spring Data JPA 리포지토리
+│   │   │   │   ├── ProductRepository.java
+│   │   │   │   ├── OrderRepository.java
+│   │   │   │   ├── CartRepository.java
+│   │   │   │   └── MembersRepository.java
+│   │   │   ├── service/                   # 비즈니스 로직
 │   │   │   │   ├── ProductService.java
+│   │   │   │   ├── OrderService.java
+│   │   │   │   ├── CartService.java
 │   │   │   │   └── FileService.java
 │   │   │   └── WebShoppingApplication.java
 │   │   └── resources/
-│   │       ├── templates/           # Thymeleaf 템플릿
+│   │       ├── templates/                 # Thymeleaf 템플릿
 │   │       │   ├── main.html
 │   │       │   ├── layout/
+│   │       │   │   └── default.html          # 공통 레이아웃
 │   │       │   ├── members/
-│   │       │   └── product/
-│   │       │       ├── form.html        # 상품 등록/수정 폼
-│   │       │       ├── list.html        # 상품 목록
-│   │       │       └── detail.html      # 상품 상세
-│   │       ├── static/              # CSS, JS, 이미지
+│   │       │   │   ├── login.html
+│   │       │   │   ├── register.html
+│   │       │   │   └── mypage.html           # 마이페이지 (리뉴얼)
+│   │       │   ├── product/
+│   │       │   │   ├── form.html             # 상품 등록/수정
+│   │       │   │   ├── list.html             # 상품 목록 (검색/필터/페이징)
+│   │       │   │   └── detail.html           # 상품 상세
+│   │       │   ├── cart/
+│   │       │   │   └── cart.html             # 장바구니
+│   │       │   ├── order/
+│   │       │   │   ├── checkout.html         # 주문/결제
+│   │       │   │   ├── list.html             # 주문 내역
+│   │       │   │   └── detail.html           # 주문 상세
+│   │       │   ├── admin/                    # 관리자 페이지 (신규)
+│   │       │   │   ├── order-management.html # 주문 관리
+│   │       │   │   └── seller-management.html# 판매자 관리
+│   │       │   └── error/                    # 에러 페이지 (신규)
+│   │       │       ├── 404.html
+│   │       │       └── 500.html
+│   │       ├── static/                    # 정적 리소스
+│   │       │   ├── css/
+│   │       │   │   └── common.css
+│   │       │   └── js/
+│   │       │       ├── common.js
+│   │       │       └── toast.js              # Toast 알림 (신규)
 │   │       └── application.properties
-│   └── test/                        # 테스트 코드
+│   └── test/                              # 테스트 코드
 └── build.gradle
 ```
 
@@ -259,174 +366,321 @@ public class Product {
                 .map(ProductImage::getImageUrl)
                 .collect(Collectors.toList());
     }
-    
-    // 이미지 추가 (양방향 연관관계 설정)
-    public void addImage(ProductImage image) {
-        images.add(image);
-        image.setProduct(this);
-    }
 }
 ```
 
 <br>
 
-### 2️⃣ **파일 업로드 서비스**
+### 2️⃣ **장바구니 시스템 (Session 기반)**
 
-#### 📌 **FileService 구현**
-```java
-@Service
-public class FileService {
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-    
-    public String uploadFile(MultipartFile file) {
-        // 원본 파일명
-        String originalFilename = file.getOriginalFilename();
-        
-        // UUID로 고유한 파일명 생성
-        String savedFilename = UUID.randomUUID() + "_" + originalFilename;
-        
-        // 파일 저장 경로
-        Path filePath = Paths.get(uploadDir, savedFilename);
-        
-        // 파일 저장
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        
-        return "/uploads/" + savedFilename;
-    }
-}
-```
-
-#### 📌 **컨트롤러에서 다중 파일 처리**
-```java
-@PostMapping("/register")
-public String register(ProductDTO productDTO,
-                       @RequestParam(required = false) MultipartFile mainImageFile,
-                       @RequestParam(required = false) List<MultipartFile> detailImageFiles) {
-    
-    List<String> imageUrls = new ArrayList<>();
-    
-    // 대표 이미지 저장
-    if (mainImageFile != null && !mainImageFile.isEmpty()) {
-        String mainUrl = fileService.uploadFile(mainImageFile);
-        imageUrls.add(mainUrl);
-    }
-    
-    // 상세 이미지 저장
-    if (detailImageFiles != null && !detailImageFiles.isEmpty()) {
-        for (MultipartFile file : detailImageFiles) {
-            if (!file.isEmpty()) {
-                String url = fileService.uploadFile(file);
-                imageUrls.add(url);
-            }
-        }
-    }
-    
-    // 서비스 호출
-    productService.create(productDTO, imageUrls);
-    
-    return "redirect:/product/register";
-}
-```
-
-<br>
-
-### 3️⃣ **할인가 자동 계산**
-
-#### 📌 **Product 엔티티의 할인 로직**
+#### 📌 **Cart 엔티티 설계**
 ```java
 @Entity
-public class Product {
-    private Integer price;           // 원가
-    private Integer discountRate;    // 할인율 (%)
+public class Cart {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
-    // 할인가 계산 메서드
-    public Integer getDiscountPrice() {
-        if (discountRate != null && discountRate > 0) {
-            return price - (price * discountRate / 100);
-        }
-        return price;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Members members;
+    
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
+    
+    // 총 금액 계산
+    public Integer getTotalPrice() {
+        return cartItems.stream()
+                .mapToInt(CartItem::getTotalPrice)
+                .sum();
     }
 }
 ```
 
-#### 📌 **Thymeleaf 템플릿에서 할인가 표시**
-```html
-<!-- 할인율이 있는 경우 -->
-<div th:if="${product.discountRate != null and product.discountRate > 0}">
-    <span class="original-price" th:text="${product.price} + '원'">10,000원</span>
-    <span class="discount-rate" th:text="${product.discountRate} + '%'">10%</span>
-    <span class="discount-price" th:text="${product.discountPrice} + '원'">9,000원</span>
-</div>
-
-<!-- 할인율이 없는 경우 -->
-<div th:unless="${product.discountRate != null and product.discountRate > 0}">
-    <span class="price" th:text="${product.price} + '원'">10,000원</span>
-</div>
+#### 📌 **CartItem 엔티티**
+```java
+@Entity
+public class CartItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+    
+    private Integer quantity;
+    
+    // 상품별 총 금액 계산
+    public Integer getTotalPrice() {
+        return product.getDiscountPrice() * quantity;
+    }
+}
 ```
 
 <br>
 
-### 4️⃣ **Cascade 연관관계 관리**
+### 3️⃣ **주문 시스템**
 
-#### 📌 **Product 삭제 시 이미지 자동 삭제**
+#### 📌 **Order 엔티티 설계**
 ```java
 @Entity
-public class Product {
-    @OneToMany(mappedBy = "product", 
-               cascade = CascadeType.ALL,  // 모든 영속성 전이
-               orphanRemoval = true)        // 고아 객체 자동 삭제
-    private List<ProductImage> images = new ArrayList<>();
+@Table(name = "orders")
+public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Members member;
+    
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
+    
+    private LocalDateTime orderDate;
+    
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;  // PENDING, CONFIRMED, PREPARING, SHIPPED, DELIVERED, CANCELLED
+    
+    private Integer totalPrice;
+    
+    // 배송 정보
+    private String recipientName;
+    private String recipientPhone;
+    private String deliveryAddress;
+    private String deliveryMessage;
+    
+    // 주문 생성 정적 팩토리 메서드
+    public static Order createOrder(Members member, String recipientName, 
+                                   String recipientPhone, String deliveryAddress,
+                                   String deliveryMessage) {
+        return Order.builder()
+                .member(member)
+                .recipientName(recipientName)
+                .recipientPhone(recipientPhone)
+                .deliveryAddress(deliveryAddress)
+                .deliveryMessage(deliveryMessage)
+                .orderItems(new ArrayList<>())
+                .build();
+    }
+    
+    // 주문 취소
+    public void cancel() {
+        if (this.orderStatus == OrderStatus.SHIPPED || 
+            this.orderStatus == OrderStatus.DELIVERED) {
+            throw new IllegalStateException("배송중이거나 배송완료된 주문은 취소할 수 없습니다.");
+        }
+        this.orderStatus = OrderStatus.CANCELLED;
+        
+        // 재고 복구
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel();
+        }
+    }
 }
 ```
 
-#### 📌 **상품 수정 시 이미지 업데이트**
+#### 📌 **OrderItem 엔티티**
 ```java
-@Service
-public class ProductService {
-    @Transactional
-    public void update(Long id, ProductDTO dto, 
-                      MultipartFile mainImage, 
-                      List<MultipartFile> detailImages,
-                      Boolean keepMainImage) {
+@Entity
+public class OrderItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Product product;
+    
+    private Integer orderPrice;  // 주문 당시 가격
+    private Integer quantity;
+    
+    // 주문 상품 생성 (재고 차감)
+    public static OrderItem createOrderItem(Product product, int quantity) {
+        OrderItem orderItem = OrderItem.builder()
+                .product(product)
+                .orderPrice(product.getDiscountPrice())
+                .quantity(quantity)
+                .build();
         
-        Product product = productRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("상품 없음"));
-        
-        // 기본 정보 업데이트
-        product.setProductName(dto.getProductName());
-        product.setPrice(dto.getPrice());
-        
-        // 대표 이미지 교체 (기존 삭제 안 함)
-        if (!keepMainImage && mainImage != null && !mainImage.isEmpty()) {
-            // 기존 대표 이미지 찾아서 업데이트
-            product.getImages().stream()
-                .filter(img -> "Y".equals(img.getRepImgYn()))
-                .findFirst()
-                .ifPresent(img -> {
-                    String newUrl = fileService.uploadFile(mainImage);
-                    img.setImageUrl(newUrl);
-                });
-        }
-        
-        // 상세 이미지 추가
-        if (detailImages != null && !detailImages.isEmpty()) {
-            int currentOrder = product.getImages().size();
-            for (MultipartFile file : detailImages) {
-                if (!file.isEmpty()) {
-                    String url = fileService.uploadFile(file);
-                    ProductImage newImage = ProductImage.builder()
-                        .imageUrl(url)
-                        .repImgYn("N")
-                        .imageOrder(currentOrder++)
-                        .build();
-                    product.addImage(newImage);
-                }
-            }
-        }
-        
-        productRepository.save(product);
+        product.removeStock(quantity);  // 재고 차감
+        return orderItem;
     }
+    
+    // 주문 취소 (재고 복구)
+    public void cancel() {
+        product.addStock(quantity);
+    }
+    
+    // 주문 상품 총 가격
+    public Integer getTotalPrice() {
+        return orderPrice * quantity;
+    }
+}
+```
+
+<br>
+
+### 4️⃣ **관리자 주문 관리 (신규)**
+
+#### 📌 **검색/필터 쿼리**
+```java
+@Repository
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    
+    /**
+     * 관리자 주문 검색 (통합 검색 + 상태 + 날짜 필터)
+     */
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "JOIN oi.product p " +
+           "WHERE p.members.email = :email " +
+           "AND (:keyword IS NULL OR " +
+           "     CAST(o.id AS string) LIKE %:keyword% OR " +
+           "     o.member.name LIKE %:keyword% OR " +
+           "     p.productName LIKE %:keyword%) " +
+           "AND (:status IS NULL OR o.orderStatus = :status) " +
+           "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +
+           "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
+           "ORDER BY o.orderDate DESC")
+    Page<Order> searchOrdersLatest(
+        @Param("email") String email,
+        @Param("keyword") String keyword,
+        @Param("status") OrderStatus status,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        Pageable pageable
+    );
+    
+    /**
+     * 상태별 주문 개수 조회 (통계용)
+     */
+    @Query("SELECT o.orderStatus, COUNT(o) FROM Order o " +
+           "JOIN o.orderItems oi " +
+           "JOIN oi.product p " +
+           "WHERE p.members.email = :email " +
+           "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +
+           "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
+           "GROUP BY o.orderStatus")
+    List<Object[]> countOrdersByStatus(
+        @Param("email") String email,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
+}
+```
+
+<br>
+
+### 5️⃣ **Toast 알림 시스템 (신규)**
+
+#### 📌 **JavaScript 구현**
+```javascript
+/**
+ * Toast 알림 표시
+ * @param {string} message - 표시할 메시지
+ * @param {string} type - 알림 타입 (success, error, warning, info)
+ * @param {number} duration - 표시 시간 (ms)
+ */
+function showToast(message, type = 'info', duration = 3000) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-item';
+    toast.style.cssText = `
+        min-width: 300px;
+        padding: 16px 20px;
+        background: ${typeConfig[type].bgColor};
+        border-left: 4px solid ${typeConfig[type].color};
+        border-radius: 8px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    toast.innerHTML = `
+        <i class="fas ${typeConfig[type].icon}"></i>
+        <span>${message}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    // 자동 제거
+    setTimeout(() => removeToast(toast), duration);
+}
+```
+
+<br>
+
+### 6️⃣ **예외 처리 시스템 (신규)**
+
+#### 📌 **GlobalExceptionHandler**
+```java
+@Log4j2
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    
+    /**
+     * 커스텀 비즈니스 예외 처리
+     */
+    @ExceptionHandler(CustomException.class)
+    public String handleCustomException(CustomException e, 
+                                       RedirectAttributes redirectAttributes) {
+        log.error("CustomException: {} - {}", e.getErrorCode().getCode(), e.getMessage());
+        
+        redirectAttributes.addFlashAttribute("error", e.getMessage());
+        return "redirect:/";
+    }
+    
+    /**
+     * EntityNotFoundException 처리
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public String handleEntityNotFoundException(EntityNotFoundException e, Model model) {
+        log.error("EntityNotFoundException: {}", e.getMessage());
+        
+        model.addAttribute("errorMessage", "요청하신 데이터를 찾을 수 없습니다.");
+        return "error/404";
+    }
+    
+    /**
+     * 모든 예외 처리 (최종 방어선)
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleException(Exception e, Model model) {
+        log.error("Unexpected Exception: ", e);
+        
+        model.addAttribute("errorMessage", "서버 오류가 발생했습니다.");
+        return "error/500";
+    }
+}
+```
+
+#### 📌 **ErrorCode Enum**
+```java
+@Getter
+@AllArgsConstructor
+public enum ErrorCode {
+    // 상품 관련
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "상품을 찾을 수 없습니다."),
+    OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "P002", "재고가 부족합니다."),
+    
+    // 주문 관련
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "주문을 찾을 수 없습니다."),
+    ORDER_CANNOT_CANCEL(HttpStatus.BAD_REQUEST, "O003", "취소할 수 없는 주문 상태입니다."),
+    EMPTY_CART(HttpStatus.BAD_REQUEST, "O004", "장바구니가 비어있습니다."),
+    
+    // 회원 관련
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M001", "회원을 찾을 수 없습니다."),
+    DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "M002", "이미 사용중인 이메일입니다."),
+    
+    // ... 기타
 }
 ```
 
@@ -436,91 +690,147 @@ public class ProductService {
 
 ## 🚧 트러블슈팅
 
-### 1️⃣ **문제: 이미지 업로드 시 파일 경로 설정 오류**
+### 1️⃣ **문제: 장바구니 중복 상품 처리**
+
+#### 🔴 **발생 상황**
+- 같은 상품을 여러 번 담으면 CartItem이 계속 추가됨
+- 사용자가 의도한 것은 수량 증가였음
+
+#### ✅ **해결 방법**
+```java
+@Service
+public class CartService {
+    @Transactional
+    public void addCart(String email, Long productId, Integer quantity) {
+        Cart cart = getOrCreateCart(email);
+        
+        // 기존에 담긴 상품인지 확인
+        Optional<CartItem> existingItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst();
+        
+        if (existingItem.isPresent()) {
+            // 기존 상품이면 수량만 증가
+            CartItem item = existingItem.get();
+            item.setQuantity(item.getQuantity() + quantity);
+        } else {
+            // 새 상품이면 CartItem 생성
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+            
+            CartItem newItem = CartItem.builder()
+                    .cart(cart)
+                    .product(product)
+                    .quantity(quantity)
+                    .build();
+            
+            cart.getCartItems().add(newItem);
+        }
+        
+        cartRepository.save(cart);
+    }
+}
+```
+
+#### 📌 **배운 점**
+- Stream API를 활용한 중복 체크
+- 비즈니스 로직을 Service 계층에서 처리
+
+<br>
+
+### 2️⃣ **문제: 주문 시 재고 차감 실패**
+
+#### 🔴 **발생 상황**
+- 동시에 여러 사용자가 같은 상품 주문 시 재고 오버플로우
+- `@Transactional`이 제대로 동작하지 않음
+
+#### ✅ **해결 방법**
+```java
+@Entity
+public class Product {
+    private Integer stockQuantity;
+    
+    // 재고 차감 (비관적 락)
+    public void removeStock(int quantity) {
+        int restStock = this.stockQuantity - quantity;
+        if (restStock < 0) {
+            throw new CustomException(ErrorCode.OUT_OF_STOCK, 
+                    this.productName + "의 재고가 부족합니다. (현재 재고: " + this.stockQuantity + "개)");
+        }
+        this.stockQuantity = restStock;
+    }
+    
+    // 재고 복구
+    public void addStock(int quantity) {
+        this.stockQuantity += quantity;
+    }
+}
+```
+
+```java
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Product p WHERE p.id = :id")
+    Optional<Product> findByIdWithLock(@Param("id") Long id);
+}
+```
+
+#### 📌 **배운 점**
+- 비관적 락(`PESSIMISTIC_WRITE`)으로 동시성 제어
+- 재고 차감 전 유효성 검증 필수
+
+<br>
+
+### 3️⃣ **문제: 페이징 + Fetch Join 충돌**
 
 #### 🔴 **발생 원인**
 ```java
 // 문제가 된 코드
-@Value("${file.upload-dir}")
-private String uploadDir = "uploads/"; // application.properties 설정 무시됨
+@Query("SELECT DISTINCT p FROM Product p " +
+       "LEFT JOIN FETCH p.images " +  // Fetch Join
+       "WHERE p.category.id = :categoryId")
+Page<Product> findByCategoryWithImages(@Param("categoryId") Long categoryId, 
+                                       Pageable pageable);
+
+// 경고: HHH90003004: firstResult/maxResults specified with collection fetch
 ```
 
 #### ✅ **해결 방법**
 ```java
-// 수정된 코드
-@Value("${file.upload-dir}")
-private String uploadDir; // 기본값 제거
-
-// application.properties
-file.upload-dir=C:/uploads/products
+// Fetch Join 제거 (JPA가 자동으로 LIMIT/OFFSET SQL 생성)
+@Query("SELECT DISTINCT p FROM Product p " +
+       "JOIN p.images " +  // FETCH 제거!
+       "WHERE p.category.id = :categoryId")
+Page<Product> findByCategoryWithImages(@Param("categoryId") Long categoryId, 
+                                       Pageable pageable);
 ```
 
 #### 📌 **배운 점**
-- `@Value`로 주입받는 필드는 기본값을 설정하면 안 됨
-- 파일 경로는 절대 경로로 설정하는 것이 안전
+- Fetch Join과 페이징은 함께 사용하면 안 됨
+- JPA가 메모리에서 페이징하면 성능 저하
+- N+1 문제는 `@BatchSize`로 해결
 
 <br>
 
-### 2️⃣ **문제: 상품 수정 시 이미지 중복 업로드**
-
-#### 🔴 **발생 상황**
-- 상품 수정 시 기존 이미지 유지 옵션을 선택해도 새 이미지가 추가로 업로드됨
-- `orphanRemoval = true` 때문에 기존 이미지 삭제됨
-
-#### ✅ **해결 방법**
-```java
-// 기존 이미지 유지 여부 파라미터 추가
-@PostMapping("/edit/{id}")
-public String edit(...,
-                   @RequestParam(required = false, defaultValue = "false") Boolean keepMainImage) {
-    
-    // 대표 이미지 교체 로직
-    if (!keepMainImage && mainImage != null && !mainImage.isEmpty()) {
-        // 기존 이미지 URL만 변경 (엔티티는 유지)
-        product.getImages().stream()
-            .filter(img -> "Y".equals(img.getRepImgYn()))
-            .findFirst()
-            .ifPresent(img -> img.setImageUrl(newUrl));
-    }
-}
-```
-
-#### 📌 **배운 점**
-- `orphanRemoval`과 `cascade`의 차이점 명확히 이해
-- 이미지 교체 시 URL만 변경하는 것이 효율적
-
-<br>
-
-### 3️⃣ **문제: Thymeleaf에서 할인가 표시 시 null 처리**
+### 4️⃣ **문제: Order 엔티티에 orderNumber 필드 없음**
 
 #### 🔴 **발생 원인**
-```html
-<!-- 문제가 된 코드 -->
-<span th:text="${product.discountPrice} + '원'">할인가</span>
-<!-- discountRate가 null일 때 NPE 발생 -->
+```java
+// Repository 쿼리
+o.orderNumber LIKE %:keyword%  // ❌ orderNumber 필드가 없음!
 ```
 
 #### ✅ **해결 방법**
 ```java
-// Product 엔티티
-public Integer getDiscountPrice() {
-    if (discountRate != null && discountRate > 0) {  // null 체크 추가
-        return price - (price * discountRate / 100);
-    }
-    return price;
-}
-```
-
-```html
-<!-- Thymeleaf 템플릿 -->
-<div th:if="${product.discountRate != null and product.discountRate > 0}">
-    <span class="discount-price" th:text="${product.discountPrice} + '원'"></span>
-</div>
+// id를 문자열로 변환해서 검색
+CAST(o.id AS string) LIKE %:keyword%  // ✅ id를 주문번호로 사용
 ```
 
 #### 📌 **배운 점**
-- 엔티티 메서드에서 null 안전성 확보 중요
-- Thymeleaf의 조건부 렌더링 활용
+- 엔티티 설계 시 필드명 확인 필수
+- `CAST` 함수로 타입 변환 가능
 
 <br>
 
@@ -529,76 +839,93 @@ public Integer getDiscountPrice() {
 ## 💡 개발 과정 및 느낀 점
 
 ### 📚 **배운 점**
-1. **다중 이미지 업로드 시스템 설계**: 
-   - 대표 이미지와 상세 이미지를 구분하는 설계 경험
-   - `repImgYn`, `imageOrder` 필드를 활용한 유연한 이미지 관리
-   - 상품별 최대 6개 이미지 업로드 및 순서 관리
 
-2. **파일 업로드 보안 & 최적화**: 
-   - UUID를 활용한 파일명 중복 방지
-   - 허용된 확장자만 업로드하도록 검증
-   - 파일 크기 제한 설정 (10MB)
+#### **1. JPA 연관관계 실전 활용**
+- **양방향 연관관계**: Product ↔ ProductImage, Cart ↔ CartItem, Order ↔ OrderItem
+- **Cascade 설정**: `CascadeType.ALL` + `orphanRemoval = true`로 연관 엔티티 자동 관리
+- **Lazy Loading**: `fetch = FetchType.LAZY`로 성능 최적화
+- **연관관계 편의 메서드**: `addImage()`, `addOrderItem()` 등으로 양방향 관계 안전하게 설정
 
-3. **JPA Cascade 실전 활용**: 
-   - `CascadeType.ALL`과 `orphanRemoval`의 차이점 체감
-   - 연관관계 편의 메서드의 중요성
-   - 상품 삭제 시 연관 이미지 자동 정리
+#### **2. Spring Security 인증/인가**
+- **역할 기반 접근 제어**: `@PreAuthorize("hasRole('ADMIN')")`
+- **BCrypt 암호화**: 비밀번호 안전하게 저장
+- **로그인 성공/실패 핸들러**: 커스텀 리다이렉트
+- **Remember-Me 기능**: 자동 로그인 구현
 
-4. **비즈니스 로직 분리**: 
-   - 할인가 계산을 엔티티 메서드로 분리
-   - Controller → Service → Repository 계층 명확히 구분
-   - DTO를 활용한 화면-엔티티 분리
+#### **3. 복잡한 쿼리 작성**
+- **JPQL**: 다중 조인 + 조건 + 정렬 + 페이징
+- **동적 쿼리**: `:keyword IS NULL OR ...` 패턴
+- **집계 함수**: `COUNT()`, `GROUP BY`로 통계 조회
+- **CAST 함수**: 타입 변환으로 검색 확장
 
-### 🚀 **향후 개발 방향**
+#### **4. 파일 업로드 시스템**
+- **UUID**: 파일명 중복 방지
+- **확장자 검증**: 허용된 이미지만 업로드
+- **파일 크기 제한**: 10MB 제한
+- **Cascade 삭제**: 상품 삭제 시 이미지 자동 정리
 
-#### **1단계: 장바구니 & 주문 시스템 (진행 예정)**
+#### **5. 예외 처리 전략**
+- **GlobalExceptionHandler**: 전역 예외 처리
+- **CustomException**: 비즈니스 예외 정의
+- **ErrorCode Enum**: 에러 코드 체계화
+- **사용자 친화적 메시지**: Toast 알림으로 UX 개선
+
+### 🎯 **성장 포인트**
+
+#### **기술적 성장**
+- **Spring Boot 생태계 이해도 향상**
+- **JPA 실무 활용 능력 배양**
+- **RESTful하지 않지만 실용적인 설계**
+- **예외 처리 & 로깅의 중요성 체감**
+
+#### **설계적 성장**
+- **엔티티 설계**: 정규화 vs 성능 트레이드오프 고민
+- **서비스 계층 분리**: 비즈니스 로직과 컨트롤러 분리
+- **DTO 활용**: 엔티티와 뷰 계층 분리
+- **계층별 책임 명확화**: Controller → Service → Repository
+
+#### **완성도 향상**
+- **Toast 알림**: 사용자 경험 개선
+- **에러 페이지**: 404, 500 페이지 디자인
+- **관리자 페이지**: 실무 수준의 검색/필터 기능
+- **마이페이지 리뉴얼**: 탭 네비게이션으로 UX 개선
+
+### 🚀 **향후 개발 방향 (선택)**
+
+#### **인프라 개선**
 ```
-✅ 구현 계획:
-- Session 기반 장바구니 (비회원 지원)
-- 주문 엔티티 설계 (Order, OrderItem)
-- 주문 상태 관리 (주문완료, 배송중, 배송완료, 취소)
-- 재고 관리 시스템 (주문 시 재고 차감)
-```
-
-#### **2단계: 결제 시스템 (진행 예정)**
-```
-✅ 구현 계획:
-- PortOne(구 아임포트) API 연동
-- 결제 수단: 카드, 계좌이체, 무통장입금
-- 결제 실패/취소 처리 로직
-- 결제 내역 조회 및 영수증 발행
-```
-
-#### **3단계: 검색 & 필터링 기능 (진행 예정)**
-```
-✅ 구현 계획:
-- 상품명 키워드 검색 (QueryDSL 활용)
-- 가격대별 필터링 (최소가 ~ 최대가)
-- 카테고리 + 검색어 조합 검색
-- 정렬 기능 (최신순, 가격순, 인기순)
-```
-
-#### **4단계: 인프라 개선 (진행 예정)**
-```
-✅ 구현 계획:
+✅ 구상 중:
 - AWS S3로 이미지 업로드 전환
 - Redis Session 관리 (장바구니 성능 향상)
 - AWS RDS 데이터베이스 전환
 - Docker 컨테이너 기반 배포
 ```
 
-### 🎯 **장기 목표**
-- **관리자 대시보드**: 판매 통계, 재고 관리, 주문 현황
-- **리뷰 시스템**: 구매 후 리뷰 작성, 별점 평가
-- **쿠폰 & 프로모션**: 할인 쿠폰, 이벤트 배너 관리
-- **추천 알고리즘**: 구매 이력 기반 상품 추천
+#### **추가 기능**
+```
+✅ 구상 중:
+- 리뷰 시스템 (별점, 사진 리뷰)
+- 찜하기 (위시리스트)
+- 쿠폰 & 프로모션
+- 추천 알고리즘 (구매 이력 기반)
+- 재입고 알림
+```
+
+#### **성능 최적화**
+```
+✅ 구상 중:
+- 인덱스 추가 (검색 성능 향상)
+- 쿼리 최적화 (N+1 문제 해결)
+- 캐시 적용 (Redis)
+- 이미지 CDN 적용
+```
 
 <br>
 
 ---
 
 ## 🔗 관련 링크
-- **GitHub Repository**: [https://github.com/yourusername/webShopping](https://github.com/yourusername/webShopping)
+- **GitHub Repository**: https://github.com/HyochanCodeRepo/webShopping
 - **시연 영상**: (추가 예정)
 - **배포 URL**: (추가 예정)
 
@@ -608,6 +935,12 @@ public Integer getDiscountPrice() {
 
 ## 📧 Contact
 - **이메일**: hyochan.lee91@gmail.com
+- **GitHub**: https://github.com/HyochanCodeRepo
+
+---
+
+## 📝 License
+이 프로젝트는 포트폴리오 목적으로 제작되었습니다.
 
 ---
 

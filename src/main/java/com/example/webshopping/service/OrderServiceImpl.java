@@ -127,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // Order 엔티티를 OrderResponseDTO로 변환
-    private OrderResponseDTO convertToDTO(Order order) {
+    public OrderResponseDTO convertToDTO(Order order) {
         List<OrderItemDTO> itemDTOs = order.getOrderItems().stream()
                 .map(item -> OrderItemDTO.builder()
                         .orderItemId(item.getId())

@@ -37,9 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const category = document.querySelector('.search-category').value;
         
         if (keyword) {
-            let url = '/products?keyword=' + encodeURIComponent(keyword);
-            if (category !== 'all') {
-                url += '&category=' + encodeURIComponent(category);
+            let url = '/product/search?keyword=' + encodeURIComponent(keyword);
+            if (category && category !== 'all' && category !== '') {
+                url += '&categoryId=' + category;
             }
             window.location.href = url;
         }

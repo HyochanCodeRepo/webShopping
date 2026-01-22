@@ -4,10 +4,7 @@ import com.example.webshopping.dto.CategoryDTO;
 import com.example.webshopping.dto.ProductDTO;
 import com.example.webshopping.dto.ProductOptionDTO;
 import com.example.webshopping.entity.*;
-import com.example.webshopping.repository.CategoryRepository;
-import com.example.webshopping.repository.MembersRepository;
-import com.example.webshopping.repository.ProductDetailRepository;
-import com.example.webshopping.repository.ProductRepository;
+import com.example.webshopping.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private final FileService fileService;
     private final MembersRepository membersRepository;
     private final ProductDetailRepository productDetailRepository;
+    private final CartItemRepository cartItemRepository;
 
 
 
@@ -217,8 +215,9 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
 
-        // 1. 장바구니 아이템에서 해당 상품 참조 제거
-        // (CartItem -> Product 외래키)
+        // 1. 장바구니 아이템에서 해당 상품 참조 제거 (외래키 제약조건 해결)
+        log.info("장바구니에서 상품 제거 중 - Product ID: {}", id);
+        cartItemRepository.deleteByProduct_Id(id);
         
         // 2. 주문 아이템은 이력이므로 유지 (삭제하지 않음)
         // (OrderItem -> Product 참조는 남겨둠)

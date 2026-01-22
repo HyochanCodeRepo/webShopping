@@ -177,7 +177,76 @@
                 border-radius: 4px;
                 font-size: 14px;
                 cursor: pointer;
+                background: #fff;
             }
+            
+            .sort-select:focus {
+                outline: none;
+                border-color: #ff9900;
+            }
+            
+            /* 가격 필터 */
+            .price-filter {
+                margin-bottom: 30px;
+                padding: 20px;
+                background: #fff;
+                border: 1px solid #e8e8e8;
+                border-radius: 8px;
+            }
+            
+            .filter-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 15px;
+            }
+            
+            .price-buttons {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            
+            .price-btn {
+                padding: 10px 20px;
+                border: 2px solid #ddd;
+                background: #fff;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #666;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .price-btn:hover {
+                border-color: #ff9900;
+                color: #ff9900;
+            }
+            
+            .price-btn.active {
+                border-color: #ff9900;
+                background: #ff9900;
+                color: #fff;
+            }
+            
+            .btn-clear-filter {
+                padding: 10px 20px;
+                border: 2px solid #E31837;
+                background: #fff;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #E31837;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .btn-clear-filter:hover {
+                background: #E31837;
+                color: #fff;
+            }
+            
 
             /* 상품 그리드 */
             .product-grid {
@@ -410,6 +479,74 @@
                     font-size: 16px;
                 }
             }
+            
+            /* ========== 페이지네이션 ========== */
+            .pagination-wrapper {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 50px 0;
+                gap: 10px;
+            }
+            
+            .pagination {
+                display: flex;
+                gap: 5px;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .page-item {
+                display: inline-block;
+            }
+            
+            .page-link {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 40px;
+                height: 40px;
+                padding: 0 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: #fff;
+                color: #333;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s;
+                cursor: pointer;
+            }
+            
+            .page-link:hover {
+                border-color: #ff9900;
+                color: #ff9900;
+                background: #fff9f0;
+            }
+            
+            .page-item.active .page-link {
+                background: #ff9900;
+                border-color: #ff9900;
+                color: #fff;
+            }
+            
+            .page-item.disabled .page-link {
+                opacity: 0.5;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+            
+            .page-prev,
+            .page-next {
+                font-weight: 700;
+            }
+            
+            .page-info {
+                margin-left: 20px;
+                font-size: 14px;
+                color: #666;
+            }
         </style>
     </th:block>
 </head>
@@ -457,23 +594,73 @@
         
         <!-- ========== 메인 컨텐츠 영역 ========== -->
         <div class="content-area">
-            <!-- 카테고리 헤더 -->
-            <div class="category-header">
+            <!-- 카테고리 헤더 (일반 모드) -->
+            <div class="category-header" th:if="${isSearchMode == null or !isSearchMode}">
                 <h1 class="category-title" th:text="${categoryName}">카테고리명</h1>
                 <p class="category-subtitle">
                     총 <span class="product-count" th:text="${products.size()}">0</span>개의 상품
                 </p>
+            </div>
+            
+            <!-- 검색 결과 헤더 (검색 모드) -->
+            <div class="category-header" th:if="${isSearchMode != null and isSearchMode}">
+                <h1 class="category-title">
+                    "<span style="color: #E31837;" th:text="${keyword}">검색어</span>" 검색 결과
+                </h1>
+                <p class="category-subtitle">
+                    총 <span class="product-count" th:text="${products.size()}">0</span>개의 상품이 검색되었습니다.
+                </p>
+                <p class="category-subtitle" th:if="${categoryId != null and categoryId > 0}" style="font-size: 14px; color: #888; margin-top: 5px;">
+                    <i class="fas fa-filter"></i> 카테고리: <span th:text="${categoryName}">전체</span>
+                </p>
+            </div>
+
+            <!-- 가격 필터 (항상 표시) -->
+            <div class="price-filter">
+                <h3 class="filter-title"><i class="fas fa-filter"></i> 가격 필터</h3>
+                <div class="price-buttons">
+                    <button class="price-btn" 
+                            th:classappend="${minPrice == null and maxPrice == null} ? 'active' : ''"
+                            onclick="filterByPrice(null, null)">
+                        전체
+                    </button>
+                    <button class="price-btn" 
+                            th:classappend="${minPrice == 0 and maxPrice == 10000} ? 'active' : ''"
+                            onclick="filterByPrice(0, 10000)">
+                        1만원 이하
+                    </button>
+                    <button class="price-btn" 
+                            th:classappend="${minPrice == 10000 and maxPrice == 30000} ? 'active' : ''"
+                            onclick="filterByPrice(10000, 30000)">
+                        1만원 - 3만원
+                    </button>
+                    <button class="price-btn" 
+                            th:classappend="${minPrice == 30000 and maxPrice == 50000} ? 'active' : ''"
+                            onclick="filterByPrice(30000, 50000)">
+                        3만원 - 5만원
+                    </button>
+                    <button class="price-btn" 
+                            th:classappend="${minPrice == 50000 and maxPrice == null} ? 'active' : ''"
+                            onclick="filterByPrice(50000, null)">
+                        5만원 이상
+                    </button>
+                    <button class="btn-clear-filter" 
+                            th:if="${minPrice != null or maxPrice != null}"
+                            onclick="filterByPrice(null, null)">
+                        <i class="fas fa-times"></i> 필터 초기화
+                    </button>
+                </div>
             </div>
 
             <!-- 정렬 옵션 -->
             <div class="sort-section" th:unless="${products.isEmpty()}">
                 <div>
                     <span class="sort-label">정렬:</span>
-                    <select class="sort-select" onchange="sortProducts(this.value)">
-                        <option value="latest">최신순</option>
-                        <option value="price-low">가격 낮은순</option>
-                        <option value="price-high">가격 높은순</option>
-                        <option value="name">이름순</option>
+                    <select class="sort-select" id="sortSelect" onchange="changeSortOrder(this.value)">
+                        <option value="latest" th:selected="${sortBy == null or sortBy == 'latest'}">최신순</option>
+                        <option value="price_asc" th:selected="${sortBy == 'price_asc'}">가격 낮은순</option>
+                        <option value="price_desc" th:selected="${sortBy == 'price_desc'}">가격 높은순</option>
+                        <option value="popular" th:selected="${sortBy == 'popular'}">인기순 (리뷰 많은순)</option>
                     </select>
                 </div>
             </div>
@@ -481,10 +668,17 @@
             <!-- 상품 목록이 비어있을 때 -->
             <div class="empty-list" th:if="${products.isEmpty()}">
                 <div class="empty-icon">
-                    <i class="fas fa-box-open"></i>
+                    <i class="fas fa-box-open" th:if="${isSearchMode == null or !isSearchMode}"></i>
+                    <i class="fas fa-search" th:if="${isSearchMode != null and isSearchMode}"></i>
                 </div>
-                <p class="empty-text">
+                <p class="empty-text" th:if="${isSearchMode == null or !isSearchMode}">
                     이 카테고리에는 아직 상품이 없습니다.
+                </p>
+                <p class="empty-text" th:if="${isSearchMode != null and isSearchMode}">
+                    "<span style="color: #E31837;" th:text="${keyword}"></span>"에 대한 검색 결과가 없습니다.
+                </p>
+                <p th:if="${isSearchMode != null and isSearchMode}" style="font-size: 14px; color: #999; margin-bottom: 20px;">
+                    다른 검색어로 다시 시도해 보세요.
                 </p>
                 <a th:href="@{/}" class="btn-home">
                     <i class="fas fa-home"></i> 홈으로 이동
@@ -566,16 +760,143 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 페이지네이션 -->
+            <div class="pagination-wrapper" th:if="${productPage != null and productPage.totalPages > 0}">
+                <ul class="pagination">
+                    <!-- 이전 버튼 -->
+                    <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
+                        <a class="page-link page-prev" 
+                           th:href="@{${isSearchMode != null and isSearchMode ? '/product/search' : '/product/list'}(
+                               keyword=${keyword},
+                               categoryId=${categoryId},
+                               sortBy=${sortBy},
+                               minPrice=${minPrice},
+                               maxPrice=${maxPrice},
+                               page=${productPage.number - 1}
+                           )}"
+                           th:if="${!productPage.first}">
+                            <i class="fas fa-chevron-left"></i> 이전
+                        </a>
+                        <span class="page-link page-prev" th:if="${productPage.first}">
+                            <i class="fas fa-chevron-left"></i> 이전
+                        </span>
+                    </li>
+                    
+                    <!-- 페이지 번호들 -->
+                    <li class="page-item" 
+                        th:each="pageNum : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                        th:if="${pageNum >= (productPage.number - 2) and pageNum <= (productPage.number + 2)}"
+                        th:classappend="${pageNum == productPage.number} ? 'active'">
+                        <a class="page-link" 
+                           th:href="@{${isSearchMode != null and isSearchMode ? '/product/search' : '/product/list'}(
+                               keyword=${keyword},
+                               categoryId=${categoryId},
+                               sortBy=${sortBy},
+                               minPrice=${minPrice},
+                               maxPrice=${maxPrice},
+                               page=${pageNum}
+                           )}"
+                           th:text="${pageNum + 1}">1</a>
+                    </li>
+                    
+                    <!-- 다음 버튼 -->
+                    <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
+                        <a class="page-link page-next" 
+                           th:href="@{${isSearchMode != null and isSearchMode ? '/product/search' : '/product/list'}(
+                               keyword=${keyword},
+                               categoryId=${categoryId},
+                               sortBy=${sortBy},
+                               minPrice=${minPrice},
+                               maxPrice=${maxPrice},
+                               page=${productPage.number + 1}
+                           )}"
+                           th:if="${!productPage.last}">
+                            다음 <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <span class="page-link page-next" th:if="${productPage.last}">
+                            다음 <i class="fas fa-chevron-right"></i>
+                        </span>
+                    </li>
+                </ul>
+                
+                <!-- 페이지 정보 -->
+                <div class="page-info">
+                    <span th:text="${productPage.number + 1}">1</span> / 
+                    <span th:text="${productPage.totalPages}">10</span> 페이지
+                    (총 <span th:text="${productPage.totalElements}">200</span>개)
+                </div>
+            </div>
         </div>
     </div>
 </main>
 
 <th:block layout:fragment="script">
-    <script>
-        // 정렬 기능 (추후 구현)
-        function sortProducts(sortType) {
-            console.log('정렬:', sortType);
-            // TODO: 서버에 정렬 요청 또는 클라이언트 정렬
+    <script th:inline="javascript">
+        // Thymeleaf 변수 가져오기
+        const isSearchMode = /*[[${isSearchMode}]]*/ false;
+        const currentKeyword = /*[[${keyword}]]*/ '';
+        const currentCategoryId = /*[[${categoryId}]]*/ null;
+        const currentSortBy = /*[[${sortBy}]]*/ 'latest';
+        const currentMinPrice = /*[[${minPrice}]]*/ null;
+        const currentMaxPrice = /*[[${maxPrice}]]*/ null;
+        
+        // 정렬 변경
+        function changeSortOrder(sortBy) {
+            let url = '';
+            
+            if (isSearchMode) {
+                // 검색 모드
+                url = '/product/search?keyword=' + encodeURIComponent(currentKeyword);
+                
+                if (currentCategoryId) {
+                    url += '&categoryId=' + currentCategoryId;
+                }
+            } else {
+                // 카테고리 모드
+                url = '/product/list?categoryId=' + currentCategoryId;
+            }
+            
+            url += '&sortBy=' + sortBy;
+            
+            if (currentMinPrice !== null) {
+                url += '&minPrice=' + currentMinPrice;
+            }
+            
+            if (currentMaxPrice !== null) {
+                url += '&maxPrice=' + currentMaxPrice;
+            }
+            
+            window.location.href = url;
+        }
+        
+        // 가격 필터 적용
+        function filterByPrice(minPrice, maxPrice) {
+            let url = '';
+            
+            if (isSearchMode) {
+                // 검색 모드
+                url = '/product/search?keyword=' + encodeURIComponent(currentKeyword);
+                
+                if (currentCategoryId) {
+                    url += '&categoryId=' + currentCategoryId;
+                }
+            } else {
+                // 카테고리 모드
+                url = '/product/list?categoryId=' + currentCategoryId;
+            }
+            
+            url += '&sortBy=' + currentSortBy;
+            
+            if (minPrice !== null) {
+                url += '&minPrice=' + minPrice;
+            }
+            
+            if (maxPrice !== null) {
+                url += '&maxPrice=' + maxPrice;
+            }
+            
+            window.location.href = url;
         }
     </script>
 </th:block>

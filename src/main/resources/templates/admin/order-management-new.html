@@ -191,7 +191,7 @@
             
             .table-header {
                 display: grid;
-                grid-template-columns: 120px 100px 2fr 1fr 120px 150px 150px;
+                grid-template-columns: 120px 100px 2fr 1fr 120px 150px 100px;
                 gap: 15px;
                 padding: 15px 20px;
                 background: #f7f7f7;
@@ -203,7 +203,7 @@
             
             .table-row {
                 display: grid;
-                grid-template-columns: 120px 100px 2fr 1fr 120px 150px 150px;
+                grid-template-columns: 120px 100px 2fr 1fr 120px 150px 100px;
                 gap: 15px;
                 padding: 20px;
                 border-bottom: 1px solid #f0f0f0;
@@ -302,29 +302,6 @@
             
             .btn-detail:hover {
                 background: #131921;
-            }
-            
-            .btn-next-status {
-                padding: 8px 16px;
-                background: #ff9900;
-                color: #fff;
-                border: none;
-                border-radius: 6px;
-                font-size: 13px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s;
-                white-space: nowrap;
-            }
-            
-            .btn-next-status:hover {
-                background: #e88b00;
-            }
-            
-            .btn-actions {
-                display: flex;
-                gap: 8px;
-                justify-content: center;
             }
             
             /* 페이지네이션 */
@@ -537,39 +514,10 @@
                      th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}">
                     2024-01-22 14:30
                 </div>
-                <div class="btn-actions">
+                <div>
                     <button class="btn-detail" 
                             th:onclick="|location.href='/order/detail/' + ${order.orderId}|">
-                        상세
-                    </button>
-                    
-                    <!-- 다음단계 버튼 -->
-                    <!-- 결제대기 → 주문확정 -->
-                    <button class="btn-next-status" 
-                            th:if="${order.orderStatus.name() == 'PENDING'}"
-                            th:onclick="|updateOrderStatus(${order.orderId}, 'CONFIRMED', '주문확정')|">
-                        확정 ▶
-                    </button>
-                    
-                    <!-- 주문확정 → 배송준비 -->
-                    <button class="btn-next-status" 
-                            th:if="${order.orderStatus.name() == 'CONFIRMED'}"
-                            th:onclick="|updateOrderStatus(${order.orderId}, 'PREPARING', '배송준비')|">
-                        준비 ▶
-                    </button>
-                    
-                    <!-- 배송준비 → 배송중 -->
-                    <button class="btn-next-status" 
-                            th:if="${order.orderStatus.name() == 'PREPARING'}"
-                            th:onclick="|updateOrderStatus(${order.orderId}, 'SHIPPED', '배송중')|">
-                        출고 ▶
-                    </button>
-                    
-                    <!-- 배송중 → 배송완료 -->
-                    <button class="btn-next-status" 
-                            th:if="${order.orderStatus.name() == 'SHIPPED'}"
-                            th:onclick="|updateOrderStatus(${order.orderId}, 'DELIVERED', '배송완료')|">
-                        완료 ▶
+                        상세보기
                     </button>
                 </div>
             </div>
@@ -702,47 +650,6 @@
                 }
             });
         });
-        
-        // 주문 상태 변경
-        function updateOrderStatus(orderId, newStatus, statusText) {
-            if (!confirm(`주문 상태를 "${statusText}"(으)로 변경하시겠습니까?`)) {
-                return;
-            }
-            
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/admin/orders/' + orderId + '/status';
-            
-            const statusInput = document.createElement('input');
-            statusInput.type = 'hidden';
-            statusInput.name = 'status';
-            statusInput.value = newStatus;
-            
-            // 현재 필터 유지를 위한 파라미터
-            const keyword = document.getElementById('searchKeyword').value;
-            const sortBy = document.getElementById('sortBy').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const currentStatus = /*[[${status?.name()}]]*/ '';
-            
-            const redirectInput = document.createElement('input');
-            redirectInput.type = 'hidden';
-            redirectInput.name = 'redirect';
-            
-            let redirectUrl = '/admin/orders?';
-            if (keyword) redirectUrl += 'keyword=' + encodeURIComponent(keyword) + '&';
-            if (currentStatus) redirectUrl += 'status=' + currentStatus + '&';
-            if (startDate) redirectUrl += 'startDate=' + startDate + '&';
-            if (endDate) redirectUrl += 'endDate=' + endDate + '&';
-            redirectUrl += 'sortBy=' + sortBy;
-            
-            redirectInput.value = redirectUrl;
-            
-            form.appendChild(statusInput);
-            form.appendChild(redirectInput);
-            document.body.appendChild(form);
-            form.submit();
-        }
     </script>
 </th:block>
 </body>

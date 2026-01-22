@@ -4,7 +4,8 @@
       layout:decorate="~{layout/default}"
       lang="ko">
 <head>
-    <title th:text="${product != null ? '상품 수정' : '상품 등록'}">상품 등록</title>
+<!--    <title th:text="${product != null ? '상품 수정' : '상품 등록'}">상품 등록</title>-->
+    <title th:text="${product.id == null ? '상품 등록' : '상품 수정'}">상품</title>
     <th:block layout:fragment="css">
         <style>
             .alert {
@@ -31,28 +32,28 @@
                 border-radius: 8px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }
-            
+
             .register-header {
                 text-align: center;
                 margin-bottom: 40px;
             }
-            
+
             .register-header h1 {
                 font-size: 28px;
                 font-weight: 700;
                 color: #232f3e;
                 margin-bottom: 10px;
             }
-            
+
             .register-header p {
                 color: #666;
                 font-size: 14px;
             }
-            
+
             .form-group {
                 margin-bottom: 25px;
             }
-            
+
             .form-group label {
                 display: block;
                 font-weight: 600;
@@ -60,12 +61,12 @@
                 margin-bottom: 8px;
                 font-size: 14px;
             }
-            
+
             .form-group label .required {
                 color: #f44336;
                 margin-left: 3px;
             }
-            
+
             .form-control {
                 width: 100%;
                 padding: 12px 15px;
@@ -75,38 +76,38 @@
                 transition: all 0.3s;
                 box-sizing: border-box;
             }
-            
+
             .form-control:focus {
                 outline: none;
                 border-color: #ff9900;
                 box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
             }
-            
+
             .form-control.textarea {
                 min-height: 120px;
                 resize: vertical;
                 font-family: inherit;
             }
-            
+
             .form-row {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 20px;
             }
-            
+
             .form-row-3 {
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
                 gap: 20px;
             }
-            
+
             .file-upload-wrapper {
                 position: relative;
                 overflow: hidden;
                 display: inline-block;
                 width: 100%;
             }
-            
+
             .file-upload-btn {
                 display: inline-block;
                 padding: 12px 20px;
@@ -118,22 +119,22 @@
                 text-align: center;
                 width: 100%;
             }
-            
+
             .file-upload-btn:hover {
                 background: #e8e8e8;
             }
-            
+
             .file-upload-wrapper input[type=file] {
                 position: absolute;
                 left: -9999px;
             }
-            
+
             .file-name {
                 margin-top: 8px;
                 font-size: 13px;
                 color: #666;
             }
-            
+
             .image-preview {
                 margin-top: 15px;
                 max-width: 300px;
@@ -143,26 +144,26 @@
                 overflow: hidden;
                 display: none;
             }
-            
+
             .image-preview img {
                 width: 100%;
                 height: auto;
                 display: block;
             }
-            
+
             .help-text {
                 font-size: 12px;
                 color: #666;
                 margin-top: 5px;
             }
-            
+
             .form-actions {
                 display: flex;
                 gap: 15px;
                 margin-top: 40px;
                 justify-content: center;
             }
-            
+
             .btn {
                 padding: 14px 40px;
                 border: none;
@@ -172,32 +173,32 @@
                 cursor: pointer;
                 transition: all 0.3s;
             }
-            
+
             .btn-primary {
                 background: #ff9900;
                 color: #fff;
             }
-            
+
             .btn-primary:hover {
                 background: #e88b00;
             }
-            
+
             .btn-secondary {
                 background: #e7e9ec;
                 color: #333;
             }
-            
+
             .btn-secondary:hover {
                 background: #d5d9dd;
             }
-            
+
             .error-message {
                 color: #f44336;
                 font-size: 13px;
                 margin-top: 5px;
                 display: none;
             }
-            
+
             /* 상세 이미지 미리보기 */
             .detail-previews {
                 display: flex;
@@ -205,7 +206,7 @@
                 margin-top: 15px;
                 flex-wrap: wrap;
             }
-            
+
             .detail-preview-item {
                 position: relative;
                 width: 100px;
@@ -215,18 +216,18 @@
                 overflow: hidden;
                 transition: all 0.3s;
             }
-            
+
             .detail-preview-item:hover {
                 border-color: #ff9900;
                 transform: translateY(-2px);
             }
-            
+
             .detail-preview-item img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
             }
-            
+
             .delete-btn {
                 position: absolute;
                 top: 5px;
@@ -244,12 +245,12 @@
                 justify-content: center;
                 transition: all 0.3s;
             }
-            
+
             .delete-btn:hover {
                 background: rgba(227, 24, 55, 1);
                 transform: scale(1.1);
             }
-            
+
             .image-number {
                 position: absolute;
                 bottom: 5px;
@@ -261,7 +262,7 @@
                 font-size: 12px;
                 font-weight: 600;
             }
-            
+
             /* 사이즈 옵션 스타일 */
             .size-options-container {
                 margin-top: 15px;
@@ -270,7 +271,7 @@
                 border-radius: 8px;
                 border: 1px solid #e0e0e0;
             }
-            
+
             .size-option-item {
                 display: grid;
                 grid-template-columns: 2fr 1fr 1fr 50px;
@@ -281,7 +282,7 @@
                 background: white;
                 border-radius: 4px;
             }
-            
+
             .add-size-btn {
                 display: inline-block;
                 padding: 10px 20px;
@@ -293,11 +294,11 @@
                 font-size: 14px;
                 margin-top: 10px;
             }
-            
+
             .add-size-btn:hover {
                 background: #45a049;
             }
-            
+
             .remove-size-btn {
                 background: #f44336;
                 color: white;
@@ -307,7 +308,7 @@
                 cursor: pointer;
                 font-size: 12px;
             }
-            
+
             .remove-size-btn:hover {
                 background: #da190b;
             }
@@ -315,413 +316,536 @@
     </th:block>
 </head>
 <body>
-    <main layout:fragment="content">
-        <div th:if="${message}" class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
-            <span th:text="${message}"></span>
+<main layout:fragment="content">
+    <div th:if="${message}" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${message}"></span>
+    </div>
+
+    <div class="register-container">
+        <div class="register-header">
+            <h1>✨ 상품 등록</h1>
+            <p>새로운 상품 정보를 입력해주세요</p>
         </div>
 
-        <div class="register-container">
-            <div class="register-header">
-                <h1>✨ 상품 등록</h1>
-                <p>새로운 상품 정보를 입력해주세요</p>
+        <form th:action="${product.id == null} ? @{/product/register} : @{/product/edit/{id}(id=${product.id})}"
+              method="post"
+              enctype="multipart/form-data"
+              id="productForm">
+
+            <!-- 상품명 -->
+            <div class="form-group">
+                <label for="productName">상품명<span class="required">*</span></label>
+                <input type="text"
+                       class="form-control"
+                       id="productName"
+                       name="productName"
+                       th:value="${product?.productName}"
+                       placeholder="상품명을 입력하세요"
+                       required>
             </div>
-            
-            <form th:action="${product != null ? '/product/edit/' + product.id : '/product/register'}" 
-                  method="post" 
-                  enctype="multipart/form-data" 
-                  id="productForm">
-                
-                <!-- 상품명 -->
+
+            <!-- 카테고리 세분화 (3단계) -->
+            <div class="form-row-3">
+                <!-- 대분류 -->
                 <div class="form-group">
-                    <label for="productName">상품명<span class="required">*</span></label>
-                    <input type="text" 
-                           class="form-control" 
-                           id="productName" 
-                           name="productName" 
-                           th:value="${product?.productName}"
-                           placeholder="상품명을 입력하세요" 
-                           required>
-                </div>
-                
-                <!-- 카테고리 세분화 (3단계) -->
-                <div class="form-row-3">
-                    <!-- 대분류 -->
-                    <div class="form-group">
-                        <label for="largeCategory">대분류<span class="required">*</span></label>
-                        <select class="form-control" id="largeCategory" onchange="loadMediumCategories()" required>
-                            <option value="">선택하세요</option>
-                            <option th:each="category : ${categories}" 
-                                    th:value="${category.id}" 
-                                    th:text="${category.name}">
-                            </option>
-                        </select>
-                    </div>
-                    
-                    <!-- 중분류 -->
-                    <div class="form-group">
-                        <label for="mediumCategory">중분류<span class="required">*</span></label>
-                        <select class="form-control" id="mediumCategory" onchange="loadSmallCategories()" required disabled>
-                            <option value="">대분류를 먼저 선택하세요</option>
-                        </select>
-                    </div>
-                    
-                    <!-- 소분류 (UI용 - disabled 유지) -->
-                    <div class="form-group">
-                        <label for="categoryIdSelect">소분류</label>
-                        <select class="form-control" id="categoryIdSelect" onchange="updateCategoryId()" disabled>
-                            <option value="">중분류를 먼저 선택하세요</option>
-                        </select>
-                        <div class="help-text">소분류가 없으면 중분류 사용</div>
-                    </div>
-                </div>
-                
-                <!-- ✅ 실제 서버로 전송되는 hidden input -->
-                <input type="hidden" id="categoryId" name="categoryId" required>
-                
-                <!-- 상품 타입 -->
-                <div class="form-group">
-                    <label for="productType">상품 타입<span class="required">*</span></label>
-                    <select class="form-control" id="productType" name="productType" onchange="loadDefaultSizes()" required>
+                    <label for="largeCategory">대분류<span class="required">*</span></label>
+                    <select class="form-control" id="largeCategory" required>
                         <option value="">선택하세요</option>
-                        <option th:each="type : ${productTypes}" 
-                                th:value="${type.name()}" 
-                                th:text="${type.description}">
+                        <option th:each="category : ${categories}"
+                                th:value="${category.id}"
+                                th:text="${category.name}">
                         </option>
                     </select>
-                    <div class="help-text">상품 타입에 따라 기본 사이즈 옵션이 자동으로 설정됩니다</div>
                 </div>
-                
-                <!-- 가격 & 할인율 -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="price">가격<span class="required">*</span></label>
-                        <input type="number" 
-                               class="form-control" 
-                               id="price" 
-                               name="price" 
-                               th:value="${product?.price}"
-                               placeholder="0" 
-                               min="0" 
-                               oninput="calculateDiscount()" 
-                               required>
-                        <div class="help-text">단위: 원</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="discountRate">할인율</label>
-                        <input type="number" 
-                               class="form-control" 
-                               id="discountRate" 
-                               name="discountRate" 
-                               th:value="${product?.discountRate}"
-                               placeholder="0" 
-                               min="0" 
-                               max="100" 
-                               oninput="calculateDiscount()">
-                        <div class="help-text">단위: % (0-100)</div>
-                        <div id="discountPrice" style="margin-top: 10px; font-size: 16px; font-weight: 600; color: #E31837;"></div>
-                    </div>
-                </div>
-                
-                <!-- 재고 수량 -->
+
+                <!-- 중분류 -->
                 <div class="form-group">
-                    <label for="stockQuantity">기본 재고 수량<span class="required">*</span></label>
-                    <input type="number" 
-                           class="form-control" 
-                           id="stockQuantity" 
-                           name="stockQuantity" 
-                           th:value="${product?.stockQuantity}"
-                           placeholder="0" 
-                           min="0" 
+                    <label for="mediumCategory">중분류<span class="required">*</span></label>
+                    <select class="form-control" id="mediumCategory" required disabled>
+                        <option value="">대분류를 먼저 선택하세요</option>
+                    </select>
+                </div>
+
+                <!-- 소분류 (UI용 - disabled 유지) -->
+                <div class="form-group">
+                    <label for="categoryIdSelect">소분류</label>
+                    <select class="form-control" id="categoryIdSelect" disabled>
+                        <option value="">중분류를 먼저 선택하세요</option>
+                    </select>
+                    <div class="help-text">소분류가 없으면 중분류 사용</div>
+                </div>
+            </div>
+
+            <!-- ✅ 실제 서버로 전송되는 hidden input -->
+            <input type="hidden" id="categoryId" name="categoryId" required>
+
+            <!-- 상품 타입 -->
+            <div class="form-group">
+                <label for="productType">상품 타입<span class="required">*</span></label>
+                <select class="form-control" id="productType" name="productType" required>
+                    <option value="">선택하세요</option>
+                    <option th:each="type : ${productTypes}"
+                            th:value="${type.name()}"
+                            th:text="${type.description}">
+                    </option>
+                </select>
+                <div class="help-text">상품 타입에 따라 기본 사이즈 옵션이 자동으로 설정됩니다</div>
+            </div>
+
+            <!-- 가격 & 할인율 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">가격<span class="required">*</span></label>
+                    <input type="number"
+                           class="form-control"
+                           id="price"
+                           name="price"
+                           th:value="${product?.price}"
+                           placeholder="0"
+                           min="0"
                            required>
-                    <div class="help-text">옵션별 재고는 아래에서 개별 설정 가능</div>
+                    <div class="help-text">단위: 원</div>
                 </div>
-                
-                <!-- 상품 옵션 (사이즈 등) -->
+
                 <div class="form-group">
-                    <label>상품 옵션 (사이즈/색상)<span class="required">*</span></label>
-                    <div class="size-options-container" id="sizeOptionsContainer">
-                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
-                            상품 타입을 선택하면 기본 사이즈가 자동으로 추가됩니다.
-                        </p>
-                        <div id="sizeOptionsList">
-                            <!-- 동적으로 추가될 사이즈 옵션들 -->
-                        </div>
-                        <button type="button" class="add-size-btn" onclick="addSizeOption()">
-                            <i class="fas fa-plus"></i> 옵션 추가
+                    <label for="discountRate">할인율</label>
+                    <input type="number"
+                           class="form-control"
+                           id="discountRate"
+                           name="discountRate"
+                           th:value="${product?.discountRate}"
+                           placeholder="0"
+                           min="0"
+                           max="100">
+                    <div class="help-text">단위: % (0-100)</div>
+                    <div id="discountPrice" style="margin-top: 10px; font-size: 16px; font-weight: 600; color: #E31837;"></div>
+                </div>
+            </div>
+
+            <!-- 재고 수량 -->
+            <div class="form-group">
+                <label for="stockQuantity">기본 재고 수량<span class="required">*</span></label>
+                <input type="number"
+                       class="form-control"
+                       id="stockQuantity"
+                       name="stockQuantity"
+                       th:value="${product?.stockQuantity}"
+                       placeholder="0"
+                       min="0"
+                       required>
+                <div class="help-text">옵션별 재고는 아래에서 개별 설정 가능</div>
+            </div>
+
+            <!-- 상품 옵션 (사이즈 등) -->
+            <div class="form-group">
+                <label>상품 옵션 (사이즈/색상)<span class="required">*</span></label>
+                <div class="size-options-container" id="sizeOptionsContainer">
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                        상품 타입을 선택하면 기본 사이즈가 자동으로 추가됩니다.
+                    </p>
+                    <div id="sizeOptionsList">
+                        <!-- 동적으로 추가될 사이즈 옵션들 -->
+                    </div>
+                    <button type="button" class="add-size-btn" id="addSizeBtn">
+                        <i class="fas fa-plus"></i> 옵션 추가
+                    </button>
+                </div>
+            </div>
+
+            <!-- 상품 설명 -->
+            <div class="form-group">
+                <label for="description">상품 간단 설명</label>
+                <textarea class="form-control textarea"
+                          id="description"
+                          name="description"
+                          rows="3"
+                          placeholder="상품 목록에 표시될 간단한 설명을 입력하세요"
+                          th:text="${product?.description}"></textarea>
+            </div>
+
+            <!-- 대표 이미지 -->
+            <div class="form-group">
+                <label for="mainImageFile">대표 이미지<span class="required">*</span></label>
+                <div class="file-upload-wrapper">
+                    <label for="mainImageFile" class="file-upload-btn">
+                        <i class="fas fa-cloud-upload-alt"></i> 대표 이미지 선택
+                    </label>
+                    <input type="file"
+                           id="mainImageFile"
+                           name="mainImageFile"
+                           accept="image/*"
+                           th:required="${product == null}">
+                </div>
+                <div class="file-name" id="mainFileName">선택된 파일 없음</div>
+                <div class="image-preview" id="mainImagePreview" th:style="${product?.repImageUrl != null ? 'display: block;' : ''}">
+                    <img id="mainPreview"
+                         th:src="${product?.repImageUrl}"
+                         alt="대표 이미지 미리보기">
+                </div>
+
+                <!--수정 모드일 때 기존 대표 이미지 URL 유지용-->
+                <input type="hidden"
+                       name="existingMainImageUrl"
+                       th:if="${product != null}"
+                       th:value="${product.repImageUrl}">
+
+                <div class="help-text" th:if="${product != null}">새 이미지를 선택하지 않으면 기존 이미지가 유지됩니다</div>
+            </div>
+
+            <!-- 상세 이미지 -->
+            <div class="form-group">
+                <label>상세 이미지 (최대 4개)</label>
+
+                <!-- ✅ hidden file input 1개 (미리 생성) -->
+                <input type="file"
+                       id="detailImageFiles"
+                       name="detailImageFiles"
+                       accept="image/*"
+                       multiple
+                       style="display: none;">
+
+                <!-- 임시 선택용 input -->
+                <input type="file"
+                       id="detailImageInput"
+                       accept="image/*"
+                       style="display: none;">
+
+                <button type="button" class="file-upload-btn" id="addDetailImageBtn">
+                    <i class="fas fa-plus"></i> 상세 이미지 추가
+                </button>
+                <div id="detailPreviews" class="detail-previews">
+                    <!-- ✅ 수정 모드: 기존 상세 이미지 표시 -->
+                    <div th:each="imageUrl, iterStat : ${product?.detailImageUrls}"
+                         class="detail-preview-item existing-image">
+                        <img th:src="${imageUrl}" th:alt="'상세' + ${iterStat.count}">
+                        <button type="button" class="delete-btn" th:onclick="'deleteExistingImage(' + ${iterStat.index} + ')'">
+                            <i class="fas fa-times"></i>
                         </button>
+                        <span class="image-number" th:text="${iterStat.count}"></span>
                     </div>
                 </div>
-                
-                <!-- 상품 설명 -->
-                <div class="form-group">
-                    <label for="description">상품 간단 설명</label>
-                    <textarea class="form-control textarea" 
-                              id="description" 
-                              name="description" 
-                              rows="3" 
-                              placeholder="상품 목록에 표시될 간단한 설명을 입력하세요"
-                              th:text="${product?.description}"></textarea>
-                </div>
-                
-                <!-- 대표 이미지 -->
-                <div class="form-group">
-                    <label for="mainImageFile">대표 이미지<span class="required">*</span></label>
-                    <div class="file-upload-wrapper">
-                        <label for="mainImageFile" class="file-upload-btn">
-                            <i class="fas fa-cloud-upload-alt"></i> 대표 이미지 선택
-                        </label>
-                        <input type="file" 
-                               id="mainImageFile" 
-                               name="mainImageFile" 
-                               accept="image/*" 
-                               onchange="previewMainImage(event)" 
-                               th:required="${product == null}">
-                    </div>
-                    <div class="file-name" id="mainFileName">선택된 파일 없음</div>
-                    <div class="image-preview" id="mainImagePreview" th:style="${product?.repImageUrl != null ? 'display: block;' : ''}">
-                        <img id="mainPreview" 
-                             th:src="${product?.repImageUrl}" 
-                             alt="대표 이미지 미리보기">
-                    </div>
+                <div class="help-text" th:if="${product != null}">기존 이미지를 삭제하려면 X 버튼을 클릭하세요</div>
+            </div>
 
-                    <!--수정 모드일 때 기존 대표 이미지 URL 유지용-->
-                    <input type="hidden"
-                            name="existingMainImageUrl"
-                            th:if="${product != null}"
-                            th:value="${product.repImageUrl}">
+            <!-- 버튼 -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i>
+                    <span th:text="${product.id != null ? '수정하기' : '등록하기'}">등록하기</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-times"></i> 취소
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
 
-                    <div class="help-text" th:if="${product != null}">새 이미지를 선택하지 않으면 기존 이미지가 유지됩니다</div>
-                </div>
-                
-                <!-- 상세 이미지 -->
-                <div class="form-group">
-                    <label>상세 이미지 (최대 4개)</label>
-                    
-                    <!-- ✅ hidden file input 1개 (미리 생성) -->
-                    <input type="file" 
-                           id="detailImageFiles" 
-                           name="detailImageFiles"
-                           accept="image/*" 
-                           multiple
-                           style="display: none;">
-                    
-                    <!-- 임시 선택용 input -->
-                    <input type="file" 
-                           id="detailImageInput" 
-                           accept="image/*" 
-                           style="display: none;">
-                    
-                    <button type="button" class="file-upload-btn" onclick="document.getElementById('detailImageInput').click()">
-                        <i class="fas fa-plus"></i> 상세 이미지 추가
-                    </button>
-                    <div id="detailPreviews" class="detail-previews">
-                        <!-- ✅ 수정 모드: 기존 상세 이미지 표시 -->
-                        <div th:each="imageUrl, iterStat : ${product?.detailImageUrls}" 
-                             class="detail-preview-item existing-image">
-                            <img th:src="${imageUrl}" th:alt="'상세' + ${iterStat.count}">
-                            <button type="button" class="delete-btn" th:onclick="'deleteExistingImage(' + ${iterStat.index} + ')'">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <span class="image-number" th:text="${iterStat.count}"></span>
-                        </div>
-                    </div>
-                    <div class="help-text" th:if="${product != null}">기존 이미지를 삭제하려면 X 버튼을 클릭하세요</div>
-                </div>
-                
-                <!-- 버튼 -->
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-check"></i> 
-                        <span th:text="${product != null ? '수정하기' : '등록하기'}">등록하기</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="history.back()">
-                        <i class="fas fa-times"></i> 취소
-                    </button>
-                </div>
-            </form>
-        </div>
-    </main>
-    
-    <th:block layout:fragment="script">
-        <script th:inline="javascript">
-            let detailImagesArray = [];
-            let sizeOptionIndex = 0;
-            let existingDetailImages = []; // ✅ 기존 상세 이미지 URL 저장
-            
-            // ✅ 수정 모드 체크 (Thymeleaf에서 주입)
-            /*<![CDATA[*/
-            const editMode = /*[[${product != null}]]*/ false;
-            const productData = editMode ? {
-                id: /*[[${product.id}]]*/ null,
-                categoryId: /*[[${product.categoryId}]]*/ null,
-                productType: /*[[${product.productType}]]*/ null,
-                options: /*[[${product.options}]]*/ [],
-                detailImageUrls: /*[[${product.detailImageUrls}]]*/ []
-            } : null;
-            /*]]*/
-            
-            console.log('수정 모드:', editMode);
-            console.log('상품 데이터:', productData);
-            
-            // ✅ 기존 상세 이미지 URL 저장
-            if (editMode && productData && productData.detailImageUrls) {
-                existingDetailImages = [...productData.detailImageUrls];
-                console.log('기존 상세 이미지:', existingDetailImages);
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        let detailImagesArray = [];
+        let sizeOptionIndex = 0;
+        let existingDetailImages = []; // ✅ 기존 상세 이미지 URL 저장
+
+        // ✅ 수정 모드 체크 (Thymeleaf에서 주입)
+        /*<![CDATA[*/
+        const editMode = /*[[${product.id != null}]]*/ false;
+        const productData = editMode ? {
+            id: /*[[${product.id}]]*/ null,
+            categoryId: /*[[${product.categoryId}]]*/ null,
+            productType: /*[[${product.productType}]]*/ null,
+            options: /*[[${product.options}]]*/ [],
+            detailImageUrls: /*[[${product.detailImageUrls}]]*/ []
+        } : null;
+        /*]]*/
+
+        console.log('수정 모드:', editMode);
+        console.log('상품 데이터:', productData);
+
+        // ✅ 기존 상세 이미지 URL 저장
+        if (editMode && productData && productData.detailImageUrls) {
+            existingDetailImages = [...productData.detailImageUrls];
+            console.log('기존 상세 이미지:', existingDetailImages);
+        }
+
+        // ========== DOM 로드 후 이벤트 리스너 등록 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM 로드 완료 - 이벤트 리스너 등록 시작');
+
+            // 대분류 선택
+            const largeCategorySelect = document.getElementById('largeCategory');
+            if (largeCategorySelect) {
+                largeCategorySelect.addEventListener('change', loadMediumCategories);
             }
-            
-            // ========== 카테고리 세분화 ==========
-            
-            // 중분류 로드
-            async function loadMediumCategories() {
-                const largeCategoryId = document.getElementById('largeCategory').value;
-                const mediumSelect = document.getElementById('mediumCategory');
-                const smallSelect = document.getElementById('categoryIdSelect');
-                const hiddenCategoryId = document.getElementById('categoryId');
-                
-                // 초기화
-                mediumSelect.innerHTML = '<option value="">선택하세요</option>';
-                smallSelect.innerHTML = '<option value="">중분류를 먼저 선택하세요</option>';
-                mediumSelect.disabled = true;
-                smallSelect.disabled = true;
-                hiddenCategoryId.value = '';
-                
-                if (!largeCategoryId) return;
-                
-                try {
-                    const response = await fetch(`/product/api/categories/${largeCategoryId}/children`);
-                    const categories = await response.json();
-                    
-                    if (categories.length > 0) {
-                        categories.forEach(cat => {
-                            const option = document.createElement('option');
-                            option.value = cat.id;
-                            option.textContent = cat.name;
-                            mediumSelect.appendChild(option);
-                        });
-                        mediumSelect.disabled = false;
-                    } else {
-                        // ✅ 중분류가 없으면 대분류를 최종 카테고리로 사용
-                        console.log('중분류 없음 - 대분류를 최종 카테고리로 사용:', largeCategoryId);
-                        mediumSelect.innerHTML = '<option value="">중분류 없음 (대분류 사용)</option>';
-                        smallSelect.innerHTML = '<option value="">중분류 없음</option>';
-                        // ✅ hidden input에 대분류 ID 설정
-                        hiddenCategoryId.value = largeCategoryId;
+
+            // 중분류 선택
+            const mediumCategorySelect = document.getElementById('mediumCategory');
+            if (mediumCategorySelect) {
+                mediumCategorySelect.addEventListener('change', loadSmallCategories);
+            }
+
+            // 소분류 선택
+            const categoryIdSelect = document.getElementById('categoryIdSelect');
+            if (categoryIdSelect) {
+                categoryIdSelect.addEventListener('change', updateCategoryId);
+            }
+
+            // 상품 타입 선택
+            const productTypeSelect = document.getElementById('productType');
+            if (productTypeSelect) {
+                productTypeSelect.addEventListener('change', loadDefaultSizes);
+            }
+
+            // 가격/할인율 입력
+            const priceInput = document.getElementById('price');
+            const discountRateInput = document.getElementById('discountRate');
+            if (priceInput) {
+                priceInput.addEventListener('input', calculateDiscount);
+            }
+            if (discountRateInput) {
+                discountRateInput.addEventListener('input', calculateDiscount);
+            }
+
+            // 옵션 추가 버튼
+            const addSizeBtn = document.getElementById('addSizeBtn');
+            if (addSizeBtn) {
+                addSizeBtn.addEventListener('click', function() {
+                    addSizeOption();
+                });
+            }
+
+            // 대표 이미지 선택
+            const mainImageFile = document.getElementById('mainImageFile');
+            if (mainImageFile) {
+                mainImageFile.addEventListener('change', previewMainImage);
+            }
+
+            // 상세 이미지 추가 버튼
+            const addDetailImageBtn = document.getElementById('addDetailImageBtn');
+            if (addDetailImageBtn) {
+                addDetailImageBtn.addEventListener('click', function() {
+                    document.getElementById('detailImageInput').click();
+                });
+            }
+
+            // 상세 이미지 선택
+            const detailImageInput = document.getElementById('detailImageInput');
+            if (detailImageInput) {
+                detailImageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    // ✅ 기존 이미지 + 새 이미지 합쳐서 최대 4개
+                    const totalImages = existingDetailImages.length + detailImagesArray.length;
+                    if (totalImages >= 4) {
+                        alert('상세 이미지는 최대 4개까지만 등록 가능합니다.');
+                        return;
                     }
-                } catch (error) {
-                    console.error('중분류 로드 실패:', error);
-                }
+
+                    detailImagesArray.push(file);
+                    renderDetailPreviews();
+                    e.target.value = '';
+                });
             }
-            
-            // 소분류 로드
-            async function loadSmallCategories() {
-                const mediumCategoryId = document.getElementById('mediumCategory').value;
-                const smallSelect = document.getElementById('categoryIdSelect');
-                const hiddenCategoryId = document.getElementById('categoryId');
-                
-                smallSelect.innerHTML = '<option value="">선택하세요</option>';
-                smallSelect.disabled = true;
-                hiddenCategoryId.value = '';
-                
-                if (!mediumCategoryId) return;
-                
-                try {
-                    const response = await fetch(`/product/api/categories/${mediumCategoryId}/children`);
-                    const categories = await response.json();
-                    
-                    if (categories.length > 0) {
-                        categories.forEach(cat => {
-                            const option = document.createElement('option');
-                            option.value = cat.id;
-                            option.textContent = cat.name;
-                            smallSelect.appendChild(option);
-                        });
-                        smallSelect.disabled = false;
-                    } else {
-                        // ✅ 소분류가 없으면 중분류를 최종 카테고리로 사용
-                        console.log('소분류 없음 - 중분류를 최종 카테고리로 사용:', mediumCategoryId);
-                        smallSelect.innerHTML = '<option value="">소분류 없음 (중분류 사용)</option>';
-                        // ✅ hidden input에 중분류 ID 설정
-                        hiddenCategoryId.value = mediumCategoryId;
-                    }
-                } catch (error) {
-                    console.error('소분류 로드 실패:', error);
+
+            console.log('✅ 모든 이벤트 리스너 등록 완료');
+
+            // ✅ 수정 모드 데이터 로드
+            if (editMode && productData) {
+                console.log('수정 모드 데이터 로드 시작');
+
+                // 상품 타입 설정
+                if (productData.productType) {
+                    document.getElementById('productType').value = productData.productType;
                 }
-            }
-            
-            // ✅ 소분류 선택 시 hidden input 업데이트
-            function updateCategoryId() {
-                const selectedValue = document.getElementById('categoryIdSelect').value;
-                const hiddenCategoryId = document.getElementById('categoryId');
-                
-                if (selectedValue) {
-                    hiddenCategoryId.value = selectedValue;
-                    console.log('소분류 선택됨:', selectedValue);
-                }
-            }
-            
-            // ========== 상품 타입별 기본 사이즈 ==========
-            
-            async function loadDefaultSizes() {
-                const productType = document.getElementById('productType').value;
-                
-                if (!productType) {
-                    document.getElementById('sizeOptionsList').innerHTML = '';
-                    return;
-                }
-                
-                try {
-                    const response = await fetch(`/product/api/product-types/${productType}/sizes`);
-                    const sizes = await response.json();
-                    
-                    // 기존 옵션 초기화
-                    document.getElementById('sizeOptionsList').innerHTML = '';
+
+                // 기존 옵션 로드
+                if (productData.options && productData.options.length > 0) {
+                    const container = document.getElementById('sizeOptionsList');
+                    container.innerHTML = '';
                     sizeOptionIndex = 0;
-                    
-                    // 기본 재고 수량
-                    const defaultStock = document.getElementById('stockQuantity').value || 0;
-                    
-                    // 각 사이즈별로 옵션 추가
-                    sizes.forEach(size => {
-                        addSizeOption('사이즈', size, defaultStock, 0);
+
+                    productData.options.forEach(option => {
+                        addSizeOption(
+                            option.optionType,
+                            option.optionValue,
+                            option.stockQuantity,
+                            option.additionalPrice || 0
+                        );
                     });
-                    
-                } catch (error) {
-                    console.error('기본 사이즈 로드 실패:', error);
+
+                    console.log('기존 옵션 로드 완료:', productData.options.length + '개');
                 }
+
+                // 카테고리 ID가 있으면 hidden input에 설정
+                if (productData.categoryId) {
+                    document.getElementById('categoryId').value = productData.categoryId;
+                    console.log('카테고리 ID 설정:', productData.categoryId);
+                }
+
+                // 대표 이미지 파일명 표시
+                const mainFileName = document.getElementById('mainFileName');
+                if (productData.id && mainFileName) {
+                    mainFileName.textContent = '기존 이미지 유지 (변경하려면 새 파일 선택)';
+                }
+
+                // 할인가 계산
+                calculateDiscount();
             }
-            
-            // 사이즈 옵션 추가
-            function addSizeOption(type = '사이즈', value = '', stock = 0, additionalPrice = 0) {
-                const container = document.getElementById('sizeOptionsList');
-                const index = sizeOptionIndex++;
-                
-                const div = document.createElement('div');
-                div.className = 'size-option-item';
-                div.id = `sizeOption${index}`;
-                div.innerHTML = `
+        });
+
+        // ========== 카테고리 세분화 ==========
+
+        // 중분류 로드
+        async function loadMediumCategories() {
+            const largeCategoryId = document.getElementById('largeCategory').value;
+            const mediumSelect = document.getElementById('mediumCategory');
+            const smallSelect = document.getElementById('categoryIdSelect');
+            const hiddenCategoryId = document.getElementById('categoryId');
+
+            // 초기화
+            mediumSelect.innerHTML = '<option value="">선택하세요</option>';
+            smallSelect.innerHTML = '<option value="">중분류를 먼저 선택하세요</option>';
+            mediumSelect.disabled = true;
+            smallSelect.disabled = true;
+            hiddenCategoryId.value = '';
+
+            if (!largeCategoryId) return;
+
+            try {
+                const response = await fetch(`/product/api/categories/${largeCategoryId}/children`);
+                const categories = await response.json();
+
+                if (categories.length > 0) {
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        mediumSelect.appendChild(option);
+                    });
+                    mediumSelect.disabled = false;
+                } else {
+                    // ✅ 중분류가 없으면 대분류를 최종 카테고리로 사용
+                    console.log('중분류 없음 - 대분류를 최종 카테고리로 사용:', largeCategoryId);
+                    mediumSelect.innerHTML = '<option value="">중분류 없음 (대분류 사용)</option>';
+                    smallSelect.innerHTML = '<option value="">중분류 없음</option>';
+                    // ✅ hidden input에 대분류 ID 설정
+                    hiddenCategoryId.value = largeCategoryId;
+                }
+            } catch (error) {
+                console.error('중분류 로드 실패:', error);
+            }
+        }
+
+        // 소분류 로드
+        async function loadSmallCategories() {
+            const mediumCategoryId = document.getElementById('mediumCategory').value;
+            const smallSelect = document.getElementById('categoryIdSelect');
+            const hiddenCategoryId = document.getElementById('categoryId');
+
+            smallSelect.innerHTML = '<option value="">선택하세요</option>';
+            smallSelect.disabled = true;
+            hiddenCategoryId.value = '';
+
+            if (!mediumCategoryId) return;
+
+            try {
+                const response = await fetch(`/product/api/categories/${mediumCategoryId}/children`);
+                const categories = await response.json();
+
+                if (categories.length > 0) {
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        smallSelect.appendChild(option);
+                    });
+                    smallSelect.disabled = false;
+                } else {
+                    // ✅ 소분류가 없으면 중분류를 최종 카테고리로 사용
+                    console.log('소분류 없음 - 중분류를 최종 카테고리로 사용:', mediumCategoryId);
+                    smallSelect.innerHTML = '<option value="">소분류 없음 (중분류 사용)</option>';
+                    // ✅ hidden input에 중분류 ID 설정
+                    hiddenCategoryId.value = mediumCategoryId;
+                }
+            } catch (error) {
+                console.error('소분류 로드 실패:', error);
+            }
+        }
+
+        // ✅ 소분류 선택 시 hidden input 업데이트
+        function updateCategoryId() {
+            const selectedValue = document.getElementById('categoryIdSelect').value;
+            const hiddenCategoryId = document.getElementById('categoryId');
+
+            if (selectedValue) {
+                hiddenCategoryId.value = selectedValue;
+                console.log('소분류 선택됨:', selectedValue);
+            }
+        }
+
+        // ========== 상품 타입별 기본 사이즈 ==========
+
+        async function loadDefaultSizes() {
+            const productType = document.getElementById('productType').value;
+
+            if (!productType) {
+                document.getElementById('sizeOptionsList').innerHTML = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/product/api/product-types/${productType}/sizes`);
+                const sizes = await response.json();
+
+                // 기존 옵션 초기화
+                document.getElementById('sizeOptionsList').innerHTML = '';
+                sizeOptionIndex = 0;
+
+                // 기본 재고 수량
+                const defaultStock = document.getElementById('stockQuantity').value || 0;
+
+                // 각 사이즈별로 옵션 추가
+                sizes.forEach(size => {
+                    addSizeOption('사이즈', size, defaultStock, 0);
+                });
+
+            } catch (error) {
+                console.error('기본 사이즈 로드 실패:', error);
+            }
+        }
+
+        // 사이즈 옵션 추가
+        function addSizeOption(type = '사이즈', value = '', stock = 0, additionalPrice = 0) {
+            const container = document.getElementById('sizeOptionsList');
+            const index = sizeOptionIndex++;
+
+            const div = document.createElement('div');
+            div.className = 'size-option-item';
+            div.id = `sizeOption${index}`;
+            div.innerHTML = `
                     <div>
-                        <input type="text" 
-                               class="form-control" 
-                               name="options[${index}].optionType" 
-                               placeholder="옵션명 (예: 사이즈, 색상)" 
+                        <input type="text"
+                               class="form-control"
+                               name="options[${index}].optionType"
+                               placeholder="옵션명 (예: 사이즈, 색상)"
                                value="${type}"
                                required>
                     </div>
                     <div>
-                        <input type="text" 
-                               class="form-control" 
-                               name="options[${index}].optionValue" 
-                               placeholder="값 (예: M, 250)" 
+                        <input type="text"
+                               class="form-control"
+                               name="options[${index}].optionValue"
+                               placeholder="값 (예: M, 250)"
                                value="${value}"
                                required>
                     </div>
                     <div>
-                        <input type="number" 
-                               class="form-control" 
-                               name="options[${index}].stockQuantity" 
-                               placeholder="재고" 
+                        <input type="number"
+                               class="form-control"
+                               name="options[${index}].stockQuantity"
+                               placeholder="재고"
                                value="${stock}"
                                min="0"
                                required>
@@ -732,270 +856,209 @@
                     <input type="hidden" name="options[${index}].additionalPrice" value="${additionalPrice}">
                     <input type="hidden" name="options[${index}].displayOrder" value="${index}">
                 `;
-                
-                container.appendChild(div);
+
+            container.appendChild(div);
+        }
+
+        // 사이즈 옵션 삭제
+        function removeSizeOption(index) {
+            const element = document.getElementById(`sizeOption${index}`);
+            if (element) {
+                element.remove();
             }
-            
-            // 사이즈 옵션 삭제
-            function removeSizeOption(index) {
-                const element = document.getElementById(`sizeOption${index}`);
-                if (element) {
-                    element.remove();
+        }
+
+        // ========== 이미지 처리 ==========
+
+        function previewMainImage(event) {
+            const file = event.target.files[0];
+            const fileName = document.getElementById('mainFileName');
+            const preview = document.getElementById('mainImagePreview');
+            const previewImg = document.getElementById('mainPreview');
+
+            if (file) {
+                fileName.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
                 }
+                reader.readAsDataURL(file);
             }
-            
-            // ========== 이미지 처리 ==========
-            
-            function previewMainImage(event) {
-                const file = event.target.files[0];
-                const fileName = document.getElementById('mainFileName');
-                const preview = document.getElementById('mainImagePreview');
-                const previewImg = document.getElementById('mainPreview');
-                
-                if (file) {
-                    fileName.textContent = file.name;
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImg.src = e.target.result;
-                        preview.style.display = 'block';
-                    }
-                    reader.readAsDataURL(file);
-                }
-            }
-            
-            document.getElementById('detailImageInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                // ✅ 기존 이미지 + 새 이미지 합쳐서 최대 4개
-                const totalImages = existingDetailImages.length + detailImagesArray.length;
-                if (totalImages >= 4) {
-                    alert('상세 이미지는 최대 4개까지만 등록 가능합니다.');
-                    return;
-                }
-                
-                detailImagesArray.push(file);
-                renderDetailPreviews();
-                e.target.value = '';
-            });
-            
-            function renderDetailPreviews() {
-                const container = document.getElementById('detailPreviews');
-                
-                // ✅ 기존 이미지는 유지하고 새 이미지만 추가
-                const existingImages = container.querySelectorAll('.existing-image');
-                const startIndex = existingImages.length;
-                
-                // 새 이미지 추가
-                detailImagesArray.forEach((file, index) => {
-                    const actualIndex = startIndex + index;
-                    
-                    // 이미 렌더링된 이미지는 스킵
-                    if (container.querySelector(`[data-new-index="${index}"]`)) return;
-                    
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const div = document.createElement('div');
-                        div.className = 'detail-preview-item';
-                        div.setAttribute('data-new-index', index);
-                        div.innerHTML = `
+        }
+
+        function renderDetailPreviews() {
+            const container = document.getElementById('detailPreviews');
+
+            // ✅ 기존 이미지는 유지하고 새 이미지만 추가
+            const existingImages = container.querySelectorAll('.existing-image');
+            const startIndex = existingImages.length;
+
+            // 새 이미지 추가
+            detailImagesArray.forEach((file, index) => {
+                const actualIndex = startIndex + index;
+
+                // 이미 렌더링된 이미지는 스킵
+                if (container.querySelector(`[data-new-index="${index}"]`)) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'detail-preview-item';
+                    div.setAttribute('data-new-index', index);
+                    div.innerHTML = `
                             <img src="${e.target.result}" alt="새 상세${index+1}">
                             <button type="button" class="delete-btn" onclick="deleteNewImage(${index})">
                                 <i class="fas fa-times"></i>
                             </button>
                             <span class="image-number">${actualIndex + 1}</span>
                         `;
-                        container.appendChild(div);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-            
-            // ✅ 기존 이미지 삭제
-            function deleteExistingImage(index) {
-                if (confirm('이 이미지를 삭제하시겠습니까?')) {
-                    existingDetailImages.splice(index, 1);
-                    
-                    // 화면에서 제거
-                    const container = document.getElementById('detailPreviews');
-                    const existingImages = container.querySelectorAll('.existing-image');
-                    if (existingImages[index]) {
-                        existingImages[index].remove();
-                    }
-                    
-                    // 번호 재정렬
-                    updateImageNumbers();
-                    console.log('기존 이미지 삭제됨, 남은 이미지:', existingDetailImages);
-                }
-            }
-            
-            // ✅ 새로 추가한 이미지 삭제
-            function deleteNewImage(index) {
-                detailImagesArray.splice(index, 1);
-                
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ✅ 기존 이미지 삭제
+        function deleteExistingImage(index) {
+            if (confirm('이 이미지를 삭제하시겠습니까?')) {
+                existingDetailImages.splice(index, 1);
+
                 // 화면에서 제거
                 const container = document.getElementById('detailPreviews');
-                const element = container.querySelector(`[data-new-index="${index}"]`);
-                if (element) {
-                    element.remove();
+                const existingImages = container.querySelectorAll('.existing-image');
+                if (existingImages[index]) {
+                    existingImages[index].remove();
                 }
-                
-                // 전체 다시 렌더링
-                container.querySelectorAll('.detail-preview-item:not(.existing-image)').forEach(el => el.remove());
-                renderDetailPreviews();
-                
+
                 // 번호 재정렬
                 updateImageNumbers();
+                console.log('기존 이미지 삭제됨, 남은 이미지:', existingDetailImages);
             }
-            
-            // ✅ 이미지 번호 재정렬
-            function updateImageNumbers() {
-                const container = document.getElementById('detailPreviews');
-                const allImages = container.querySelectorAll('.detail-preview-item');
-                allImages.forEach((img, idx) => {
-                    const numberSpan = img.querySelector('.image-number');
-                    if (numberSpan) {
-                        numberSpan.textContent = idx + 1;
-                    }
-                });
+        }
+
+        // ✅ 새로 추가한 이미지 삭제
+        function deleteNewImage(index) {
+            detailImagesArray.splice(index, 1);
+
+            // 화면에서 제거
+            const container = document.getElementById('detailPreviews');
+            const element = container.querySelector(`[data-new-index="${index}"]`);
+            if (element) {
+                element.remove();
             }
-            
-            // ========== 할인가 계산 ==========
-            
-            function calculateDiscount() {
-                const price = parseInt(document.getElementById('price').value) || 0;
-                const discountRate = parseInt(document.getElementById('discountRate').value) || 0;
-                const discountPriceElement = document.getElementById('discountPrice');
-                
-                if (price > 0 && discountRate > 0) {
-                    const discountAmount = Math.floor(price * discountRate / 100);
-                    const finalPrice = price - discountAmount;
-                    discountPriceElement.innerHTML = `판매가: ${finalPrice.toLocaleString()}원`;
-                } else if (price > 0) {
-                    discountPriceElement.innerHTML = `판매가: ${price.toLocaleString()}원`;
+
+            // 전체 다시 렌더링
+            container.querySelectorAll('.detail-preview-item:not(.existing-image)').forEach(el => el.remove());
+            renderDetailPreviews();
+
+            // 번호 재정렬
+            updateImageNumbers();
+        }
+
+        // ✅ 이미지 번호 재정렬
+        function updateImageNumbers() {
+            const container = document.getElementById('detailPreviews');
+            const allImages = container.querySelectorAll('.detail-preview-item');
+            allImages.forEach((img, idx) => {
+                const numberSpan = img.querySelector('.image-number');
+                if (numberSpan) {
+                    numberSpan.textContent = idx + 1;
+                }
+            });
+        }
+
+        // ========== 할인가 계산 ==========
+
+        function calculateDiscount() {
+            const price = parseInt(document.getElementById('price').value) || 0;
+            const discountRate = parseInt(document.getElementById('discountRate').value) || 0;
+            const discountPriceElement = document.getElementById('discountPrice');
+
+            if (price > 0 && discountRate > 0) {
+                const discountAmount = Math.floor(price * discountRate / 100);
+                const finalPrice = price - discountAmount;
+                discountPriceElement.innerHTML = `판매가: ${finalPrice.toLocaleString()}원`;
+            } else if (price > 0) {
+                discountPriceElement.innerHTML = `판매가: ${price.toLocaleString()}원`;
+            } else {
+                discountPriceElement.innerHTML = '';
+            }
+        }
+
+        // ========== 폼 제출 ==========
+
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            console.log('=== 폼 제출 시작 ===');
+
+            // ✅ hidden input의 값 확인
+            const hiddenCategoryId = document.getElementById('categoryId');
+            const mediumCategoryId = document.getElementById('mediumCategory').value;
+            const largeCategoryId = document.getElementById('largeCategory').value;
+
+            console.log('대분류 ID:', largeCategoryId);
+            console.log('중분류 ID:', mediumCategoryId);
+            console.log('Hidden categoryId (변경 전):', hiddenCategoryId.value);
+
+            // hidden input이 비어있으면 중분류나 대분류를 설정
+            if (!hiddenCategoryId.value || hiddenCategoryId.value === '') {
+                if (mediumCategoryId && mediumCategoryId !== '') {
+                    hiddenCategoryId.value = mediumCategoryId;
+                    console.log('✅ 소분류 없음 -> 중분류 사용:', mediumCategoryId);
+                } else if (largeCategoryId && largeCategoryId !== '') {
+                    hiddenCategoryId.value = largeCategoryId;
+                    console.log('✅ 중/소분류 없음 -> 대분류 사용:', largeCategoryId);
                 } else {
-                    discountPriceElement.innerHTML = '';
+                    // ✅ 수정 모드에서는 카테고리가 이미 설정되어 있을 수 있음
+                    if (!editMode) {
+                        e.preventDefault();
+                        alert('카테고리를 선택해주세요.');
+                        console.error('❌ 카테고리가 선택되지 않음');
+                        return;
+                    }
                 }
             }
-            
-            // ========== 폼 제출 ==========
-            
-            // ✅ 페이지 로드 시 수정 모드 처리
-            document.addEventListener('DOMContentLoaded', function() {
-                if (editMode && productData) {
-                    console.log('수정 모드 데이터 로드 시작');
-                    
-                    // 상품 타입 설정
-                    if (productData.productType) {
-                        document.getElementById('productType').value = productData.productType;
-                    }
-                    
-                    // 기존 옵션 로드
-                    if (productData.options && productData.options.length > 0) {
-                        const container = document.getElementById('sizeOptionsList');
-                        container.innerHTML = '';
-                        sizeOptionIndex = 0;
-                        
-                        productData.options.forEach(option => {
-                            addSizeOption(
-                                option.optionType,
-                                option.optionValue,
-                                option.stockQuantity,
-                                option.additionalPrice || 0
-                            );
-                        });
-                        
-                        console.log('기존 옵션 로드 완료:', productData.options.length + '개');
-                    }
-                    
-                    // 카테고리 ID가 있으면 hidden input에 설정
-                    if (productData.categoryId) {
-                        document.getElementById('categoryId').value = productData.categoryId;
-                        console.log('카테고리 ID 설정:', productData.categoryId);
-                    }
-                    
-                    // 대표 이미지 파일명 표시
-                    const mainFileName = document.getElementById('mainFileName');
-                    if (productData.id && mainFileName) {
-                        mainFileName.textContent = '기존 이미지 유지 (변경하려면 새 파일 선택)';
-                    }
-                    
-                    // 할인가 계산
-                    calculateDiscount();
+
+            console.log('Hidden categoryId (최종):', hiddenCategoryId.value);
+
+            // 옵션이 1개 이상 있는지 확인
+            const optionsList = document.getElementById('sizeOptionsList');
+            if (optionsList.children.length === 0) {
+                e.preventDefault();
+                alert('최소 1개 이상의 상품 옵션을 추가해주세요.');
+                console.error('❌ 상품 옵션 없음');
+                return;
+            }
+
+            // ✅ 실무 정석: 기존 hidden input 재사용
+            if (detailImagesArray.length > 0) {
+                const dataTransfer = new DataTransfer();
+                detailImagesArray.forEach(file => dataTransfer.items.add(file));
+
+                // 이미 존재하는 input에 files만 설정
+                const fileInput = document.getElementById('detailImageFiles');
+                fileInput.files = dataTransfer.files;
+            }
+
+            // ✅ 디버깅: 전송되는 폼 데이터 확인
+            const formData = new FormData(this);
+            console.log('=== 폼 전송 데이터 ===');
+            console.log('수정 모드:', editMode);
+            console.log('기존 상세 이미지 수:', existingDetailImages.length);
+            console.log('새 상세 이미지 수:', detailImagesArray.length);
+            let paramCount = 0;
+            for (let [key, value] of formData.entries()) {
+                paramCount++;
+                if (key === 'categoryId') {
+                    console.log(`⭐ ${paramCount}. ${key}:`, value);
+                } else {
+                    console.log(`${paramCount}. ${key}:`, value instanceof File ? `File(${value.name})` : value);
                 }
-            });
-            
-            document.getElementById('productForm').addEventListener('submit', function(e) {
-                console.log('=== 폼 제출 시작 ===');
-                
-                // ✅ hidden input의 값 확인
-                const hiddenCategoryId = document.getElementById('categoryId');
-                const mediumCategoryId = document.getElementById('mediumCategory').value;
-                const largeCategoryId = document.getElementById('largeCategory').value;
-                
-                console.log('대분류 ID:', largeCategoryId);
-                console.log('중분류 ID:', mediumCategoryId);
-                console.log('Hidden categoryId (변경 전):', hiddenCategoryId.value);
-                
-                // hidden input이 비어있으면 중분류나 대분류를 설정
-                if (!hiddenCategoryId.value || hiddenCategoryId.value === '') {
-                    if (mediumCategoryId && mediumCategoryId !== '') {
-                        hiddenCategoryId.value = mediumCategoryId;
-                        console.log('✅ 소분류 없음 -> 중분류 사용:', mediumCategoryId);
-                    } else if (largeCategoryId && largeCategoryId !== '') {
-                        hiddenCategoryId.value = largeCategoryId;
-                        console.log('✅ 중/소분류 없음 -> 대분류 사용:', largeCategoryId);
-                    } else {
-                        // ✅ 수정 모드에서는 카테고리가 이미 설정되어 있을 수 있음
-                        if (!editMode) {
-                            e.preventDefault();
-                            alert('카테고리를 선택해주세요.');
-                            console.error('❌ 카테고리가 선택되지 않음');
-                            return;
-                        }
-                    }
-                }
-                
-                console.log('Hidden categoryId (최종):', hiddenCategoryId.value);
-                
-                // 옵션이 1개 이상 있는지 확인
-                const optionsList = document.getElementById('sizeOptionsList');
-                if (optionsList.children.length === 0) {
-                    e.preventDefault();
-                    alert('최소 1개 이상의 상품 옵션을 추가해주세요.');
-                    console.error('❌ 상품 옵션 없음');
-                    return;
-                }
-                
-                // ✅ 실무 정석: 기존 hidden input 재사용
-                if (detailImagesArray.length > 0) {
-                    const dataTransfer = new DataTransfer();
-                    detailImagesArray.forEach(file => dataTransfer.items.add(file));
-                    
-                    // 이미 존재하는 input에 files만 설정
-                    const fileInput = document.getElementById('detailImageFiles');
-                    fileInput.files = dataTransfer.files;
-                }
-                
-                // ✅ 디버깅: 전송되는 폼 데이터 확인
-                const formData = new FormData(this);
-                console.log('=== 폼 전송 데이터 ===');
-                console.log('수정 모드:', editMode);
-                console.log('기존 상세 이미지 수:', existingDetailImages.length);
-                console.log('새 상세 이미지 수:', detailImagesArray.length);
-                let paramCount = 0;
-                for (let [key, value] of formData.entries()) {
-                    paramCount++;
-                    if (key === 'categoryId') {
-                        console.log(`⭐ ${paramCount}. ${key}:`, value);
-                    } else {
-                        console.log(`${paramCount}. ${key}:`, value instanceof File ? `File(${value.name})` : value);
-                    }
-                }
-                console.log(`총 파라미터 개수: ${paramCount}`);
-                console.log('===================');
-            });
-        </script>
-    </th:block>
+            }
+            console.log(`총 파라미터 개수: ${paramCount}`);
+            console.log('===================');
+        });
+    </script>
+</th:block>
 </body>
 </html>

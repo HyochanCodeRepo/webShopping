@@ -236,3 +236,128 @@
         padding: 20px 15px;
     }
 }
+
+/* ========================================
+   시연용 계정 로그인 섹션
+======================================== */
+.demo-login-section {
+    margin: 25px 0;
+}
+
+.demo-accounts-info {
+    background-color: #f7f9fc;
+    border: 1px solid #d5dce5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+.demo-info-text {
+    font-size: 13px;
+    color: #565959;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.demo-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-demo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.demo-icon {
+    font-size: 18px;
+}
+
+.demo-text {
+    font-weight: 600;
+}
+
+/* 관리자 버튼 */
+.btn-demo-admin {
+    background: #fff;
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-demo-admin:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+/* 판매자 버튼 */
+.btn-demo-seller {
+    background: #fff;
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.btn-demo-seller:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+/* 구매자 버튼 */
+.btn-demo-user {
+    background: #fff;
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.btn-demo-user:hover {
+    background: #28a745;
+    color: #fff;
+}
+
+@media (max-width: 480px) {
+    .demo-accounts-info {
+        padding: 15px;
+    }
+    
+    .btn-demo {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .demo-icon {
+        font-size: 16px;
+    }
+}
+
+/* ========================================
+   마이페이지 추가 스타일
+======================================== */
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0F1111;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #E31837;
+}
+
+.readonly-input {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    color: #767676;
+}
+
+.readonly-input:focus {
+    border-color: #a6a6a6;
+    box-shadow: none;
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>500 - 서버 오류</title>
+    <th:block layout:fragment="css">
+        <style>
+            .error-container {
+                max-width: 600px;
+                margin: 100px auto;
+                padding: 60px 40px;
+                text-align: center;
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            }
+            
+            .error-icon {
+                font-size: 120px;
+                color: #E31837;
+                margin-bottom: 30px;
+            }
+            
+            .error-code {
+                font-size: 80px;
+                font-weight: 800;
+                color: #232f3e;
+                margin-bottom: 20px;
+                letter-spacing: -2px;
+            }
+            
+            .error-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 15px;
+            }
+            
+            .error-message {
+                font-size: 16px;
+                color: #666;
+                line-height: 1.6;
+                margin-bottom: 40px;
+            }
+            
+            .error-actions {
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+            }
+            
+            .btn-home,
+            .btn-refresh {
+                padding: 14px 30px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .btn-home {
+                background: #ff9900;
+                color: #fff;
+            }
+            
+            .btn-home:hover {
+                background: #e88b00;
+                transform: translateY(-2px);
+            }
+            
+            .btn-refresh {
+                background: #f0f0f0;
+                color: #333;
+            }
+            
+            .btn-refresh:hover {
+                background: #e0e0e0;
+            }
+            
+            .error-detail {
+                margin-top: 30px;
+                padding: 20px;
+                background: #f7f7f7;
+                border-radius: 8px;
+                text-align: left;
+                font-size: 13px;
+                color: #666;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-server"></i>
+        </div>
+        <div class="error-code">500</div>
+        <h1 class="error-title">서버 오류가 발생했습니다</h1>
+        <p class="error-message" th:text="${errorMessage} ?: '일시적인 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'">
+            일시적인 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+        </p>
+        <div class="error-actions">
+            <a th:href="@{/}" class="btn-home">
+                <i class="fas fa-home"></i> 홈으로 가기
+            </a>
+            <button onclick="location.reload()" class="btn-refresh">
+                <i class="fas fa-redo"></i> 새로고침
+            </button>
+        </div>
+        
+        <!-- 에러 상세 정보 (개발 환경에서만 표시) -->
+        <div class="error-detail" th:if="${errorDetail}">
+            <strong>에러 상세:</strong><br>
+            <span th:text="${errorDetail}"></span>
+        </div>
+    </div>
+</main>
+</body>
+</html>

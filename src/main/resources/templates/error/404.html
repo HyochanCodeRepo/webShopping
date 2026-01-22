@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}"
+      lang="ko">
+<head>
+    <title>404 - 페이지를 찾을 수 없습니다</title>
+    <th:block layout:fragment="css">
+        <style>
+            .error-container {
+                max-width: 600px;
+                margin: 100px auto;
+                padding: 60px 40px;
+                text-align: center;
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            }
+            
+            .error-icon {
+                font-size: 120px;
+                color: #E31837;
+                margin-bottom: 30px;
+            }
+            
+            .error-code {
+                font-size: 80px;
+                font-weight: 800;
+                color: #232f3e;
+                margin-bottom: 20px;
+                letter-spacing: -2px;
+            }
+            
+            .error-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: #232f3e;
+                margin-bottom: 15px;
+            }
+            
+            .error-message {
+                font-size: 16px;
+                color: #666;
+                line-height: 1.6;
+                margin-bottom: 40px;
+            }
+            
+            .error-actions {
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+            }
+            
+            .btn-home,
+            .btn-back {
+                padding: 14px 30px;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: all 0.3s;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .btn-home {
+                background: #ff9900;
+                color: #fff;
+            }
+            
+            .btn-home:hover {
+                background: #e88b00;
+                transform: translateY(-2px);
+            }
+            
+            .btn-back {
+                background: #f0f0f0;
+                color: #333;
+            }
+            
+            .btn-back:hover {
+                background: #e0e0e0;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="error-code">404</div>
+        <h1 class="error-title">페이지를 찾을 수 없습니다</h1>
+        <p class="error-message" th:text="${errorMessage} ?: '요청하신 페이지가 존재하지 않습니다.'">
+            요청하신 페이지가 존재하지 않습니다.
+        </p>
+        <div class="error-actions">
+            <a th:href="@{/}" class="btn-home">
+                <i class="fas fa-home"></i> 홈으로 가기
+            </a>
+            <button onclick="history.back()" class="btn-back">
+                <i class="fas fa-arrow-left"></i> 이전 페이지
+            </button>
+        </div>
+    </div>
+</main>
+</body>
+</html>
