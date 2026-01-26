@@ -84,9 +84,11 @@
                         <span class="menu-text">페이지</span>
                     </a>
                     
-                    <a th:href="@{/order/list}" class="user-menu-item">
+                    <a th:href="@{/order/list}" class="user-menu-item order-badge-container">
                         <span class="menu-label">반품</span>
                         <span class="menu-text">& 주문</span>
+                        <span class="order-badge" id="orderBadge" style="display:none;" 
+                              sec:authorize="hasAnyRole('ADMIN', 'SELLER')">0</span>
                     </a>
                     <a th:href="@{/cart}" class="user-menu-item cart-icon">
                         <i class="fas fa-shopping-cart"></i>
@@ -237,6 +239,45 @@
             window.location.href = url;
         }
     });
+    
+    // ========== 주문 뱃지 업데이트 ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        updateOrderBadge();
+        
+        // 30초마다 자동 갱신
+        setInterval(updateOrderBadge, 30000);
+    });
+    
+    async function updateOrderBadge() {
+        const badge = document.getElementById('orderBadge');
+        if (!badge) return;
+        
+        try {
+            // 관리자/판매자용 API 먼저 시도
+            const response = await fetch('/api/new-orders-count');
+            
+            if (response.ok) {
+                const data = await response.json();
+                const count = data.count;
+                
+                // 뱃지 업데이트
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+            
+        } catch (error) {
+            console.error('주문 뱃지 업데이트 실패:', error);
+        }
+    }
+    
+    // 주문 목록 페이지 방문 시 마지막 확인 시간 저장
+    if (window.location.pathname === '/order/list') {
+        localStorage.setItem('lastOrderCheck', new Date().toISOString());
+    }
     </script>
     
     <!-- Footer -->

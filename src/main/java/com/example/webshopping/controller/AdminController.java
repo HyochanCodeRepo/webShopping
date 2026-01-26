@@ -347,4 +347,114 @@ public class AdminController {
         
         return "redirect:/admin/sellers";
     }
+    
+    
+    // ========== 대시보드 통계 API ==========
+    
+    /**
+     * 관리자 대시보드 통계 데이터 (REST API)
+     * 실시간 카드용 데이터
+     */
+    @GetMapping("/api/stats/summary")
+    @ResponseBody
+    public Map<String, Object> getDashboardStats() {
+        
+        Map<String, Object> stats = new HashMap<>();
+        
+        // 오늘 매출
+        Integer todaySales = orderRepository.getTodaySales();
+        Integer yesterdaySales = orderRepository.getYesterdaySales();
+        double salesChangeRate = calculateChangeRate(yesterdaySales, todaySales);
+        
+        // 오늘 주문 건수
+        Long todayOrderCount = orderRepository.getTodayOrderCount();
+        Long yesterdayOrderCount = orderRepository.getYesterdayOrderCount();
+        long orderCountChange = todayOrderCount - yesterdayOrderCount;
+        
+        // 처리 대기 주문
+        Long pendingCount = orderRepository.getPendingOrderCount();
+        
+        // 신규 회원
+        Long todayNewMembers = membersRepository.getTodayNewMemberCount();
+        Long yesterdayNewMembers = membersRepository.getYesterdayNewMemberCount();
+        long memberCountChange = todayNewMembers - yesterdayNewMembers;
+        
+        // 전체 회원 수
+        Long totalMembers = membersRepository.count();
+        
+        stats.put("todaySales", todaySales);
+        stats.put("salesChangeRate", salesChangeRate);
+        stats.put("todayOrderCount", todayOrderCount);
+        stats.put("orderCountChange", orderCountChange);
+        stats.put("pendingCount", pendingCount);
+        stats.put("todayNewMembers", todayNewMembers);
+        stats.put("memberCountChange", memberCountChange);
+        stats.put("totalMembers", totalMembers);
+        
+        log.info("대시보드 통계 조회 - 오늘 매출: {}, 오늘 주문: {}, 처리대기: {}, 신규회원: {}", 
+                 todaySales, todayOrderCount, pendingCount, todayNewMembers);
+        
+        return stats;
+    }
+    
+    /**
+     * 최근 7일 매출 추이 (차트용)
+     */
+    @GetMapping("/api/stats/sales-trend")
+    @ResponseBody
+    public Map<String, Object> getSalesTrend() {
+        
+        List<Object[]> salesData = orderRepository.getLast7DaysSales();
+        
+        List<String> dates = salesData.stream()
+                .map(row -> row[0].toString())
+                .collect(Collectors.toList());
+        
+        List<Integer> sales = salesData.stream()
+                .map(row -> ((Number) row[1]).intValue())
+                .collect(Collectors.toList());
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("dates", dates);
+        result.put("sales", sales);
+        
+        log.info("매출 추이 조회 - 데이터 수: {}", salesData.size());
+        
+        return result;
+    }
+    
+    /**
+     * 주문 상태별 통계 (도넛 차트용)
+     */
+    @GetMapping("/api/stats/order-status")
+    @ResponseBody
+    public Map<String, Object> getOrderStatusStats() {
+        
+        List<Object[]> statusData = orderRepository.getOrderStatusCounts();
+        
+        Map<String, Long> statusMap = new HashMap<>();
+        for (Object[] row : statusData) {
+            OrderStatus status = (OrderStatus) row[0];
+            Long count = (Long) row[1];
+            statusMap.put(status.name(), count);
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("labels", statusMap.keySet());
+        result.put("counts", statusMap.values());
+        
+        log.info("주문 상태 통계 조회 - {}", statusMap);
+        
+        return result;
+    }
+    
+    /**
+     * 증감률 계산 헬퍼 메서드
+     */
+    private double calculateChangeRate(Integer previous, Integer current) {
+        if (previous == null || previous == 0) {
+            return current != null && current > 0 ? 100.0 : 0.0;
+        }
+        return ((double) (current - previous) / previous) * 100;
+    }
 }

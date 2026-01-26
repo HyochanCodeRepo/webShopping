@@ -5,6 +5,7 @@ import com.example.webshopping.constant.PaymentMethod;
 import com.example.webshopping.constant.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,6 +31,9 @@ public class Order {
 
     @Column(nullable = false)
     private LocalDateTime orderDate;
+    
+    @UpdateTimestamp
+    private LocalDateTime updatedDate; // 주문 수정 시간 (상태 변경 추적용)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

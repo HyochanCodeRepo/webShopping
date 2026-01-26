@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,5 +245,45 @@ public class OrderController {
         
         redirectAttributes.addFlashAttribute("error", "결제가 취소되었습니다: " + message);
         return "redirect:/cart";
+    }
+    
+    /**
+     * 내 주문 업데이트 건수 조회 API (일반 사용자용)
+     * 마지막 확인 시간 이후 상태 변경된 주문 건수
+     */
+    @GetMapping("/api/my-updates-count")
+    @ResponseBody
+    public ResponseEntity<Map<String, Long>> getMyOrderUpdatesCount(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) String lastChecked) {
+        
+        if (userDetails == null) {
+            return ResponseEntity.ok(Map.of("count", 0L));
+        }
+        
+        try {
+            String email = userDetails.getUsername();
+            Members member = membersRepository.findByEmail(email);
+            
+            if (member == null) {
+                return ResponseEntity.ok(Map.of("count", 0L));
+            }
+            
+            // 마지막 확인 시간 파싱 (없으면 24시간 전)
+            LocalDateTime lastCheckedTime;
+            if (lastChecked != null && !lastChecked.isEmpty()) {
+                lastCheckedTime = LocalDateTime.parse(lastChecked);
+            } else {
+                lastCheckedTime = LocalDateTime.now().minusDays(1);
+            }
+            
+            Long count = orderService.countUpdatedOrders(member.getId(), lastCheckedTime);
+            
+            return ResponseEntity.ok(Map.of("count", count));
+            
+        } catch (Exception e) {
+            log.error("주문 업데이트 건수 조회 실패: {}", e.getMessage());
+            return ResponseEntity.ok(Map.of("count", 0L));
+        }
     }
 }

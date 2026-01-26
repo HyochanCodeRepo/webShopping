@@ -37,5 +37,8 @@ public interface OrderService {
     
     // Order 엔티티를 DTO로 변환
     OrderResponseDTO convertToDTO(com.example.webshopping.entity.Order order);
+    
+    // 특정 시간 이후 상태 변경된 주문 건수 조회
+    Long countUpdatedOrders(Long memberId, java.time.LocalDateTime lastCheckedTime);
 
 }

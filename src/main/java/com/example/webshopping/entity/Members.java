@@ -3,6 +3,9 @@ package com.example.webshopping.entity;
 import com.example.webshopping.constant.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,4 +31,8 @@ public class Members {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+    
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime regTime;  // 가입일시
 }

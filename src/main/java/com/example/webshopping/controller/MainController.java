@@ -2,6 +2,7 @@ package com.example.webshopping.controller;
 
 import com.example.webshopping.entity.Product;
 import com.example.webshopping.repository.CategoryRepository;
+import com.example.webshopping.repository.OrderRepository;
 import com.example.webshopping.repository.ProductRepository;
 import com.example.webshopping.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,7 @@ public class MainController {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ReviewRepository reviewRepository;
+    private final OrderRepository orderRepository;
 
 
     @GetMapping("/")
@@ -77,6 +80,18 @@ public class MainController {
 
         return "main";
     }
-
+    
+    /**
+     * 새 주문 건수 조회 API (Header용)
+     * 처리 대기 중인 주문 건수 반환
+     */
+    @GetMapping("/api/new-orders-count")
+    @ResponseBody
+    public Map<String, Long> getNewOrdersCount() {
+        Long pendingCount = orderRepository.getPendingOrderCount();
+        Map<String, Long> response = new HashMap<>();
+        response.put("count", pendingCount);
+        return response;
+    }
 
 }

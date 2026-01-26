@@ -358,4 +358,13 @@ public class OrderServiceImpl implements OrderService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+    
+    /**
+     * 특정 시간 이후 상태 변경된 주문 건수 조회 (일반 사용자용)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long countUpdatedOrders(Long memberId, java.time.LocalDateTime lastCheckedTime) {
+        return orderRepository.countUpdatedOrdersByMember(memberId, lastCheckedTime);
+    }
 }

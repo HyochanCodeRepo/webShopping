@@ -12,6 +12,99 @@
 
 <br>
 
+## 🆕 최근 업데이트 (2026-01-26)
+
+### ✨ 관리자 대시보드 통계 시스템 추가
+
+#### 📊 실시간 통계 카드 (4개)
+- **오늘 매출**: 전일 대비 증감률 표시 (▲ 15.2% / ▼ 3.1%)
+  - 결제완료 이상만 집계 (결제대기/취소 제외)
+- **오늘 주문**: 전일 대비 증감 건수 표시
+- **처리 대기**: 🔥 신규 주문 건수 (PENDING + PAYMENT_COMPLETED)
+- **신규 회원**: 오늘 가입한 회원 수
+
+#### 📈 Chart.js 차트 (2개)
+- **최근 7일 매출 추이**: 꺾은선 그래프로 일별 매출 시각화
+- **주문 상태 현황**: 도넛 차트로 상태별 비율 표시
+
+#### 💡 **구현 핵심 로직**
+```java
+// 날짜 계산 (JPQL)
+CURRENT_DATE - 1 DAY  // ✅ 올바른 문법
+
+// 매출 집계 기준
+WHERE o.orderStatus != 'CANCEL' 
+  AND o.orderStatus != 'PENDING'  // 결제 대기 제외
+
+// 처리 대기 건수
+WHERE o.orderStatus IN ('PENDING', 'PAYMENT_COMPLETED')
+```
+
+### 🔔 실시간 주문 알림 뱃지 시스템 추가
+
+#### 📍 뱃지 표시 위치
+- **Header "반품 & 주문"**: 관리자/판매자만 표시
+- **Admin "주문 관리" 카드**: 새 주문 건수 표시
+
+#### 🔄 자동 갱신
+- 30초마다 API 폴링으로 실시간 업데이트
+- LocalStorage로 마지막 확인 시간 추적
+
+#### 💡 **구현 핵심 로직**
+```javascript
+// 관리자/판매자만 뱃지 렌더링
+<span sec:authorize="hasAnyRole('ADMIN', 'SELLER')">
+
+// 30초 폴링
+setInterval(updateOrderBadge, 30000);
+
+// 뱃지 업데이트
+if (count > 0) {
+    badge.textContent = count > 99 ? '99+' : count;
+    badge.style.display = 'flex';
+}
+```
+
+#### 🎨 **CSS 스타일**
+- 빨간 원형 뱃지 (#ff3b30)
+- 우측 상단 절대 위치
+- 99+ 오버플로우 표시
+
+### 🗂️ 엔티티 필드 추가
+
+#### Members 엔티티
+```java
+@CreationTimestamp
+@Column(updatable = false)
+private LocalDateTime regTime;  // 가입일시
+```
+
+#### Order 엔티티
+```java
+@UpdateTimestamp
+private LocalDateTime updatedDate;  // 주문 수정 시간 (상태 변경 추적용)
+```
+
+### 📌 주요 의사결정 사항
+
+1. **매출 집계 기준 변경**
+   - 문제: 결제 대기 주문도 매출에 포함되는 문제
+   - 해결: `PENDING` 상태 제외, 실제 결제 완료된 주문만 집계
+
+2. **처리 대기 건수 정의**
+   - 문제: 일반 주문(PENDING)이 카운트 안 됨
+   - 해결: `PENDING + PAYMENT_COMPLETED` 둘 다 포함
+
+3. **트래픽 최적화 고민**
+   - 30초 폴링의 트래픽 부담 검토
+   - 결론: 포트폴리오 수준에서는 문제없음 (동시 접속 100명 기준 시간당 ~7MB)
+
+4. **뱃지 표시 대상**
+   - 일반 사용자 vs 관리자 구분
+   - 결론: 관리자/판매자만 표시 (일반 사용자에게는 의미 없는 정보)
+
+---
+
 ## 📖 목차
 1. [프로젝트 소개](#-프로젝트-소개)
 2. [주요 기능](#-주요-기능)

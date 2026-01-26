@@ -135,4 +135,79 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
     );
+    
+    // ========== 관리자 대시보드 통계 (ADMIN 전체 데이터) ==========
+    
+    /**
+     * 오늘 매출 합계 (결제완료 이상만 포함, 취소/결제대기 제외)
+     */
+    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Order o " +
+           "WHERE DATE(o.orderDate) = CURRENT_DATE " +
+           "AND o.orderStatus != 'CANCEL' " +
+           "AND o.orderStatus != 'PENDING'")
+    Integer getTodaySales();
+    
+    /**
+     * 어제 매출 합계 (전일 대비 계산용)
+     */
+    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Order o " +
+           "WHERE DATE(o.orderDate) = CURRENT_DATE - 1 DAY " +
+           "AND o.orderStatus != 'CANCEL' " +
+           "AND o.orderStatus != 'PENDING'")
+    Integer getYesterdaySales();
+    
+    /**
+     * 오늘 주문 건수
+     */
+    @Query("SELECT COUNT(o) FROM Order o " +
+           "WHERE DATE(o.orderDate) = CURRENT_DATE")
+    Long getTodayOrderCount();
+    
+    /**
+     * 어제 주문 건수 (전일 대비 계산용)
+     */
+    @Query("SELECT COUNT(o) FROM Order o " +
+           "WHERE DATE(o.orderDate) = CURRENT_DATE - 1 DAY")
+    Long getYesterdayOrderCount();
+    
+    /**
+     * 처리 대기 중인 주문 건수 (결제완료 + 결제대기 상태)
+     */
+    @Query("SELECT COUNT(o) FROM Order o " +
+           "WHERE o.orderStatus IN ('PENDING', 'PAYMENT_COMPLETED')")
+    Long getPendingOrderCount();
+    
+    /**
+     * 최근 7일 일별 매출 (차트용, 결제완료 이상만 포함)
+     * @return [날짜, 매출] 형태의 리스트
+     */
+    @Query("SELECT DATE(o.orderDate), COALESCE(SUM(o.totalPrice), 0) " +
+           "FROM Order o " +
+           "WHERE o.orderDate >= CURRENT_DATE - 6 DAY " +
+           "AND o.orderStatus != 'CANCEL' " +
+           "AND o.orderStatus != 'PENDING' " +
+           "GROUP BY DATE(o.orderDate) " +
+           "ORDER BY DATE(o.orderDate) ASC")
+    List<Object[]> getLast7DaysSales();
+    
+    /**
+     * 전체 주문 상태별 건수 (도넛 차트용)
+     * @return [상태, 건수] 형태의 리스트
+     */
+    @Query("SELECT o.orderStatus, COUNT(o) FROM Order o " +
+           "GROUP BY o.orderStatus")
+    List<Object[]> getOrderStatusCounts();
+    
+    /**
+     * 특정 회원의 특정 시간 이후 상태 변경된 주문 건수
+     * (일반 사용자용 - 새 알림 체크)
+     * @param memberId 회원 ID
+     * @param lastCheckedTime 마지막 확인 시간
+     * @return 상태 변경된 주문 건수
+     */
+    @Query("SELECT COUNT(o) FROM Order o " +
+           "WHERE o.member.id = :memberId " +
+           "AND o.updatedDate > :lastCheckedTime")
+    Long countUpdatedOrdersByMember(@Param("memberId") Long memberId, 
+                                      @Param("lastCheckedTime") LocalDateTime lastCheckedTime);
 }
