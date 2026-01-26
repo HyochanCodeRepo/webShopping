@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -20,6 +21,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @return 주문 엔티티 리스트
      */
     List<Order> findByMember_IdOrderByOrderDateDesc(Long memberId);
+    
+    /**
+     * 토스 주문 ID로 주문 조회 (결제용)
+     * @param orderId 토스 주문 ID (UUID)
+     * @return 주문 엔티티
+     */
+    Optional<Order> findByOrderId(String orderId);
 
 
     // ========== 여기 추가! ==========

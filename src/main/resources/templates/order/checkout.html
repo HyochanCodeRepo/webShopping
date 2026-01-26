@@ -9,53 +9,63 @@
     <th:block layout:fragment="css">
         <!-- Daum 우편번호 API -->
         <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <!-- 토스페이먼츠 SDK -->
+        <script src="https://js.tosspayments.com/v1/payment"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
         <style>
+            :root {
+                --primary-black: #000;
+                --text-primary: #000;
+                --text-secondary: #666;
+                --text-light: #999;
+                --border-color: #e5e5e5;
+                --bg-light: #fafafa;
+            }
+            
             .checkout-container {
-                max-width: 1200px;
-                margin: 40px auto;
-                padding: 0 20px;
+                max-width: 1280px;
+                margin: 60px auto;
+                padding: 0 40px;
             }
             
             .checkout-header {
-                padding: 20px 0;
-                border-bottom: 2px solid #232f3e;
-                margin-bottom: 40px;
+                padding-bottom: 24px;
+                border-bottom: 2px solid var(--primary-black);
+                margin-bottom: 60px;
             }
             
             .checkout-title {
-                font-size: 28px;
+                font-size: 32px;
                 font-weight: 700;
-                color: #232f3e;
+                color: var(--text-primary);
+                letter-spacing: -1px;
             }
             
             .checkout-main {
                 display: grid;
-                grid-template-columns: 1fr 400px;
-                gap: 30px;
+                grid-template-columns: 1fr 420px;
+                gap: 60px;
             }
             
             .section {
                 background: #fff;
-                border-radius: 8px;
-                padding: 30px;
-                margin-bottom: 20px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                padding: 0;
+                margin-bottom: 40px;
             }
             
             .section-title {
                 font-size: 20px;
                 font-weight: 700;
-                color: #232f3e;
-                margin-bottom: 20px;
-                padding-bottom: 15px;
-                border-bottom: 2px solid #e8e8e8;
+                color: var(--text-primary);
+                margin-bottom: 24px;
+                letter-spacing: -0.5px;
             }
             
             .order-item {
                 display: flex;
                 gap: 20px;
-                padding: 20px 0;
-                border-bottom: 1px solid #f0f0f0;
+                padding: 24px 0;
+                border-bottom: 1px solid var(--border-color);
             }
             
             .order-item:last-child {
@@ -65,8 +75,7 @@
             .item-image {
                 width: 100px;
                 height: 100px;
-                border: 1px solid #e8e8e8;
-                border-radius: 4px;
+                border: 1px solid var(--border-color);
                 overflow: hidden;
                 flex-shrink: 0;
             }
@@ -82,56 +91,59 @@
             }
             
             .item-name {
-                font-size: 16px;
-                font-weight: 600;
-                color: #232f3e;
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--text-primary);
                 margin-bottom: 8px;
             }
             
             .item-quantity {
                 font-size: 14px;
-                color: #666;
+                color: var(--text-secondary);
                 margin-bottom: 8px;
             }
             
             .item-price {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: 700;
-                color: #E31837;
+                color: var(--text-primary);
             }
             
             .form-group {
-                margin-bottom: 20px;
+                margin-bottom: 24px;
             }
             
             .form-label {
                 display: block;
                 font-size: 14px;
                 font-weight: 600;
-                color: #333;
+                color: var(--text-primary);
                 margin-bottom: 8px;
             }
             
             .form-label .required {
-                color: #E31837;
+                color: #d43f21;
                 margin-left: 2px;
             }
             
             .form-input {
                 width: 100%;
-                padding: 12px 15px;
-                border: 1px solid #ddd;
+                padding: 14px 16px;
+                border: 1px solid var(--border-color);
                 border-radius: 4px;
-                font-size: 14px;
-                transition: border-color 0.3s;
+                font-size: 15px;
+                transition: border-color 0.2s;
             }
             
             .form-input:focus {
                 outline: none;
-                border-color: #ff9900;
+                border-color: var(--text-primary);
             }
             
-            /* 주소 검색 버튼 */
+            .form-input:read-only {
+                background-color: var(--bg-light);
+            }
+            
             .address-group {
                 display: flex;
                 gap: 10px;
@@ -142,48 +154,62 @@
             }
             
             .btn-address-search {
-                padding: 12px 20px;
-                background: #232f3e;
+                padding: 14px 20px;
+                background: var(--primary-black);
                 color: #fff;
                 border: none;
                 border-radius: 4px;
                 font-size: 14px;
                 font-weight: 600;
                 cursor: pointer;
-                transition: all 0.3s;
+                transition: background 0.2s;
                 white-space: nowrap;
             }
             
             .btn-address-search:hover {
-                background: #ff9900;
+                background: #333;
             }
             
-            /* 약관 동의 */
+            .form-textarea {
+                width: 100%;
+                padding: 14px 16px;
+                border: 1px solid var(--border-color);
+                border-radius: 4px;
+                font-size: 15px;
+                resize: vertical;
+                min-height: 100px;
+            }
+            
+            .form-textarea:focus {
+                outline: none;
+                border-color: var(--text-primary);
+            }
+            
             .terms-section {
-                background: #f7f7f7;
-                border-radius: 8px;
-                padding: 20px;
-                margin-top: 20px;
+                background: var(--bg-light);
+                border-radius: 4px;
+                padding: 24px;
+                margin-top: 32px;
             }
             
             .terms-title {
                 font-size: 16px;
                 font-weight: 700;
-                color: #333;
-                margin-bottom: 15px;
+                color: var(--text-primary);
+                margin-bottom: 16px;
             }
             
             .terms-content {
                 background: #fff;
-                border: 1px solid #ddd;
+                border: 1px solid var(--border-color);
                 border-radius: 4px;
-                padding: 15px;
+                padding: 16px;
                 max-height: 150px;
                 overflow-y: auto;
                 font-size: 13px;
-                color: #666;
+                color: var(--text-secondary);
                 line-height: 1.6;
-                margin-bottom: 15px;
+                margin-bottom: 16px;
             }
             
             .terms-agree {
@@ -193,40 +219,29 @@
             }
             
             .terms-agree input[type="checkbox"] {
-                width: 20px;
-                height: 20px;
+                width: 18px;
+                height: 18px;
                 cursor: pointer;
+                accent-color: var(--primary-black);
             }
             
             .terms-agree label {
-                font-size: 15px;
-                font-weight: 600;
-                color: #333;
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--text-primary);
                 cursor: pointer;
             }
             
             .terms-agree .required {
-                color: #E31837;
-            }
-            
-            .form-textarea {
-                width: 100%;
-                padding: 12px 15px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                font-size: 14px;
-                resize: vertical;
-                min-height: 80px;
-            }
-            
-            .form-textarea:focus {
-                outline: none;
-                border-color: #ff9900;
+                color: #d43f21;
             }
             
             .order-summary {
                 position: sticky;
-                top: 20px;
+                top: 120px;
+                background: var(--bg-light);
+                padding: 32px 28px;
+                border-radius: 4px;
             }
             
             .summary-row {
@@ -237,64 +252,99 @@
             }
             
             .summary-label {
-                color: #666;
+                color: var(--text-secondary);
+                font-weight: 400;
             }
             
             .summary-value {
                 font-weight: 600;
-                color: #333;
+                color: var(--text-primary);
             }
             
             .summary-total {
-                margin-top: 15px;
-                padding-top: 15px;
-                border-top: 2px solid #e8e8e8;
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 2px solid var(--border-color);
             }
             
             .summary-total .summary-label {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: 700;
-                color: #333;
+                color: var(--text-primary);
             }
             
             .summary-total .summary-value {
                 font-size: 24px;
                 font-weight: 700;
-                color: #E31837;
+                color: var(--text-primary);
             }
             
-            .btn-order {
+            /* 결제 버튼 스타일 */
+            .payment-buttons {
+                margin-top: 24px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .btn-payment {
                 width: 100%;
                 padding: 18px;
-                background: #ff9900;
-                color: #fff;
                 border: none;
-                border-radius: 8px;
-                font-size: 18px;
+                border-radius: 4px;
+                font-size: 16px;
                 font-weight: 600;
                 cursor: pointer;
-                margin-top: 20px;
-                transition: all 0.3s;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
             }
             
-            .btn-order:hover {
-                background: #e88b00;
-            }
-            
-            .btn-order:disabled {
-                background: #ddd;
+            .btn-payment:disabled {
+                opacity: 0.5;
                 cursor: not-allowed;
+            }
+            
+            /* 토스 결제 버튼 (메인) */
+            .btn-toss-payment {
+                background: var(--primary-black);
+                color: #fff;
+            }
+            
+            .btn-toss-payment:hover:not(:disabled) {
+                background: #333;
+            }
+            
+            /* 일반 주문 버튼 (보조) */
+            .btn-normal-order {
+                background: #fff;
+                color: var(--text-primary);
+                border: 1px solid var(--border-color);
+            }
+            
+            .btn-normal-order:hover:not(:disabled) {
+                background: var(--bg-light);
+            }
+            
+            .btn-description {
+                font-size: 12px;
+                color: var(--text-light);
+                text-align: center;
+                margin-top: 4px;
+                font-weight: 400;
             }
             
             .loading {
                 text-align: center;
-                padding: 40px;
-                color: #666;
+                padding: 80px 20px;
+                color: var(--text-secondary);
             }
             
             .loading-spinner {
-                border: 4px solid #f3f3f3;
-                border-top: 4px solid #ff9900;
+                border: 3px solid var(--bg-light);
+                border-top: 3px solid var(--primary-black);
                 border-radius: 50%;
                 width: 40px;
                 height: 40px;
@@ -307,13 +357,24 @@
                 100% { transform: rotate(360deg); }
             }
             
-            @media (max-width: 768px) {
+            @media (max-width: 1024px) {
                 .checkout-main {
                     grid-template-columns: 1fr;
                 }
                 
                 .order-summary {
                     position: static;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .checkout-container {
+                    padding: 0 24px;
+                    margin: 40px auto;
+                }
+                
+                .checkout-title {
+                    font-size: 28px;
                 }
                 
                 .order-item {
@@ -342,11 +403,13 @@
             
             <div id="checkoutContent" class="checkout-main" style="display: none;">
                 <div>
+                    <!-- 주문 상품 -->
                     <div class="section">
                         <h2 class="section-title">주문 상품</h2>
                         <div id="orderItemsList"></div>
                     </div>
                     
+                    <!-- 배송 정보 -->
                     <div class="section">
                         <h2 class="section-title">배송 정보</h2>
                         <form id="orderForm">
@@ -368,7 +431,6 @@
                                        placeholder="010-1234-5678"
                                        maxlength="13"
                                        required>
-                                <small style="color: #666; font-size: 12px;">자동으로 하이픈이 추가됩니다</small>
                             </div>
                             
                             <div class="form-group">
@@ -379,7 +441,7 @@
                                     <input type="text" id="postcode" class="form-input" 
                                            placeholder="우편번호" readonly required>
                                     <button type="button" class="btn-address-search" onclick="searchAddress()">
-                                        <i class="fas fa-search"></i> 우편번호 검색
+                                        우편번호 검색
                                     </button>
                                 </div>
                             </div>
@@ -397,7 +459,7 @@
                                     상세주소 <span class="required">*</span>
                                 </label>
                                 <input type="text" name="deliveryAddress" id="detailAddress" class="form-input" 
-                                       placeholder="상세주소를 입력하세요 (동/호수 등)" required>
+                                       placeholder="상세주소를 입력하세요" required>
                             </div>
                             
                             <div class="form-group">
@@ -411,20 +473,17 @@
                                 <h3 class="terms-title">구매 조건 확인 및 결제 진행 동의</h3>
                                 <div class="terms-content">
                                     <p><strong>주문 내용 확인 및 결제 동의</strong></p>
-                                    <p>1. 주문하실 상품, 가격, 배송정보, 할인내역 등을 최종 확인하였으며, 구매에 동의하십니까? (전자상거래법 제8조 제2항)</p>
+                                    <p>1. 주문하실 상품, 가격, 배송정보 등을 최종 확인하였으며, 구매에 동의하십니까?</p>
                                     <p>2. 본인은 만 19세 이상이며, 주문 내용을 확인하였습니다.</p>
                                     <br>
                                     <p><strong>취소 및 환불 정책</strong></p>
-                                    <p>3. 상품 발송 전까지 주문을 취소할 수 있으며, 배송 시작 후에는 취소가 불가능합니다.</p>
-                                    <p>4. 단순 변심에 의한 반품은 상품 수령 후 7일 이내 가능하며, 반품 배송비는 고객 부담입니다.</p>
-                                    <br>
-                                    <p><strong>개인정보 수집 및 이용</strong></p>
-                                    <p>5. 주문 및 배송을 위해 수집된 개인정보는 배송 완료 후 관계 법령에 따라 보관됩니다.</p>
+                                    <p>3. 상품 발송 전까지 주문을 취소할 수 있습니다.</p>
+                                    <p>4. 단순 변심에 의한 반품은 상품 수령 후 7일 이내 가능합니다.</p>
                                 </div>
                                 <div class="terms-agree">
                                     <input type="checkbox" id="agreeTerms" required>
                                     <label for="agreeTerms">
-                                        위 내용을 확인하였으며 결제 진행에 동의합니다. <span class="required">*</span>
+                                        위 내용을 확인하였으며 결제 진행에 동의합니다 <span class="required">*</span>
                                     </label>
                                 </div>
                             </div>
@@ -432,8 +491,9 @@
                     </div>
                 </div>
                 
+                <!-- 결제 정보 사이드바 -->
                 <div>
-                    <div class="section order-summary">
+                    <div class="order-summary">
                         <h2 class="section-title">결제 정보</h2>
                         
                         <div class="summary-row">
@@ -457,13 +517,22 @@
                         </div>
                         
                         <div class="summary-row summary-total">
-                            <span class="summary-label">총 결제금액</span>
+                            <span class="summary-label">최종 결제금액</span>
                             <span class="summary-value" id="totalPrice">0원</span>
                         </div>
                         
-                        <button type="button" class="btn-order" onclick="submitOrder()">
-                            <i class="fas fa-credit-card"></i> 주문하기
-                        </button>
+                        <!-- 2개의 결제 버튼 -->
+                        <div class="payment-buttons">
+                            <button type="button" class="btn-payment btn-toss-payment" onclick="payWithToss()">
+                                토스페이먼츠로 결제하기
+                            </button>
+                            <p class="btn-description">실제 결제 플로우를 체험해보세요 (테스트 모드)</p>
+                            
+                            <button type="button" class="btn-payment btn-normal-order" onclick="normalOrder()">
+                                결제 없이 주문하기
+                            </button>
+                            <p class="btn-description">테스트용 - 결제 과정을 건너뜁니다</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -475,71 +544,46 @@
             let cartData = null;
             let memberName = /*[[${memberName}]]*/ '';
             let memberPhone = /*[[${memberPhone}]]*/ '';
+            const tossClientKey = /*[[${tossClientKey}]]*/ '';
+            let tossPayments = null;
             
             document.addEventListener('DOMContentLoaded', function() {
+                // 토스페이먼츠 SDK 초기화
+                tossPayments = TossPayments(tossClientKey);
+                
                 loadCartData();
                 loadMemberInfo();
+                
+                // 전화번호 자동 포맷팅
+                const phoneInput = document.getElementById('recipientPhone');
+                phoneInput.addEventListener('input', function(e) {
+                    e.target.value = formatPhoneNumber(e.target.value);
+                });
             });
             
-            // 회원 정보 자동 입력
             function loadMemberInfo() {
                 if (memberName) {
                     document.getElementById('recipientName').value = memberName;
                 }
                 if (memberPhone) {
-                    // 전화번호 포맷팅 (010-1234-5678)
-                    const formatted = formatPhoneNumber(memberPhone);
-                    document.getElementById('recipientPhone').value = formatted;
+                    document.getElementById('recipientPhone').value = formatPhoneNumber(memberPhone);
                 }
             }
             
-            // 전화번호 포맷팅 함수
             function formatPhoneNumber(value) {
-                // 숫자만 추출
                 const numbers = value.replace(/[^\d]/g, '');
-                
-                // 길이에 따라 포맷팅
-                if (numbers.length <= 3) {
-                    return numbers;
-                } else if (numbers.length <= 7) {
-                    return numbers.slice(0, 3) + '-' + numbers.slice(3);
-                } else if (numbers.length <= 11) {
-                    return numbers.slice(0, 3) + '-' + numbers.slice(3, 7) + '-' + numbers.slice(7);
-                }
+                if (numbers.length <= 3) return numbers;
+                if (numbers.length <= 7) return numbers.slice(0, 3) + '-' + numbers.slice(3);
+                if (numbers.length <= 11) return numbers.slice(0, 3) + '-' + numbers.slice(3, 7) + '-' + numbers.slice(7);
                 return numbers.slice(0, 3) + '-' + numbers.slice(3, 7) + '-' + numbers.slice(7, 11);
             }
             
-            // 전화번호 입력 시 자동 하이픈 추가
-            document.addEventListener('DOMContentLoaded', function() {
-                const phoneInput = document.getElementById('recipientPhone');
-                
-                phoneInput.addEventListener('input', function(e) {
-                    let value = e.target.value;
-                    // 숫자만 남기기
-                    value = value.replace(/[^\d]/g, '');
-                    // 포맷팅
-                    e.target.value = formatPhoneNumber(value);
-                });
-            });
-            
-            // Daum 우편번호 검색
             function searchAddress() {
                 new daum.Postcode({
                     oncomplete: function(data) {
-                        // 우편번호와 주소 정보를 해당 필드에 넣는다
                         document.getElementById('postcode').value = data.zonecode;
-                        
-                        // 도로명 주소 또는 지번 주소 선택
-                        let addr = '';
-                        if (data.userSelectedType === 'R') {
-                            addr = data.roadAddress;
-                        } else {
-                            addr = data.jibunAddress;
-                        }
-                        
+                        const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
                         document.getElementById('address').value = addr;
-                        
-                        // 상세주소 필드로 포커스 이동
                         document.getElementById('detailAddress').focus();
                     }
                 }).open();
@@ -548,10 +592,7 @@
             async function loadCartData() {
                 try {
                     const response = await fetch('/cart/items');
-                    
-                    if (!response.ok) {
-                        throw new Error('장바구니 정보를 불러올 수 없습니다.');
-                    }
+                    if (!response.ok) throw new Error('장바구니 조회 실패');
                     
                     cartData = await response.json();
                     
@@ -566,34 +607,28 @@
                     
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('checkoutContent').style.display = 'grid';
-                    
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('장바구니 정보를 불러오는 중 오류가 발생했습니다.');
+                    alert('장바구니 정보를 불러올 수 없습니다.');
                     location.href = '/cart';
                 }
             }
             
             function renderOrderItems() {
                 const container = document.getElementById('orderItemsList');
-                container.innerHTML = '';
-                
-                cartData.items.forEach(item => {
-                    const itemHtml = `
-                        <div class="order-item">
-                            <div class="item-image">
-                                <img src="${item.imageUrl}" alt="${item.productName}"
-                                     onerror="this.src='/images/product-sample.jpg'">
-                            </div>
-                            <div class="item-info">
-                                <div class="item-name">${item.productName}</div>
-                                <div class="item-quantity">수량: ${item.quantity}개</div>
-                                <div class="item-price">${formatPrice(item.totalPrice)}원</div>
-                            </div>
+                container.innerHTML = cartData.items.map(item => `
+                    <div class="order-item">
+                        <div class="item-image">
+                            <img src="${item.imageUrl}" alt="${item.productName}"
+                                 onerror="this.src='/images/product-sample.jpg'">
                         </div>
-                    `;
-                    container.innerHTML += itemHtml;
-                });
+                        <div class="item-info">
+                            <div class="item-name">${item.productName}</div>
+                            <div class="item-quantity">수량: ${item.quantity}개</div>
+                            <div class="item-price">${formatPrice(item.totalPrice)}원</div>
+                        </div>
+                    </div>
+                `).join('');
             }
             
             function renderSummary() {
@@ -603,48 +638,54 @@
                 document.getElementById('totalPrice').textContent = formatPrice(cartData.totalPrice) + '원';
             }
             
-            async function submitOrder() {
+            function validateForm() {
                 const form = document.getElementById('orderForm');
-                
                 if (!form.checkValidity()) {
                     form.reportValidity();
-                    return;
+                    return false;
                 }
                 
-                // 약관 동의 확인
                 const agreeTerms = document.getElementById('agreeTerms');
                 if (!agreeTerms.checked) {
                     alert('구매 조건 확인 및 결제 진행에 동의해주세요.');
                     agreeTerms.focus();
-                    return;
+                    return false;
                 }
                 
-                // 전체 주소 합치기 (우편번호 + 주소 + 상세주소)
+                return true;
+            }
+            
+            function getOrderData() {
                 const postcode = document.getElementById('postcode').value;
                 const address = document.getElementById('address').value;
                 const detailAddress = document.getElementById('detailAddress').value;
                 const fullAddress = `[${postcode}] ${address} ${detailAddress}`;
                 
-                // 숨겨진 input으로 전체 주소 전송
-                const addressInput = document.querySelector('input[name="deliveryAddress"]');
-                addressInput.value = fullAddress;
+                const phoneValue = document.getElementById('recipientPhone').value.replace(/[^\d]/g, '');
                 
-                // 전화번호 하이픈 제거 (숫자만 전송)
-                const phoneInput = document.getElementById('recipientPhone');
-                const phoneValue = phoneInput.value.replace(/[^\d]/g, '');
+                return {
+                    recipientName: document.getElementById('recipientName').value,
+                    recipientPhone: phoneValue,
+                    deliveryAddress: fullAddress,
+                    deliveryMessage: document.querySelector('[name="deliveryMessage"]').value
+                };
+            }
+            
+            // 일반 주문 (결제 없음)
+            async function normalOrder() {
+                if (!validateForm()) return;
                 
-                const formData = new FormData(form);
-                formData.set('recipientPhone', phoneValue); // 숫자만 전송
-                
-                if (!confirm('주문하시겠습니까?')) {
-                    return;
-                }
+                if (!confirm('결제 없이 주문하시겠습니까?\n(테스트용 - 주문만 생성됩니다)')) return;
                 
                 const btn = event.target;
                 btn.disabled = true;
                 btn.textContent = '주문 처리 중...';
                 
                 try {
+                    const orderData = getOrderData();
+                    const formData = new FormData();
+                    Object.keys(orderData).forEach(key => formData.append(key, orderData[key]));
+                    
                     const response = await fetch('/order/create', {
                         method: 'POST',
                         body: formData
@@ -656,14 +697,52 @@
                         alert('주문이 완료되었습니다!');
                         location.href = '/order/list';
                     } else {
-                        throw new Error('주문 처리 중 오류가 발생했습니다.');
+                        throw new Error('주문 실패');
                     }
-                    
                 } catch (error) {
                     console.error('Error:', error);
                     alert('주문 처리 중 오류가 발생했습니다.');
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-credit-card"></i> 주문하기';
+                    btn.textContent = '결제 없이 주문하기';
+                }
+            }
+            
+            // 토스 결제
+            async function payWithToss() {
+                if (!validateForm()) return;
+                
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = '주문 생성 중...';
+                
+                try {
+                    // 1. 결제용 주문 생성
+                    const orderData = getOrderData();
+                    
+                    const response = await fetch('/order/create-for-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(orderData)
+                    });
+                    
+                    if (!response.ok) throw new Error('주문 생성 실패');
+                    
+                    const result = await response.json();
+                    
+                    // 2. 토스 결제창 호출
+                    tossPayments.requestPayment('카드', {
+                        amount: result.amount,
+                        orderId: result.orderId,
+                        orderName: result.orderName,
+                        successUrl: window.location.origin + '/order/payment-success',
+                        failUrl: window.location.origin + '/order/payment-fail',
+                    });
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('결제 처리 중 오류가 발생했습니다.');
+                    btn.disabled = false;
+                    btn.textContent = '토스페이먼츠로 결제하기';
                 }
             }
             

@@ -1,9 +1,12 @@
 package com.example.webshopping.service;
 
 import com.example.webshopping.constant.OrderStatus;
+import com.example.webshopping.constant.PaymentMethod;
 import com.example.webshopping.dto.OrderItemDTO;
 import com.example.webshopping.dto.OrderRequestDTO;
 import com.example.webshopping.dto.OrderResponseDTO;
+import com.example.webshopping.dto.PaymentRequestDTO;
+import com.example.webshopping.dto.PaymentResponseDTO;
 import com.example.webshopping.entity.*;
 import com.example.webshopping.repository.CartRepository;
 import com.example.webshopping.repository.MembersRepository;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,10 +32,13 @@ public class OrderServiceImpl implements OrderService {
     private final MembersRepository membersRepository;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final PaymentService paymentService;
 
 
     @Override
     public Long createOrder(String email, OrderRequestDTO orderRequestDTO) {
+
+        log.info("✅ 일반 주문 생성 시작 (결제 없음) - 회원: {}", email);
 
         // 1. 회원조회
         Members members =
@@ -84,9 +91,118 @@ public class OrderServiceImpl implements OrderService {
         cart.getCartItems().clear();
         cartRepository.save(cart);
 
-        log.info("주문 생성 완료 - 주문번호 : {}, 회원 : {}", order.getId(), email);
+        log.info("✅ 일반 주문 생성 완료 - 주문번호: {}, 회원: {}", order.getId(), email);
 
         return order.getId();
+    }
+    
+    @Override
+    public Long createOrderForPayment(String email, OrderRequestDTO orderRequestDTO) {
+        
+        log.info("✅ 결제용 주문 생성 시작 - 회원: {}", email);
+        
+        // 1. 회원조회
+        Members members = membersRepository.findByEmail(email);
+        if (members == null) {
+            throw new EntityNotFoundException("회원을 찾을 수 없습니다.");
+        }
+        
+        // 2. 장바구니 조회
+        Cart cart = cartRepository.findByMembers_Id(members.getId())
+                .orElseThrow(() -> new EntityNotFoundException("장바구니가 비어있습니다."));
+        
+        if (cart.getCartItems().isEmpty()) {
+            throw new IllegalStateException("장바구니에 상품이 없습니다.");
+        }
+        
+        // 3. 주문 생성 (UUID 생성)
+        Order order = Order.createOrder(
+                members,
+                orderRequestDTO.getRecipientName(),
+                orderRequestDTO.getRecipientPhone(),
+                orderRequestDTO.getDeliveryAddress(),
+                orderRequestDTO.getDeliveryMessage()
+        );
+        
+        // 토스용 주문 ID 생성 (UUID)
+        String orderId = UUID.randomUUID().toString();
+        order.setOrderId(orderId);
+        
+        // 4. 장바구니 상품들을 주문 상품으로 변환
+        for (CartItem cartItem : cart.getCartItems()) {
+            Product product = cartItem.getProduct();
+            
+            if (product.getStockQuantity() < cartItem.getQuantity()) {
+                throw new IllegalStateException(
+                        product.getProductName() + "의 재고가 부족합니다. (현재 재고 : "
+                                + product.getStockQuantity() + "개)"
+                );
+            }
+            
+            // OrderItem 생성 (재고는 결제 완료 후 차감)
+            OrderItem orderItem = OrderItem.builder()
+                    .product(product)
+                    .orderPrice(product.getDiscountPrice())
+                    .quantity(cartItem.getQuantity())
+                    .build();
+            order.addOrderItem(orderItem);
+        }
+        
+        // 5. 총 금액 계산
+        order.calculateTotalPrice();
+        
+        // 6. 주문 저장 (결제 전 상태)
+        orderRepository.save(order);
+        
+        log.info("✅ 결제용 주문 생성 완료 - DB ID: {}, 토스 OrderId: {}, 금액: {}", 
+                 order.getId(), orderId, order.getTotalPrice());
+        
+        return order.getId();
+    }
+    
+    @Override
+    public void confirmOrderPayment(PaymentRequestDTO paymentRequestDTO) {
+        
+        log.info("✅ 결제 승인 처리 시작 - orderId: {}", paymentRequestDTO.getOrderId());
+        
+        // 1. 토스페이먼츠 결제 승인 API 호출
+        PaymentResponseDTO paymentResponse = paymentService.confirmPayment(paymentRequestDTO);
+        
+        // 2. 주문 조회 (토스 orderId로 조회)
+        Order order = orderRepository.findByOrderId(paymentRequestDTO.getOrderId())
+                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+        
+        // 3. 결제 금액 검증
+        if (!order.getTotalPrice().equals(paymentRequestDTO.getAmount())) {
+            throw new IllegalStateException("결제 금액이 일치하지 않습니다.");
+        }
+        
+        // 4. 주문에 결제 정보 저장
+        PaymentMethod paymentMethod = PaymentMethod.valueOf(paymentResponse.getMethod().toUpperCase());
+        order.completePayment(
+                paymentResponse.getPaymentKey(),
+                paymentMethod,
+                paymentResponse.getTotalAmount()
+        );
+        
+        // 5. 재고 차감
+        for (OrderItem orderItem : order.getOrderItems()) {
+            Product product = orderItem.getProduct();
+            product.setStockQuantity(product.getStockQuantity() - orderItem.getQuantity());
+            productRepository.save(product);
+        }
+        
+        // 6. 장바구니 비우기
+        Cart cart = cartRepository.findByMembers_Id(order.getMember().getId())
+                .orElseThrow(() -> new EntityNotFoundException("장바구니를 찾을 수 없습니다."));
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
+        
+        // 7. 주문 저장
+        orderRepository.save(order);
+        
+        log.info("✅ 결제 승인 처리 완료 - 주문번호: {}, 결제키: {}", 
+                 order.getId(), paymentResponse.getPaymentKey());
     }
 
     @Override
@@ -149,6 +265,14 @@ public class OrderServiceImpl implements OrderService {
                 .recipientPhone(order.getRecipientPhone())
                 .deliveryAddress(order.getDeliveryAddress())
                 .deliveryMessage(order.getDeliveryMessage())
+                // 결제 정보
+                .paymentMethod(order.getPaymentMethod())
+                .paymentMethodDescription(order.getPaymentMethod() != null ? order.getPaymentMethod().getDescription() : null)
+                .paymentStatus(order.getPaymentStatus())
+                .paymentStatusDescription(order.getPaymentStatus() != null ? order.getPaymentStatus().getDescription() : null)
+                .paymentAmount(order.getPaymentAmount())
+                .paymentApprovedAt(order.getPaymentApprovedAt())
+                .orderIdForPayment(order.getOrderId())
                 .items(itemDTOs)
                 .build();
     }

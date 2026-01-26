@@ -1,6 +1,8 @@
 package com.example.webshopping.entity;
 
 import com.example.webshopping.constant.OrderStatus;
+import com.example.webshopping.constant.PaymentMethod;
+import com.example.webshopping.constant.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,6 +51,25 @@ public class Order {
     @Column(length = 500)
     private String deliveryMessage; //배송 메시지
 
+    // ========== 결제 정보 ==========
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private PaymentMethod paymentMethod; // 결제 수단
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private PaymentStatus paymentStatus; // 결제 상태
+
+    @Column(length = 200)
+    private String paymentKey; // 토스페이먼츠 결제 키
+
+    private Integer paymentAmount; // 실제 결제 금액
+
+    private LocalDateTime paymentApprovedAt; // 결제 승인 시간
+
+    @Column(name = "toss_order_id", length = 200)
+    private String orderId; // 주문 ID (토스페이먼츠용 - UUID)
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -57,6 +78,7 @@ public class Order {
     protected void onCreate() {
         this.orderDate = LocalDateTime.now();
         this.orderStatus = OrderStatus.PENDING;
+        this.paymentStatus = PaymentStatus.READY; // 기본값: 결제 대기
     }
 
     //양방향 연관관계 편의 메서드
@@ -92,12 +114,28 @@ public class Order {
                 this.orderStatus == OrderStatus.DELIVERED) {
             throw new IllegalStateException("이미 배송중이거나 배송완료된 주문은 취소할 수 없습니다.");
         }
+        
+        // 결제 완료 상태면 결제 취소로 변경
+        if (this.paymentStatus == PaymentStatus.DONE) {
+            this.paymentStatus = PaymentStatus.CANCELED;
+        }
+        
         this.orderStatus = OrderStatus.CANCELLED;
 
         // 재고 복구
         for (OrderItem orderItem : orderItems) {
             orderItem.cancel();
         }
+    }
+    
+    // 결제 완료 처리
+    public void completePayment(String paymentKey, PaymentMethod paymentMethod, Integer paymentAmount) {
+        this.paymentKey = paymentKey;
+        this.paymentMethod = paymentMethod;
+        this.paymentAmount = paymentAmount;
+        this.paymentStatus = PaymentStatus.DONE;
+        this.paymentApprovedAt = LocalDateTime.now();
+        this.orderStatus = OrderStatus.CONFIRMED; // 주문 확정
     }
 
 }

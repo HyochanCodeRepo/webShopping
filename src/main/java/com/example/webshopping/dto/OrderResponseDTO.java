@@ -1,11 +1,12 @@
 package com.example.webshopping.dto;
 
 import com.example.webshopping.constant.OrderStatus;
+import com.example.webshopping.constant.PaymentMethod;
+import com.example.webshopping.constant.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Log4j2
 public class OrderResponseDTO {
 
     private Long orderId;
@@ -29,6 +29,15 @@ public class OrderResponseDTO {
     private String recipientPhone;
     private String deliveryAddress;
     private String deliveryMessage;
+    
+    // 결제 정보
+    private PaymentMethod paymentMethod;
+    private String paymentMethodDescription;
+    private PaymentStatus paymentStatus;
+    private String paymentStatusDescription;
+    private Integer paymentAmount;
+    private LocalDateTime paymentApprovedAt;
+    private String orderIdForPayment; // 토스용 주문 ID
 
     @Builder.Default
     private List<OrderItemDTO> items = new ArrayList<>();
