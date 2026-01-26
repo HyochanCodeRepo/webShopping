@@ -38,3 +38,4 @@ out/
 
 ### Local Configuration ###
 **/application-local.properties
+**/application-prod.properties
