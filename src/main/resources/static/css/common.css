@@ -1,6 +1,19 @@
 /* ========================================
-   Reset & Base
+   무신사 스타일 공통 CSS
+   Modern, Minimal, Clean Design
 ======================================== */
+
+/* ===== Reset & Base ===== */
+:root {
+    --primary-black: #000;
+    --text-primary: #000;
+    --text-secondary: #666;
+    --text-light: #999;
+    --border-color: #e5e5e5;
+    --bg-light: #fafafa;
+    --hover-bg: #f5f5f5;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -8,102 +21,130 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #fff;
+    color: var(--text-primary);
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 a {
     text-decoration: none;
     color: inherit;
+    transition: opacity 0.2s ease;
+}
+
+a:hover {
+    opacity: 0.7;
 }
 
 ul {
     list-style: none;
 }
 
-/* ========================================
-   Header
-======================================== */
+button {
+    font-family: inherit;
+}
+
+/* ===== Header ===== */
 .header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    background: #fff;
+    border-bottom: 1px solid var(--border-color);
 }
 
+/* Header Top */
 .header-top {
-    background-color: #fff;
-    padding: 10px 0;
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .header-container {
-    max-width: 1500px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 0 15px;
+    padding: 0 40px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 24px;
+    height: 80px;
 }
 
-/* 로고 */
+/* Logo - 무신사 스타일 */
 .logo {
     display: flex;
     align-items: center;
-    padding: 8px 10px;
-    border: 1px solid transparent;
-    border-radius: 3px;
+    padding: 8px 0;
 }
 
 .logo:hover {
-    opacity: 0.8;
+    opacity: 1;
+}
+
+.logo-image {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
 }
 
 .logo-text {
-    color: #E31837;
-    font-size: 24px;
-    font-weight: bold;
+    color: var(--primary-black);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
 }
 
-/* 검색바 */
+/* Search Bar - 미니멀 */
 .search-bar {
     flex: 1;
+    max-width: 500px;
     display: flex;
-    height: 42px;
+    height: 48px;
+    border: 2px solid var(--primary-black);
     border-radius: 4px;
     overflow: hidden;
-    border: 2px solid #E31837;
+    transition: all 0.2s;
+}
+
+.search-bar:focus-within {
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
 }
 
 .search-category {
     background-color: #fff;
     border: none;
-    padding: 0 10px;
-    font-size: 13px;
-    color: #555;
+    padding: 0 16px;
+    font-size: 14px;
+    color: var(--text-primary);
     cursor: pointer;
-    border-right: 1px solid #e5e5e5;
+    border-right: 1px solid var(--border-color);
+    font-weight: 500;
 }
 
 .search-input {
     flex: 1;
     border: none;
-    padding: 0 15px;
+    padding: 0 20px;
     font-size: 15px;
     outline: none;
+    font-weight: 400;
+}
+
+.search-input::placeholder {
+    color: var(--text-light);
 }
 
 .search-btn {
-    background-color: #E31837;
+    background-color: var(--primary-black);
     border: none;
-    padding: 0 18px;
+    padding: 0 24px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .search-btn:hover {
-    background-color: #c71430;
+    background-color: #333;
 }
 
 .search-btn i {
@@ -111,51 +152,57 @@ ul {
     color: #fff;
 }
 
-/* 유저 메뉴 */
+/* User Menu - 무신사 스타일 */
 .user-menu {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
 
 .user-menu-item {
     display: flex;
     flex-direction: column;
-    padding: 8px 10px;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    color: #333;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: 70px;
 }
 
 .user-menu-item:hover {
-    background-color: #f5f5f5;
+    background-color: var(--hover-bg);
+    opacity: 1;
 }
 
 .menu-label {
     font-size: 12px;
-    color: #888;
+    color: var(--text-secondary);
+    font-weight: 400;
 }
 
 .menu-text {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 600;
+    margin-top: 2px;
 }
 
-/* 유저 드롭다운 메뉴 */
+/* User Dropdown */
 .user-dropdown {
     position: relative;
-    cursor: pointer;
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
-    top: 100%;
+    top: calc(100% + 8px);
     right: 0;
     background-color: #fff;
-    min-width: 160px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 180px;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     z-index: 1000;
     overflow: hidden;
 }
@@ -163,137 +210,152 @@ ul {
 .dropdown-content a {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 15px;
-    color: #333;
+    gap: 12px;
+    padding: 14px 16px;
+    color: var(--text-primary);
     font-size: 14px;
+    font-weight: 500;
     transition: background-color 0.2s;
 }
 
 .dropdown-content a:hover {
-    background-color: #f5f5f5;
+    background-color: var(--hover-bg);
+    opacity: 1;
 }
 
 .dropdown-content a i {
     width: 16px;
-    color: #888;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .user-dropdown:hover .dropdown-content {
     display: block;
 }
 
-/* 장바구니 아이콘 */
+/* Cart Icon - 무신사 스타일 */
 .cart-icon {
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
+    gap: 8px;
     position: relative;
 }
 
 .cart-icon i {
-    font-size: 28px;
-    margin-right: 5px;
-    color: #333;
+    font-size: 24px;
+    color: var(--text-primary);
 }
 
-/* ✅ 장바구니 뱃지 - 빨간 동그란 스타일 */
 .cart-count {
     position: absolute;
-    top: -2px;
-    left: 18px;
-    background-color: #E31837;
+    top: 0;
+    right: 60px;
+    background-color: var(--primary-black);
     color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* 장바구니가 비어있을 때 뱃지 숨기기 */
 .cart-count.empty {
     display: none;
 }
 
 .cart-text {
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 600;
 }
 
-/* 하단 네비게이션 */
+/* Admin Button */
+.admin-btn {
+    background-color: var(--primary-black);
+    color: #fff;
+}
+
+.admin-btn:hover {
+    background-color: #333;
+}
+
+/* Header Nav - 무신사 스타일 내비게이션 */
 .header-nav {
-    background-color: #E31837;
-    padding: 5px 0;
+    background-color: #fff;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .header-nav .header-container {
-    gap: 10px;
+    height: 56px;
+    gap: 32px;
 }
 
 .nav-menu-btn {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     background: none;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    padding: 8px 10px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: bold;
+    border: none;
+    padding: 8px 16px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
 .nav-menu-btn:hover {
-    background-color: rgba(255,255,255,0.2);
+    background-color: var(--hover-bg);
 }
 
+.nav-menu-btn i {
+    font-size: 16px;
+}
+
+/* Nav Links */
 .nav-links {
     display: flex;
-    gap: 5px;
+    gap: 8px;
+    align-items: center;
 }
 
-/* ✅ 드롭다운 네비게이션 */
 .nav-dropdown {
     position: relative;
 }
 
 .nav-link-main {
     display: block;
-    padding: 8px 12px;
-    color: #fff;
-    font-size: 14px;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    font-weight: 500;
+    padding: 8px 16px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
 .nav-link-main:hover {
-    background-color: rgba(255,255,255,0.2);
+    background-color: var(--hover-bg);
+    opacity: 1;
 }
 
-/* 드롭다운 메뉴 */
+/* Dropdown Menu - 무신사 스타일 */
 .dropdown-menu {
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
     background-color: #fff;
-    min-width: 600px;
-    max-width: 800px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    border-radius: 0 0 8px 8px;
-    border: 1px solid #e5e5e5;
-    border-top: 3px solid #E31837;
-    padding: 20px;
+    min-width: 700px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 24px;
     z-index: 1000;
-    flex-wrap: wrap;
-    gap: 20px;
+    gap: 32px;
     margin-top: 0;
 }
 
@@ -301,28 +363,36 @@ ul {
     display: flex;
 }
 
-/* 드롭다운 컬럼 */
+/* 드롭다운 메뉴가 사라지지 않도록 패딩 영역 추가 */
+.nav-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: transparent;
+}
+
 .dropdown-column {
-    flex: 0 0 calc(33.333% - 15px);
-    min-width: 150px;
+    flex: 1;
+    min-width: 180px;
 }
 
 .dropdown-title {
     display: block;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
-    color: #E31837 !important;
-    padding: 8px 0;
-    border-bottom: 2px solid #E31837;
-    margin-bottom: 10px;
+    color: var(--text-primary) !important;
+    padding: 0 0 12px 0;
+    margin-bottom: 12px;
+    border-bottom: 2px solid var(--primary-black);
 }
 
 .dropdown-title:hover {
-    color: #c71430 !important;
-    text-decoration: underline;
+    opacity: 1;
 }
 
-/* 소분류 목록 */
 .dropdown-list {
     list-style: none;
     padding: 0;
@@ -330,236 +400,369 @@ ul {
 }
 
 .dropdown-list li {
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .dropdown-list li a {
     display: block;
-    padding: 6px 10px;
-    color: #333 !important;
-    font-size: 13px;
+    padding: 8px 12px;
+    color: var(--text-secondary) !important;
+    font-size: 14px;
     border-radius: 4px;
     transition: all 0.2s;
     font-weight: 500;
 }
 
 .dropdown-list li a:hover {
-    background-color: #f5f5f5;
-    color: #E31837 !important;
-    padding-left: 15px;
+    background-color: var(--hover-bg);
+    color: var(--text-primary) !important;
+    opacity: 1;
 }
 
-.nav-links li a {
-    display: block;
-    padding: 8px 12px;
+/* Admin Register Button */
+.admin-register-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: var(--primary-black);
     color: #fff;
     font-size: 14px;
-    border: 1px solid transparent;
-    border-radius: 3px;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
 
-.nav-links li a:hover {
-    background-color: rgba(255,255,255,0.2);
+.admin-register-btn:hover {
+    background-color: #333;
+    opacity: 1;
 }
 
-/* ========================================
-   Main Content
-======================================== */
+/* ===== Main Content ===== */
 .main-content {
     min-height: calc(100vh - 400px);
 }
 
-/* ========================================
-   Footer
-======================================== */
+/* ===== Footer - 무신사 스타일 ===== */
 .footer-top {
-    background-color: #E31837;
+    background-color: var(--bg-light);
     text-align: center;
+    border-top: 1px solid var(--border-color);
 }
 
 .back-to-top {
     display: block;
-    padding: 15px;
-    color: #fff;
+    padding: 20px;
+    color: var(--text-primary);
     font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
 }
 
 .back-to-top:hover {
-    background-color: #c71430;
+    background-color: #f0f0f0;
+    opacity: 1;
 }
 
 .footer-middle {
-    background-color: #333;
-    padding: 40px 0;
+    background-color: #fff;
+    padding: 60px 0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .footer-middle .footer-container {
-    max-width: 1000px;
+    max-width: 1280px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    padding: 0 15px;
+    padding: 0 40px;
+    gap: 60px;
+}
+
+.footer-column {
+    flex: 1;
 }
 
 .footer-column h4 {
-    color: #fff;
+    color: var(--text-primary);
     font-size: 16px;
-    margin-bottom: 15px;
+    font-weight: 700;
+    margin-bottom: 20px;
 }
 
 .footer-column ul li {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .footer-column ul li a {
-    color: #DDD;
+    color: var(--text-secondary);
     font-size: 14px;
+    font-weight: 400;
+    transition: color 0.2s;
 }
 
 .footer-column ul li a:hover {
-    text-decoration: underline;
+    color: var(--text-primary);
+    opacity: 1;
 }
 
 .footer-bottom {
-    background-color: #222;
-    padding: 25px 0;
+    background-color: #fff;
+    padding: 40px 0;
     text-align: center;
 }
 
 .footer-logo {
-    color: #E31837;
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.footer-logo-image {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
 }
 
 .footer-copyright {
-    color: #999;
+    color: var(--text-light);
     font-size: 13px;
+    font-weight: 400;
 }
 
-/* ========================================
-   Common Components
-======================================== */
+/* ===== Common Components ===== */
 
-/* 버튼 스타일 */
+/* Button Styles - 무신사 스타일 */
 .btn {
-    display: inline-block;
-    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
     border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    letter-spacing: -0.3px;
 }
 
 .btn-primary {
-    background: #E31837;
-    border: none;
+    background: var(--primary-black);
     color: #fff;
 }
 
 .btn-primary:hover {
-    background: #c71430;
+    background: #333;
+}
+
+.btn-secondary {
+    background: #fff;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--hover-bg);
 }
 
 .btn-cart {
-    background: #E31837;
-    border: none;
+    background: var(--primary-black);
     color: #fff;
-    border-radius: 20px;
 }
 
 .btn-cart:hover {
-    background: #c71430;
+    background: #333;
 }
 
 .btn-buy {
-    background: #ff6f00;
-    border: none;
+    background: var(--primary-black);
     color: #fff;
-    border-radius: 20px;
 }
 
 .btn-buy:hover {
-    background: #e56500;
+    background: #333;
 }
 
-/* 카드 스타일 */
+/* Card Style */
 .card {
     background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 24px;
 }
 
-/* 상품 가격 */
+/* Price */
 .price {
-    color: #333;
-    font-size: 18px;
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
 .price-symbol {
-    font-size: 13px;
+    font-size: 16px;
+    font-weight: 400;
     vertical-align: top;
 }
 
 .price-whole {
     font-size: 28px;
-    font-weight: 400;
+    font-weight: 700;
 }
 
-/* 별점 */
+/* Rating */
 .rating {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 .rating-stars {
-    color: #ffa500;
-}
-
-.rating-count {
-    color: #888;
+    color: var(--primary-black);
     font-size: 14px;
 }
 
-/* ========================================
-   Responsive
-======================================== */
-@media (max-width: 1200px) {
-    .nav-links {
-        display: none;
+.rating-count {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .header-container {
+        padding: 0 30px;
+    }
+
+    .footer-middle .footer-container {
+        padding: 0 30px;
+        gap: 40px;
     }
 }
 
 @media (max-width: 768px) {
     .header-container {
+        padding: 0 24px;
+        height: auto;
+        min-height: 70px;
         flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .logo-text {
+        font-size: 24px;
     }
     
+    .logo-image {
+        height: 44px;
+    }
+
     .search-bar {
         order: 3;
         flex: 100%;
-        margin-top: 10px;
+        max-width: 100%;
+        height: 44px;
     }
-    
-    .user-menu-item .menu-label,
-    .user-menu-item .menu-text {
-        display: none;
+
+    .search-category {
+        padding: 0 12px;
+        font-size: 13px;
     }
-    
+
+    .search-input {
+        padding: 0 16px;
+        font-size: 14px;
+    }
+
+    .user-menu {
+        gap: 4px;
+    }
+
+    .user-menu-item {
+        padding: 6px 8px;
+        min-width: auto;
+    }
+
+    .menu-label {
+        font-size: 11px;
+    }
+
+    .menu-text {
+        font-size: 13px;
+    }
+
     .cart-icon .cart-text {
         display: none;
     }
-    
+
+    .cart-count {
+        right: 20px;
+    }
+
+    .header-nav .header-container {
+        height: 48px;
+        gap: 16px;
+        padding: 0 24px;
+    }
+
+    .nav-menu-btn {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .footer-middle {
+        padding: 40px 0;
+    }
+
     .footer-middle .footer-container {
         flex-wrap: wrap;
-        gap: 30px;
+        gap: 32px;
+        padding: 0 24px;
+    }
+
+    .footer-column {
+        flex: 1 1 calc(50% - 16px);
+    }
+
+    .footer-bottom {
+        padding: 32px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-container {
+        padding: 0 20px;
+    }
+
+    .logo-text {
+        font-size: 20px;
     }
     
+    .logo-image {
+        height: 40px;
+    }
+    
+    .footer-logo-image {
+        height: 32px;
+    }
+
+    .search-bar {
+        height: 42px;
+    }
+
+    .user-menu-item .menu-label,
+    .user-menu-item .menu-text {
+        font-size: 11px;
+    }
+
+    .header-nav .header-container {
+        padding: 0 20px;
+    }
+
     .footer-column {
-        flex: 1 1 45%;
+        flex: 1 1 100%;
     }
 }

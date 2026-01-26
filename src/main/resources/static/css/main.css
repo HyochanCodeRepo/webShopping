@@ -1,12 +1,39 @@
 /* ========================================
-   Main Page Styles
+   무신사 스타일 메인 페이지
+   Modern, Minimal, Clean Design
 ======================================== */
 
-/* Hero Banner */
+/* ===== 전역 설정 ===== */
+:root {
+    --primary-black: #000;
+    --text-primary: #000;
+    --text-secondary: #666;
+    --text-light: #999;
+    --border-color: #e5e5e5;
+    --bg-light: #fafafa;
+    --hover-bg: #f5f5f5;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #fff;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+main {
+    background-color: #fff;
+}
+
+/* ===== Hero Banner - 무신사 스타일 풀스크린 배너 ===== */
 .hero-banner {
     position: relative;
-    height: 600px;  /* 400px → 600px로 증가 */
+    height: 600px;
     overflow: hidden;
+    background: #f8f8f8;
+    margin-bottom: 80px;
 }
 
 .banner-slider {
@@ -22,9 +49,8 @@
     height: 100%;
     background-size: cover;
     background-position: center;
-    background-color: #fff;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.6s ease-in-out;
 }
 
 .banner-slide.active {
@@ -33,120 +59,139 @@
 
 .banner-content {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #333;
+    bottom: 80px;
+    left: 80px;
+    text-align: left;
+    color: #fff;
+    z-index: 5;
 }
 
 .banner-content h2 {
     font-size: 48px;
-    margin-bottom: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: -1.5px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 
 .banner-content p {
-    font-size: 24px;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-/* 배너 화살표 - 컨텐츠 영역에 맞춤 */
+/* 배너 컨트롤 - 미니멀 */
 .banner-controls {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    max-width: 1500px;
-    padding: 0 20px;
+    bottom: 40px;
+    right: 80px;
     display: flex;
-    justify-content: space-between;
-    pointer-events: none;
+    gap: 12px;
     z-index: 10;
+    pointer-events: none;
 }
 
 .banner-prev,
 .banner-next {
-    background: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.9);
     border: none;
-    width: 45px;
-    height: 100px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 20px;
-    color: #333;
-    transition: background 0.3s;
+    font-size: 16px;
+    color: #000;
+    transition: all 0.3s ease;
     pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
 }
 
 .banner-prev:hover,
 .banner-next:hover {
-    background: rgba(255,255,255,1);
+    background: rgba(0,0,0,0.9);
+    color: #fff;
+    transform: scale(1.05);
 }
 
 .banner-fade {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 150px;
-    background: linear-gradient(to bottom, transparent, #f5f5f5);
-    pointer-events: none;
+    display: none;
 }
 
-/* 슬라이더와 카테고리 구분선 */
-.hero-banner::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;  /* 3px → 1px로 얇게 */
-    background-color: #ddd;  /* #E31837 → #ddd로 은은하게 */
-    z-index: 5;
-}
-
-/* Category Cards */
+/* ===== Category Cards - 무신사 스타일 그리드 ===== */
 .category-cards {
-    position: relative;
-    margin-top: 50px;  /* -100px → 50px로 변경 (카테고리를 아래로) */
-    padding: 0 20px;
-    z-index: 20;
+    max-width: 1280px;
+    margin: 0 auto 100px;
+    padding: 0 40px;
 }
 
 .cards-container {
-    max-width: 1500px;
-    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
 }
 
 .category-card {
+    display: block;
     background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    position: relative;
+}
+
+.category-card:hover {
+    border-color: #000;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 .category-card h3 {
-    font-size: 21px;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 15px;
-    color: #333;
+    color: #fff;
+    letter-spacing: -0.5px;
+    z-index: 2;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .card-image {
     width: 100%;
-    height: 200px;
+    height: 360px;
     overflow: hidden;
-    margin-bottom: 15px;
-    border-radius: 4px;
+    background: #f5f5f5;
+    position: relative;
+}
+
+.card-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 50%);
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+.category-card:hover .card-image::before {
+    opacity: 0.7;
 }
 
 .card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s;
+    transition: transform 0.4s ease;
 }
 
 .category-card:hover .card-image img {
@@ -154,296 +199,495 @@
 }
 
 .card-link {
-    color: #E31837;
+    display: block;
+    padding: 16px 24px;
+    text-align: center;
+    color: var(--text-secondary);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
 }
 
-.card-link:hover {
-    color: #c71430;
-    text-decoration: underline;
+.category-card:hover .card-link {
+    color: var(--primary-black);
+    background: var(--hover-bg);
 }
 
-/* Section Common */
+/* ===== Section Container - 넓은 여백 ===== */
 .section-container {
-    max-width: 1500px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 30px 20px;
+    padding: 0 40px 100px;
 }
 
 .section-title {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 700;
-    color: #333;
-    margin-bottom: 20px;
+    color: var(--text-primary);
+    margin-bottom: 40px;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* Deals Section */
-.deals-section {
-    background: #fff;
-    margin-top: 30px;
+.section-title i {
+    font-size: 28px;
 }
 
+/* ===== Product Slider - 가로 스크롤 ===== */
 .products-slider {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     overflow-x: auto;
-    padding-bottom: 15px;
+    padding-bottom: 16px;
     scrollbar-width: thin;
+    scrollbar-color: #ddd transparent;
+    scroll-behavior: smooth;
 }
 
 .products-slider::-webkit-scrollbar {
-    height: 8px;
+    height: 4px;
 }
 
 .products-slider::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: transparent;
 }
 
 .products-slider::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
+    background: #ddd;
+    border-radius: 2px;
+}
+
+.products-slider::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
 }
 
 .products-slider .product-card {
-    flex: 0 0 200px;
-    min-width: 200px;
+    flex: 0 0 240px;
+    min-width: 240px;
 }
 
-/* Product Card */
+/* ===== Product Card - 무신사 스타일 ===== */
 .product-card {
     background: #fff;
-    border-radius: 8px;
     overflow: hidden;
-    transition: box-shadow 0.3s;
-}
-
-.product-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.25s ease;
+    cursor: pointer;
 }
 
 .product-link {
     display: block;
+    text-decoration: none;
 }
 
 .product-image {
     position: relative;
     width: 100%;
-    height: 200px;
+    height: 320px;
     overflow: hidden;
-    background: #f7f7f7;
+    background: #fafafa;
+    border: 1px solid var(--border-color);
 }
 
 .product-image img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s;
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .product-card:hover .product-image img {
     transform: scale(1.05);
 }
 
-.deal-badge {
+/* 뱃지 스타일 - 미니멀 */
+.deal-badge,
+.new-badge {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #E31837;
-    color: #fff;
-    padding: 4px 8px;
+    top: 16px;
+    left: 16px;
+    background: #fff;
+    color: #000;
+    padding: 6px 12px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 700;
     border-radius: 2px;
+    letter-spacing: 0.5px;
+}
+
+.new-badge {
+    left: auto;
+    right: 16px;
 }
 
 .product-info {
-    padding: 15px;
+    padding: 16px 0;
+}
+
+/* 브랜드명 스타일 추가 가능 */
+.product-brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
 }
 
 .product-name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
-    color: #333;
-    line-height: 1.4;
-    height: 40px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    height: 44px;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+}
+
+/* 별점 - 미니멀 */
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
     margin-bottom: 8px;
+    color: var(--text-secondary);
 }
 
-.product-name:hover {
-    color: #333;
-    text-decoration: underline;
+.product-rating .fa-star,
+.product-rating .fa-star-half-alt {
+    color: #000;
+    font-size: 12px;
 }
 
+.product-rating .far.fa-star {
+    color: #ddd;
+}
+
+.product-rating strong {
+    color: #000;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+/* 가격 */
 .product-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-top: 8px;
 }
 
 .price-original {
-    font-size: 13px;
-    color: #999;
+    font-size: 14px;
+    color: var(--text-light);
     text-decoration: line-through;
-    margin-right: 8px;
+    font-weight: 400;
 }
 
 .price-sale {
     font-size: 18px;
-    color: #333;
+    color: var(--text-primary);
     font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
+/* 무료배송 뱃지 */
 .prime-badge {
     margin-top: 8px;
     font-size: 12px;
-    color: #E31837;
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .prime-badge i {
-    margin-right: 4px;
+    font-size: 13px;
 }
 
-/* Popular Section */
-.popular-section {
+/* ===== Deals Section ===== */
+.deals-section {
     background: #fff;
-    margin-top: 20px;
+    padding-top: 60px;
+}
+
+/* ===== Popular & New Sections ===== */
+.popular-section,
+.new-section {
+    background: #fff;
+    padding-top: 20px;
 }
 
 .new-section {
-    background: #fff;
-    margin-top: 20px;
+    background: var(--bg-light);
 }
 
-/* 캐러셀 래퍼 */
+/* ===== Carousel - 무신사 스타일 그리드 ===== */
 .carousel-wrapper {
     position: relative;
-    padding: 0 60px;
 }
 
-/* 캐러셀 버튼 */
 .carousel-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ddd;
-    width: 45px;
-    height: 100px;
-    border-radius: 4px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 18px;
-    color: #333;
-    transition: all 0.3s;
+    font-size: 16px;
+    color: #000;
+    transition: all 0.25s ease;
     z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .carousel-btn:hover {
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background: #000;
+    color: #fff;
+    border-color: #000;
 }
 
 .carousel-btn.prev {
-    left: 0;
+    left: -60px;
 }
 
 .carousel-btn.next {
-    right: 0;
+    right: -60px;
 }
 
-/* 캐러셀 컨테이너 */
 .products-carousel {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    overflow: hidden;
 }
 
-.products-carousel .product-card {
-    transition: transform 0.3s, opacity 0.3s;
-}
-
-/* NEW 뱃지 */
-.new-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #4ecdc4;
-    color: #fff;
-    padding: 4px 12px;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 2px;
-}
-
+/* 그리드 레이아웃 */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-    .cards-container {
-        grid-template-columns: repeat(2, 1fr);
+/* ===== Empty State ===== */
+.deals-section > div > div[style*="text-align: center"],
+.popular-section > div > div[style*="text-align: center"],
+.new-section > div > div[style*="text-align: center"] {
+    padding: 120px 20px;
+    color: var(--text-light);
+}
+
+.deals-section > div > div[style*="text-align: center"] i,
+.popular-section > div > div[style*="text-align: center"] i,
+.new-section > div > div[style*="text-align: center"] i {
+    font-size: 64px;
+    margin-bottom: 24px;
+    opacity: 0.2;
+}
+
+.deals-section > div > div[style*="text-align: center"] p,
+.popular-section > div > div[style*="text-align: center"] p,
+.new-section > div > div[style*="text-align: center"] p {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 1024px) {
+    .section-container {
+        padding: 0 30px 80px;
     }
-    
-    .products-grid,
-    .products-carousel {
+
+    .category-cards {
+        padding: 0 30px;
+        margin-bottom: 80px;
+    }
+
+    .products-carousel,
+    .products-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    .carousel-btn.prev {
+        left: -50px;
+    }
+
+    .carousel-btn.next {
+        right: -50px;
     }
 }
 
 @media (max-width: 768px) {
     .hero-banner {
+        height: 500px;
+        margin-bottom: 60px;
+    }
+
+    .banner-content {
+        bottom: 60px;
+        left: 40px;
+    }
+
+    .banner-content h2 {
+        font-size: 36px;
+    }
+
+    .banner-content p {
+        font-size: 16px;
+    }
+
+    .banner-controls {
+        bottom: 30px;
+        right: 40px;
+    }
+
+    .banner-prev,
+    .banner-next {
+        width: 44px;
+        height: 44px;
+        font-size: 14px;
+    }
+
+    .section-container {
+        padding: 0 24px 60px;
+    }
+
+    .section-title {
+        font-size: 28px;
+        margin-bottom: 32px;
+    }
+
+    .category-cards {
+        padding: 0 24px;
+        margin-bottom: 60px;
+    }
+
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .card-image {
         height: 300px;
     }
-    
-    .banner-content h2 {
-        font-size: 32px;
-    }
-    
-    .banner-content p {
-        font-size: 18px;
-    }
-    
-    .cards-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .category-cards {
-        margin-top: -50px;
-    }
-    
-    .products-grid,
-    .products-carousel {
+
+    .products-carousel,
+    .products-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
-    
-    .carousel-wrapper {
-        padding: 0 40px;
-    }
-    
+
     .carousel-btn {
-        width: 35px;
-        height: 80px;
+        display: none;
+    }
+
+    .carousel-wrapper {
+        padding: 0;
+    }
+
+    .product-image {
+        height: 280px;
     }
 }
 
 @media (max-width: 480px) {
-    .products-grid,
-    .products-carousel {
+    .hero-banner {
+        height: 400px;
+        margin-bottom: 40px;
+    }
+
+    .banner-content {
+        bottom: 40px;
+        left: 24px;
+    }
+
+    .banner-content h2 {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+
+    .banner-content p {
+        font-size: 14px;
+    }
+
+    .banner-controls {
+        bottom: 20px;
+        right: 24px;
+        gap: 8px;
+    }
+
+    .banner-prev,
+    .banner-next {
+        width: 40px;
+        height: 40px;
+        font-size: 13px;
+    }
+
+    .section-container {
+        padding: 0 20px 40px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        margin-bottom: 24px;
+    }
+
+    .category-cards {
+        padding: 0 20px;
+        margin-bottom: 40px;
+    }
+
+    .cards-container {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
-    
-    .carousel-wrapper {
-        padding: 0;
+
+    .card-image {
+        height: 280px;
     }
-    
-    .carousel-btn {
-        display: none;
+
+    .category-card h3 {
+        font-size: 18px;
+        top: 20px;
+        left: 20px;
+    }
+
+    .products-slider .product-card {
+        flex: 0 0 180px;
+        min-width: 180px;
+    }
+
+    .product-image {
+        height: 240px;
+    }
+
+    .product-info {
+        padding: 12px 0;
+    }
+
+    .product-name {
+        font-size: 14px;
+        height: 40px;
+    }
+
+    .price-sale {
+        font-size: 16px;
+    }
+
+    .deals-section,
+    .popular-section,
+    .new-section {
+        padding-top: 40px;
     }
 }

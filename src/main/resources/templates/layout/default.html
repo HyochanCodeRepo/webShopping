@@ -7,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title layout:title-pattern="$LAYOUT_TITLE - WebShopping">WebShopping</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/images/favicon-32x32.png}">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/apple-touch-icon.png}">
+    
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,8 +26,7 @@
             <div class="header-container">
                 <!-- 로고 -->
                 <a th:href="@{/}" class="logo">
-<!--                    <img src="/images/main_logo%20(1).png">-->
-                    <span class="logo-text">WebShopping</span>
+                    <img th:src="@{/images/android-chrome-192x192.png}" alt="WebShopping" class="logo-image">
                 </a>
                 
                 <!-- 검색바 -->
@@ -281,7 +284,9 @@
         
         <div class="footer-bottom">
             <div class="footer-container">
-                <div class="footer-logo">WebShopping</div>
+                <div class="footer-logo">
+                    <img th:src="@{/images/android-chrome-192x192.png}" alt="WebShopping" class="footer-logo-image">
+                </div>
                 <p class="footer-copyright">
                     © 2024 WebShopping. 포트폴리오 프로젝트입니다.
                 </p>

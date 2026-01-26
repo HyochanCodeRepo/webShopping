@@ -4,109 +4,125 @@
       layout:decorate="~{layout/default}"
       lang="ko">
 <head>
-    <title>홈</title>
+    <title>홈 - 모던 쇼핑몰</title>
     <th:block layout:fragment="css">
         <link rel="stylesheet" th:href="@{/css/main.css}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
     </th:block>
 </head>
 <body>
     <main layout:fragment="content">
-        <!-- 메인 배너 슬라이더 -->
+        <!-- 메인 배너 슬라이더 - 무신사 스타일 -->
         <section class="hero-banner">
             <div class="banner-slider">
                 <div class="banner-slide active" style="background-image: url('/images/main01.jpg');">
                     <div class="banner-content">
-<!--                        <h2>겨울 시즌 세일</h2>-->
-<!--                        <p>최대 50% 할인</p>-->
+                        <h2>NEW SEASON</h2>
+                        <p>2025 봄 신상품 컬렉션</p>
                     </div>
                 </div>
                 <div class="banner-slide" style="background-image: url('/images/main02.jpg');">
                     <div class="banner-content">
+                        <h2>BEST SELLER</h2>
+                        <p>인기 상품 모음</p>
                     </div>
                 </div>
-<!--                <div class="banner-slide" style="background-image: url('/images/sec01_02.jpg');">-->
-<!--                    <div class="banner-content">-->
-<!--&lt;!&ndash;                        <h2>무료 배송</h2>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <p>5만원 이상 구매시</p>&ndash;&gt;-->
-<!--                    </div>-->
-<!--                </div>-->
-
                 <div class="banner-slide" style="background-image: url('/images/main03.jpg');">
                     <div class="banner-content">
-                        <!--                        <h2>무료 배송</h2>-->
-                        <!--                        <p>5만원 이상 구매시</p>-->
+                        <h2>SPECIAL OFFER</h2>
+                        <p>최대 50% 할인</p>
                     </div>
                 </div>
             </div>
             <div class="banner-controls">
-                <button class="banner-prev"><i class="fas fa-chevron-left"></i></button>
-                <button class="banner-next"><i class="fas fa-chevron-right"></i></button>
+                <button class="banner-prev" aria-label="이전 배너">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="banner-next" aria-label="다음 배너">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
-            <div class="banner-fade"></div>
         </section>
         
-        <!-- 카테고리 카드 섹션 -->
+        <!-- 카테고리 그리드 - 무신사 스타일 -->
         <section class="category-cards">
             <div class="cards-container">
-                <div class="category-card" th:each="category : ${categories}">
+                <a th:href="@{/product/list(categoryId=${category.id})}"
+                   class="category-card"
+                   th:each="category : ${categories}">
                     <h3 th:text="${category.name}">카테고리명</h3>
                     <div class="card-image">
                         <img th:src="@{${category.imageUrl != null ? category.imageUrl : '/images/category-default.jpg'}}"
-                             alt="카테고리">
+                             th:alt="${category.name}">
                     </div>
-                    <a th:href="@{/product/list(categoryId=${category.id})}" class="card-link">더 보기</a>
-                </div>
+                    <span class="card-link">SHOP NOW →</span>
+                </a>
             </div>
         </section>
 
-
-        <!-- 오늘의 딜 섹션 -->
+        <!-- 오늘의 특가 섹션 -->
         <section class="deals-section">
             <div class="section-container">
                 <h2 class="section-title">
-                    <i class="fas fa-fire" style="color: #ff6b6b;"></i> 오늘의 딜
+                    <i class="fas fa-bolt"></i>
+                    <span>오늘의 특가</span>
                 </h2>
                 
-                <!-- 할인 상품이 있을 때 -->
                 <div class="products-slider" th:if="${!todayDeals.isEmpty()}">
                     <div class="product-card" th:each="product : ${todayDeals}">
                         <a th:href="@{/product/detail/{id}(id=${product.id})}" class="product-link">
                             <div class="product-image">
                                 <img th:src="${product.repImageUrl != null ? product.repImageUrl : '/images/product-sample.jpg'}" 
                                      th:alt="${product.productName}">
-                                <span class="deal-badge" th:text="'-' + ${product.discountRate} + '%'">-30%</span>
+                                <span class="deal-badge" th:text="${product.discountRate + '%'}">30%</span>
                             </div>
                             <div class="product-info">
                                 <h4 class="product-name" th:text="${product.productName}">상품명</h4>
+                                
+                                <!-- 별점 -->
+                                <div class="product-rating" th:if="${productReviewCounts[product.id] > 0}">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                        <i th:class="${i <= productRatings[product.id] ? 'fas fa-star' : 
+                                                      (i - 0.5 <= productRatings[product.id] ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
+                                    </span>
+                                    <strong th:text="${productRatings[product.id]}">4.5</strong>
+                                    <span th:text="'(' + ${productReviewCounts[product.id]} + ')'">(25)</span>
+                                </div>
+                                
                                 <div class="product-price">
                                     <span class="price-original" 
                                           th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">35,000원</span>
                                     <span class="price-sale" 
                                           th:text="${#numbers.formatInteger(product.discountPrice, 0, 'COMMA') + '원'}">24,500원</span>
                                 </div>
+                                
+                                <div class="prime-badge" th:if="${product.price >= 30000}">
+                                    <i class="fas fa-truck"></i> 무료배송
+                                </div>
                             </div>
                         </a>
                     </div>
                 </div>
                 
-                <!-- 할인 상품이 없을 때 -->
-                <div th:if="${todayDeals.isEmpty()}" style="text-align: center; padding: 60px 20px; color: #999;">
-                    <i class="fas fa-tags" style="font-size: 48px; margin-bottom: 20px;"></i>
-                    <p>현재 진행 중인 할인 상품이 없습니다.</p>
+                <div th:if="${todayDeals.isEmpty()}" style="text-align: center; padding: 120px 20px; color: #999;">
+                    <i class="fas fa-tags"></i>
+                    <p>현재 진행 중인 특가 상품이 없습니다</p>
                 </div>
             </div>
         </section>
         
-        <!-- 인기 상품 섹션 -->
+        <!-- 베스트 상품 섹션 -->
         <section class="popular-section">
             <div class="section-container">
                 <h2 class="section-title">
-                    <i class="fas fa-crown" style="color: #ffd700;"></i> 인기 상품
+                    <i class="fas fa-trophy"></i>
+                    <span>베스트 상품</span>
                 </h2>
                 
-                <!-- 캐러셀 컨테이너 -->
                 <div class="carousel-wrapper">
-                    <button class="carousel-btn prev" onclick="moveCarousel('popular', -1)">
+                    <button class="carousel-btn prev" onclick="moveCarousel('popular', -1)" aria-label="이전">
                         <i class="fas fa-chevron-left"></i>
                     </button>
                     
@@ -120,36 +136,29 @@
                                 <div class="product-info">
                                     <h4 class="product-name" th:text="${product.productName}">상품명</h4>
                                     
-                                    <!-- 별점 표시 -->
-                                    <div class="product-rating" style="margin: 8px 0;">
-                                        <span th:if="${productReviewCounts[product.id] > 0}" style="display: flex; align-items: center; gap: 5px; font-size: 13px;">
-                                            <span style="color: #ff9900;">
-                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
-                                                    <i th:class="${i <= productRatings[product.id] ? 'fas fa-star' : 
-                                                                  (i - 0.5 <= productRatings[product.id] ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
-                                                </span>
-                                            </span>
-                                            <span style="color: #666;">
-                                                <strong th:text="${productRatings[product.id]}">4.5</strong>
-                                                (<span th:text="${productReviewCounts[product.id]}">25</span>)
-                                            </span>
+                                    <!-- 별점 -->
+                                    <div class="product-rating" th:if="${productReviewCounts[product.id] > 0}">
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                            <i th:class="${i <= productRatings[product.id] ? 'fas fa-star' : 
+                                                          (i - 0.5 <= productRatings[product.id] ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
                                         </span>
+                                        <strong th:text="${productRatings[product.id]}">4.5</strong>
+                                        <span th:text="'(' + ${productReviewCounts[product.id]} + ')'">(25)</span>
                                     </div>
                                     
                                     <div class="product-price">
-                                        <!-- 할인이 있을 때 -->
                                         <div th:if="${product.discountRate != null and product.discountRate > 0}">
                                             <span class="price-original" 
                                                   th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">50,000원</span>
                                             <span class="price-sale" 
                                                   th:text="${#numbers.formatInteger(product.discountPrice, 0, 'COMMA') + '원'}">45,000원</span>
                                         </div>
-                                        <!-- 할인이 없을 때 -->
                                         <div th:unless="${product.discountRate != null and product.discountRate > 0}">
                                             <span class="price-sale" 
                                                   th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">50,000원</span>
                                         </div>
                                     </div>
+                                    
                                     <div class="prime-badge" th:if="${product.price >= 30000}">
                                         <i class="fas fa-truck"></i> 무료배송
                                     </div>
@@ -158,15 +167,14 @@
                         </div>
                     </div>
                     
-                    <button class="carousel-btn next" onclick="moveCarousel('popular', 1)">
+                    <button class="carousel-btn next" onclick="moveCarousel('popular', 1)" aria-label="다음">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
                 
-                <!-- 상품이 없을 때 -->
-                <div th:if="${popularProducts.isEmpty()}" style="text-align: center; padding: 60px 20px; color: #999;">
-                    <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 20px;"></i>
-                    <p>등록된 상품이 없습니다.</p>
+                <div th:if="${popularProducts.isEmpty()}" style="text-align: center; padding: 120px 20px; color: #999;">
+                    <i class="fas fa-box-open"></i>
+                    <p>등록된 상품이 없습니다</p>
                 </div>
             </div>
         </section>
@@ -175,12 +183,12 @@
         <section class="new-section">
             <div class="section-container">
                 <h2 class="section-title">
-                    <i class="fas fa-sparkles" style="color: #4ecdc4;"></i> 신상품
+                    <i class="fas fa-sparkles"></i>
+                    <span>신상품</span>
                 </h2>
                 
-                <!-- 캐러셀 컨테이너 -->
                 <div class="carousel-wrapper">
-                    <button class="carousel-btn prev" onclick="moveCarousel('new', -1)">
+                    <button class="carousel-btn prev" onclick="moveCarousel('new', -1)" aria-label="이전">
                         <i class="fas fa-chevron-left"></i>
                     </button>
                     
@@ -190,43 +198,34 @@
                                 <div class="product-image">
                                     <img th:src="${product.repImageUrl != null ? product.repImageUrl : '/images/product-sample.jpg'}" 
                                          th:alt="${product.productName}">
-                                    <span class="new-badge" th:if="${product.discountRate != null and product.discountRate > 0}">
-                                        NEW
-                                    </span>
+                                    <span class="new-badge">NEW</span>
                                 </div>
                                 <div class="product-info">
                                     <h4 class="product-name" th:text="${product.productName}">상품명</h4>
                                     
-                                    <!-- 별점 표시 -->
-                                    <div class="product-rating" style="margin: 8px 0;">
-                                        <span th:if="${productReviewCounts[product.id] > 0}" style="display: flex; align-items: center; gap: 5px; font-size: 13px;">
-                                            <span style="color: #ff9900;">
-                                                <span th:each="i : ${#numbers.sequence(1, 5)}">
-                                                    <i th:class="${i <= productRatings[product.id] ? 'fas fa-star' : 
-                                                                  (i - 0.5 <= productRatings[product.id] ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
-                                                </span>
-                                            </span>
-                                            <span style="color: #666;">
-                                                <strong th:text="${productRatings[product.id]}">4.5</strong>
-                                                (<span th:text="${productReviewCounts[product.id]}">25</span>)
-                                            </span>
+                                    <!-- 별점 -->
+                                    <div class="product-rating" th:if="${productReviewCounts[product.id] > 0}">
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}">
+                                            <i th:class="${i <= productRatings[product.id] ? 'fas fa-star' : 
+                                                          (i - 0.5 <= productRatings[product.id] ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
                                         </span>
+                                        <strong th:text="${productRatings[product.id]}">4.5</strong>
+                                        <span th:text="'(' + ${productReviewCounts[product.id]} + ')'">(25)</span>
                                     </div>
                                     
                                     <div class="product-price">
-                                        <!-- 할인이 있을 때 -->
                                         <div th:if="${product.discountRate != null and product.discountRate > 0}">
                                             <span class="price-original" 
                                                   th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">50,000원</span>
                                             <span class="price-sale" 
                                                   th:text="${#numbers.formatInteger(product.discountPrice, 0, 'COMMA') + '원'}">45,000원</span>
                                         </div>
-                                        <!-- 할인이 없을 때 -->
                                         <div th:unless="${product.discountRate != null and product.discountRate > 0}">
                                             <span class="price-sale" 
                                                   th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">50,000원</span>
                                         </div>
                                     </div>
+                                    
                                     <div class="prime-badge" th:if="${product.price >= 30000}">
                                         <i class="fas fa-truck"></i> 무료배송
                                     </div>
@@ -235,25 +234,14 @@
                         </div>
                     </div>
                     
-                    <button class="carousel-btn next" onclick="moveCarousel('new', 1)">
+                    <button class="carousel-btn next" onclick="moveCarousel('new', 1)" aria-label="다음">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
                 
-                <!-- 상품이 없을 때 -->
-                <div th:if="${newProducts.isEmpty()}" style="text-align: center; padding: 60px 20px; color: #999;">
-                    <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 20px;"></i>
-                    <p>등록된 상품이 없습니다.</p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 최근 본 상품 (나중에 구현) -->
-        <section class="recent-section" style="display: none;">
-            <div class="section-container">
-                <h2 class="section-title">최근 본 상품</h2>
-                <div class="products-slider">
-                    <!-- 최근 본 상품들 -->
+                <div th:if="${newProducts.isEmpty()}" style="text-align: center; padding: 120px 20px; color: #999;">
+                    <i class="fas fa-box-open"></i>
+                    <p>등록된 상품이 없습니다</p>
                 </div>
             </div>
         </section>
