@@ -1,6 +1,7 @@
 package com.example.webshopping.controller;
 
 import com.example.webshopping.constant.OrderStatus;
+import com.example.webshopping.constant.Role;
 import com.example.webshopping.dto.MembersDTO;
 import com.example.webshopping.dto.OrderResponseDTO;
 import com.example.webshopping.entity.Members;
@@ -92,6 +93,18 @@ public class MembersController {
         }
 
         try {
+            // 계정이 없으면 생성
+            Members member = membersRepository.findByEmail(email);
+            if (member == null) {
+                MembersDTO newMember = new MembersDTO();
+                newMember.setEmail(email);
+                newMember.setPassword(password);
+                newMember.setName(roleName);
+                newMember.setRole(Role.valueOf("ROLE_" + role.toUpperCase()));
+                membersService.create(newMember);
+                log.info("시연용 계정 생성: {} ({})", email, roleName);
+            }
+
             // Spring Security 인증 처리
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(email, password);

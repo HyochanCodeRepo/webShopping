@@ -193,6 +193,17 @@ button {
     position: relative;
 }
 
+/* 드롭다운과 트리거 사이 간격을 메우는 투명 영역 */
+.user-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: transparent;
+}
+
 .dropdown-content {
     display: none;
     position: absolute;

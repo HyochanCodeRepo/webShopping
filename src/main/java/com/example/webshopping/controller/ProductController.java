@@ -211,6 +211,23 @@ public class ProductController {
 
         model.addAttribute("product", product);
         
+        // 옵션 정보 추가
+        List<com.example.webshopping.dto.ProductOptionDTO> optionDTOs = new ArrayList<>();
+        if (product.getOptions() != null && !product.getOptions().isEmpty()) {
+            optionDTOs = product.getOptions().stream()
+                    .filter(option -> option.getIsActive())  // 활성화된 옵션만
+                    .map(option -> ProductOptionDTO.builder()
+                            .id(option.getId())
+                            .optionType(option.getOptionType())
+                            .optionValue(option.getOptionValue())
+                            .stockQuantity(option.getStockQuantity())
+                            .additionalPrice(option.getAdditionalPrice())
+                            .displayOrder(option.getDisplayOrder())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+        model.addAttribute("productOptions", optionDTOs);
+        
         // 리뷰 데이터
         model.addAttribute("reviews", reviewService.getReviewsByProductId(id));
         model.addAttribute("averageRating", reviewService.getAverageRating(id));

@@ -20,8 +20,15 @@ public class CartItemDTO {
     private Integer quantity;
     private String imageUrl;
     private Integer stockQuantity;
+    
+    // 옵션 정보
+    private Long productOptionId;
+    private String optionType;
+    private String optionValue;
+    private Integer optionStockQuantity;
+    private Integer additionalPrice;
 
     public Integer getTotalPrice(){
-        return discountPrice * quantity;
+        return (discountPrice + (additionalPrice != null ? additionalPrice : 0)) * quantity;
     }
 }

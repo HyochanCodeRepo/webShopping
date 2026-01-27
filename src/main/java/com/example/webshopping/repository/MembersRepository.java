@@ -15,15 +15,13 @@ public interface MembersRepository extends JpaRepository<Members, Long> {
     /**
      * 오늘 신규 가입 회원 수
      */
-    @Query("SELECT COUNT(m) FROM Members m " +
-           "WHERE DATE(m.regTime) = CURRENT_DATE")
+    @Query(value = "SELECT COUNT(*) FROM members WHERE DATE(reg_time) = CURRENT_DATE", nativeQuery = true)
     Long getTodayNewMemberCount();
-    
+
     /**
      * 어제 신규 가입 회원 수 (전일 대비 계산용)
      */
-    @Query("SELECT COUNT(m) FROM Members m " +
-           "WHERE DATE(m.regTime) = CURRENT_DATE - 1 DAY")
+    @Query(value = "SELECT COUNT(*) FROM members WHERE DATE(reg_time) = CURRENT_DATE - INTERVAL 1 DAY", nativeQuery = true)
     Long getYesterdayNewMemberCount();
 
 }

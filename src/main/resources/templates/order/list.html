@@ -336,6 +336,19 @@
                         </div>
                         <div class="item-info">
                             <div class="item-name" th:text="${item.productName}">상품명</div>
+                            
+                            <!-- 옵션 정보 표시 -->
+                            <div th:if="${item.optionType != null}" 
+                                 style="font-size: 13px; color: #666; margin-top: 5px;">
+                                <i class="fas fa-cog"></i>
+                                <span th:text="${item.optionType}">사이즈</span>: 
+                                <strong th:text="${item.optionValue}">250</strong>
+                                <span th:if="${item.additionalPrice != null and item.additionalPrice > 0}" 
+                                      style="color: #E31837;">
+                                    (+<span th:text="${#numbers.formatInteger(item.additionalPrice, 0, 'COMMA')}">5,000</span>원)
+                                </span>
+                            </div>
+                            
                             <div class="item-quantity">
                                 수량: <span th:text="${item.quantity}">1</span>개
                             </div>

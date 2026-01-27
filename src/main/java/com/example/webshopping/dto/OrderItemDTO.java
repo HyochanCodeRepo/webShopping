@@ -19,6 +19,11 @@ public class OrderItemDTO {
     private String imageUrl;
     private Integer quantity;
     private Integer orderPrice;
+    
+    // 옵션 정보
+    private Long productOptionId;
+    private String optionType;
+    private String optionValue;
 
     //상품별 총액 계산
     public Integer getTotalPrice() {

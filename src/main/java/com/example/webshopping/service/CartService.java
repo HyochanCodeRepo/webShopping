@@ -5,7 +5,7 @@ import com.example.webshopping.entity.Cart;
 
 public interface CartService {
 
-    public void addCart(String email, Long productId, Integer quantity);
+    public void addCart(String email, Long productId, Long productOptionId, Integer quantity);
 
     Cart getCart(String email);
 

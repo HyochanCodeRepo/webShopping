@@ -369,13 +369,35 @@
                                    class="item-name" 
                                    th:text="${item.productName}">상품명</a>
                                 
+                                <!-- 옵션 정보 표시 -->
+                                <div th:if="${item.optionType != null}" 
+                                     style="font-size: 14px; color: #666; margin-top: 5px;">
+                                    <i class="fas fa-cog"></i>
+                                    <span th:text="${item.optionType}">사이즈</span>: 
+                                    <strong th:text="${item.optionValue}">250</strong>
+                                    <span th:if="${item.additionalPrice != null and item.additionalPrice > 0}" 
+                                          style="color: #E31837;">
+                                        (+<span th:text="${#numbers.formatInteger(item.additionalPrice, 0, 'COMMA')}">5,000</span>원)
+                                    </span>
+                                </div>
+                                
                                 <div class="item-stock" 
                                      th:classappend="${item.stockQuantity <= 10} ? 'low' : ''">
-                                    <span th:if="${item.stockQuantity > 10}">재고 있음</span>
-                                    <span th:if="${item.stockQuantity <= 10 and item.stockQuantity > 0}">
-                                        재고 <span th:text="${item.stockQuantity}">5</span>개 남음
+                                    <!-- 옵션이 있으면 옵션 재고, 없으면 상품 재고 -->
+                                    <span th:if="${item.optionStockQuantity != null}">
+                                        <span th:if="${item.optionStockQuantity > 10}">재고 있음</span>
+                                        <span th:if="${item.optionStockQuantity <= 10 and item.optionStockQuantity > 0}">
+                                            재고 <span th:text="${item.optionStockQuantity}">5</span>개 남음
+                                        </span>
+                                        <span th:if="${item.optionStockQuantity <= 0}">품절</span>
                                     </span>
-                                    <span th:if="${item.stockQuantity <= 0}">품절</span>
+                                    <span th:unless="${item.optionStockQuantity != null}">
+                                        <span th:if="${item.stockQuantity > 10}">재고 있음</span>
+                                        <span th:if="${item.stockQuantity <= 10 and item.stockQuantity > 0}">
+                                            재고 <span th:text="${item.stockQuantity}">5</span>개 남음
+                                        </span>
+                                        <span th:if="${item.stockQuantity <= 0}">품절</span>
+                                    </span>
                                 </div>
                             </div>
                             
@@ -390,7 +412,7 @@
                                        readonly>
                                 <button type="button" 
                                         class="qty-btn" 
-                                        th:onclick="|increaseQuantity(${item.cartItemId}, ${item.stockQuantity})|">+</button>
+                                        th:onclick="|increaseQuantity(${item.cartItemId}, ${item.optionStockQuantity != null ? item.optionStockQuantity : item.stockQuantity})|">+</button>
                                 <button type="button" 
                                         class="btn-delete" 
                                         th:onclick="|deleteItem(${item.cartItemId})|">

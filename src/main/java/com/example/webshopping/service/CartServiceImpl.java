@@ -2,14 +2,12 @@ package com.example.webshopping.service;
 
 import com.example.webshopping.dto.CartDTO;
 import com.example.webshopping.dto.CartItemDTO;
-import com.example.webshopping.entity.Cart;
-import com.example.webshopping.entity.CartItem;
-import com.example.webshopping.entity.Members;
-import com.example.webshopping.entity.Product;
+import com.example.webshopping.entity.*;
 import com.example.webshopping.repository.CartItemRepository;
 import com.example.webshopping.repository.CartRepository;
 import com.example.webshopping.repository.MembersRepository;
 import com.example.webshopping.repository.ProductRepository;
+import com.example.webshopping.repository.ProductOptionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +28,11 @@ public class CartServiceImpl  implements CartService {
     private final ProductRepository productRepository;
     private final MembersRepository membersRepository;
     private final CartItemRepository cartItemRepository;
+    private final ProductOptionRepository productOptionRepository;
 
 
     @Override
-    public void addCart(String email, Long productId, Integer quantity) {
+    public void addCart(String email, Long productId, Long productOptionId, Integer quantity) {
         //1. 사용자 확인
         Members members =
             membersRepository.findByEmail(email);
@@ -42,9 +41,21 @@ public class CartServiceImpl  implements CartService {
         Product product =
                 productRepository.findById(productId).orElseThrow(EntityNotFoundException::new);
 
-        //3. 재고 확인
-        if (quantity > product.getStockQuantity()){
-            throw new IllegalStateException("재고가 부족합니다.");
+        //3. 옵션 확인 (옵션이 있는 경우)
+        ProductOption productOption = null;
+        if (productOptionId != null) {
+            productOption = productOptionRepository.findById(productOptionId)
+                    .orElseThrow(() -> new EntityNotFoundException("옵션을 찾을 수 없습니다."));
+            
+            // 옵션 재고 확인
+            if (quantity > productOption.getStockQuantity()){
+                throw new IllegalStateException("재고가 부족합니다. (현재 재고: " + productOption.getStockQuantity() + "개)");
+            }
+        } else {
+            // 옵션 없는 상품의 재고 확인
+            if (quantity > product.getStockQuantity()){
+                throw new IllegalStateException("재고가 부족합니다. (현재 재고: " + product.getStockQuantity() + "개)");
+            }
         }
 
         //4. Cart 조회, 없으면 생성
@@ -53,30 +64,36 @@ public class CartServiceImpl  implements CartService {
             return cartRepository.save(newCart);
         });
 
-        //5. 같은 상품이 이미 장바구니에 있는지 확인
-
-        Optional<CartItem> existingItem =
-            cartItemRepository.findByCart_IdAndProduct_Id(cart.getId(), productId);
+        //5. 같은 상품+옵션이 이미 장바구니에 있는지 확인
+        Optional<CartItem> existingItem;
+        if (productOptionId != null) {
+            existingItem = cartItemRepository.findByCart_IdAndProduct_IdAndProductOption_Id(
+                    cart.getId(), productId, productOptionId);
+        } else {
+            existingItem = cartItemRepository.findByCart_IdAndProduct_IdAndProductOptionIsNull(
+                    cart.getId(), productId);
+        }
+        
         if (existingItem.isPresent()){
             //기존 아이템이 있으면 수량만 증가
             CartItem cartItem = existingItem.get();
             int totalQuantity = cartItem.getQuantity() + quantity;
 
             //재고 초과 체크
-            if (totalQuantity > product.getStockQuantity()) {
-                throw new IllegalStateException("재고를 초과할 수 없습니다. ( 현재 재고 : "
-                        + product.getStockQuantity() + "개");
+            int availableStock = productOption != null ? 
+                    productOption.getStockQuantity() : product.getStockQuantity();
+            
+            if (totalQuantity > availableStock) {
+                throw new IllegalStateException("재고를 초과할 수 없습니다. (현재 재고: " + availableStock + "개)");
             }
             cartItem.addQuantity(quantity);
             cartItemRepository.save(cartItem);
-        }else {
+        } else {
             //새 아이템 생성
-            CartItem newCartItem = CartItem.createCartItem(cart, product, quantity);
+            CartItem newCartItem = CartItem.createCartItem(cart, product, productOption, quantity);
             cart.addCartItem(newCartItem);
             cartItemRepository.save(newCartItem);
         }
-
-
     }
 
 
@@ -134,17 +151,24 @@ public class CartServiceImpl  implements CartService {
         List<CartItemDTO> itemDTOs = cart.getCartItems().stream()
                 .map(item -> {
                     Product product = item.getProduct();
+                    ProductOption option = item.getProductOption();
 
                     return CartItemDTO.builder()
                             .cartItemId(item.getId())
                             .productId(product.getId())
-                            .productName(product.getProductName())  // ✅ 추가
+                            .productName(product.getProductName())
                             .quantity(item.getQuantity())
                             .price(product.getPrice())
                             .discountRate(product.getDiscountRate())
                             .discountPrice(product.getDiscountPrice())
-                            .imageUrl(product.getRepImageUrl())  // ✅ 추가
-                            .stockQuantity(product.getStockQuantity())  // ✅ 추가
+                            .imageUrl(product.getRepImageUrl())
+                            .stockQuantity(product.getStockQuantity())
+                            // 옵션 정보 추가
+                            .productOptionId(option != null ? option.getId() : null)
+                            .optionType(option != null ? option.getOptionType() : null)
+                            .optionValue(option != null ? option.getOptionValue() : null)
+                            .optionStockQuantity(option != null ? option.getStockQuantity() : null)
+                            .additionalPrice(option != null ? option.getAdditionalPrice() : 0)
                             .build();
                 }).toList();
 
@@ -167,10 +191,18 @@ public class CartServiceImpl  implements CartService {
         CartItem cartItem =
             cartItemRepository.findById(cartItemId).orElseThrow(EntityNotFoundException::new);
 
-        //재고확인
-        if (quantity > cartItem.getProduct().getStockQuantity()){
-            throw new IllegalStateException("재고가 부족합니다.");
+        // 재고확인 - 옵션이 있으면 옵션 재고, 없으면 상품 재고
+        int availableStock;
+        if (cartItem.getProductOption() != null) {
+            availableStock = cartItem.getProductOption().getStockQuantity();
+        } else {
+            availableStock = cartItem.getProduct().getStockQuantity();
         }
+        
+        if (quantity > availableStock){
+            throw new IllegalStateException("재고가 부족합니다. (현재 재고: " + availableStock + "개)");
+        }
+        
         //수량 변경
         cartItem.setQuantity(quantity);
         cartItemRepository.save(cartItem);

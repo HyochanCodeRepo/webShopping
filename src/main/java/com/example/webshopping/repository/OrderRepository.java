@@ -141,53 +141,53 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
      * 오늘 매출 합계 (결제완료 이상만 포함, 취소/결제대기 제외)
      */
-    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Order o " +
-           "WHERE DATE(o.orderDate) = CURRENT_DATE " +
-           "AND o.orderStatus != 'CANCEL' " +
-           "AND o.orderStatus != 'PENDING'")
+    @Query(value = "SELECT COALESCE(SUM(o.total_price), 0) FROM orders o " +
+           "WHERE DATE(o.order_date) = CURRENT_DATE " +
+           "AND o.order_status != 'CANCELLED' " +
+           "AND o.order_status != 'PENDING'", nativeQuery = true)
     Integer getTodaySales();
     
     /**
      * 어제 매출 합계 (전일 대비 계산용)
      */
-    @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Order o " +
-           "WHERE DATE(o.orderDate) = CURRENT_DATE - 1 DAY " +
-           "AND o.orderStatus != 'CANCEL' " +
-           "AND o.orderStatus != 'PENDING'")
+    @Query(value = "SELECT COALESCE(SUM(o.total_price), 0) FROM orders o " +
+           "WHERE DATE(o.order_date) = CURRENT_DATE - INTERVAL 1 DAY " +
+           "AND o.order_status != 'CANCELLED' " +
+           "AND o.order_status != 'PENDING'", nativeQuery = true)
     Integer getYesterdaySales();
     
     /**
      * 오늘 주문 건수
      */
-    @Query("SELECT COUNT(o) FROM Order o " +
-           "WHERE DATE(o.orderDate) = CURRENT_DATE")
+    @Query(value = "SELECT COUNT(*) FROM orders o " +
+           "WHERE DATE(o.order_date) = CURRENT_DATE", nativeQuery = true)
     Long getTodayOrderCount();
     
     /**
      * 어제 주문 건수 (전일 대비 계산용)
      */
-    @Query("SELECT COUNT(o) FROM Order o " +
-           "WHERE DATE(o.orderDate) = CURRENT_DATE - 1 DAY")
+    @Query(value = "SELECT COUNT(*) FROM orders o " +
+           "WHERE DATE(o.order_date) = CURRENT_DATE - INTERVAL 1 DAY", nativeQuery = true)
     Long getYesterdayOrderCount();
     
     /**
-     * 처리 대기 중인 주문 건수 (결제완료 + 결제대기 상태)
+     * 처리 대기 중인 주문 건수 (주문확정 + 결제대기 상태)
      */
     @Query("SELECT COUNT(o) FROM Order o " +
-           "WHERE o.orderStatus IN ('PENDING', 'PAYMENT_COMPLETED')")
+           "WHERE o.orderStatus IN ('PENDING', 'CONFIRMED')")
     Long getPendingOrderCount();
     
     /**
      * 최근 7일 일별 매출 (차트용, 결제완료 이상만 포함)
      * @return [날짜, 매출] 형태의 리스트
      */
-    @Query("SELECT DATE(o.orderDate), COALESCE(SUM(o.totalPrice), 0) " +
-           "FROM Order o " +
-           "WHERE o.orderDate >= CURRENT_DATE - 6 DAY " +
-           "AND o.orderStatus != 'CANCEL' " +
-           "AND o.orderStatus != 'PENDING' " +
-           "GROUP BY DATE(o.orderDate) " +
-           "ORDER BY DATE(o.orderDate) ASC")
+    @Query(value = "SELECT DATE(o.order_date), COALESCE(SUM(o.total_price), 0) " +
+           "FROM orders o " +
+           "WHERE o.order_date >= CURRENT_DATE - INTERVAL 6 DAY " +
+           "AND o.order_status != 'CANCELLED' " +
+           "AND o.order_status != 'PENDING' " +
+           "GROUP BY DATE(o.order_date) " +
+           "ORDER BY DATE(o.order_date) ASC", nativeQuery = true)
     List<Object[]> getLast7DaysSales();
     
     /**

@@ -33,10 +33,10 @@ public class CartRestController {
 
         try {
             String email = userDetails.getUsername();
-            log.info("장바구니 추가 요청 - 사용자: {}, 상품ID: {}, 수량: {}",
-                    email, requestDTO.getProductId(), requestDTO.getQuantity());
+            log.info("장바구니 추가 요청 - 사용자: {}, 상품ID: {}, 옵션ID: {}, 수량: {}",
+                    email, requestDTO.getProductId(), requestDTO.getProductOptionId(), requestDTO.getQuantity());
 
-            cartService.addCart(email, requestDTO.getProductId(), requestDTO.getQuantity());
+            cartService.addCart(email, requestDTO.getProductId(), requestDTO.getProductOptionId(), requestDTO.getQuantity());
 
             CartResponseDTO response = CartResponseDTO.builder()
                     .success(true)

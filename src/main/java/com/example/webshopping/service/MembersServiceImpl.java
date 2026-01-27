@@ -28,8 +28,11 @@ public class MembersServiceImpl implements MembersService {
         Members members = modelMapper.map(memberDTO, Members.class);
 
         members.setPassword(passwordEncoder.encode(members.getPassword()));
-        members.setRole(Role.ROLE_USER);
-
+        
+        // DTO에 role이 설정되어 있지 않으면 기본값 USER 설정
+        if (members.getRole() == null) {
+            members.setRole(Role.ROLE_USER);
+        }
 
         membersRepository.save(members);
 

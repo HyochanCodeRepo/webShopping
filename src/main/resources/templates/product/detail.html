@@ -159,6 +159,64 @@
                 border-bottom: 1px solid #e8e8e8;
             }
             
+            /* 옵션 선택 영역 */
+            .option-section {
+                padding: 20px 0;
+                border-bottom: 1px solid #e8e8e8;
+            }
+            
+            .option-label {
+                font-size: 15px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 10px;
+                display: block;
+            }
+            
+            .option-select {
+                width: 100%;
+                height: 45px;
+                padding: 0 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 15px;
+                background: #fff;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            
+            .option-select:hover {
+                border-color: #ff9900;
+            }
+            
+            .option-select:focus {
+                outline: none;
+                border-color: #ff9900;
+            }
+            
+            .option-info {
+                margin-top: 10px;
+                padding: 10px;
+                background: #f7f7f7;
+                border-radius: 4px;
+                font-size: 14px;
+                display: none;
+            }
+            
+            .option-info.active {
+                display: block;
+            }
+            
+            .option-stock {
+                color: #067d62;
+                font-weight: 600;
+            }
+            
+            .option-price {
+                color: #E31837;
+                font-weight: 600;
+            }
+            
             .quantity-label {
                 font-size: 15px;
                 font-weight: 600;
@@ -522,6 +580,35 @@
                         </span>
                     </div>
                     
+                    <!-- 옵션 선택 (옵션이 있는 경우만 표시) -->
+                    <div class="option-section" th:if="${!productOptions.isEmpty()}">
+                        <label class="option-label">옵션 선택 *</label>
+                        <select id="optionSelect" class="option-select" onchange="selectOption()">
+                            <option value="">옵션을 선택해주세요</option>
+                            <option th:each="option : ${productOptions}" 
+                                    th:value="${option.id}"
+                                    th:data-stock="${option.stockQuantity}"
+                                    th:data-price="${option.additionalPrice}"
+                                    th:disabled="${option.stockQuantity <= 0}"
+                                    th:text="${option.optionType + ': ' + option.optionValue + 
+                                             (option.additionalPrice > 0 ? ' (+' + #numbers.formatInteger(option.additionalPrice, 0, 'COMMA') + '원)' : '') +
+                                             (option.stockQuantity <= 0 ? ' [품절]' : '')}">
+                                사이즈: 250
+                            </option>
+                        </select>
+                        
+                        <div id="optionInfo" class="option-info">
+                            <div>
+                                <i class="fas fa-box"></i> 
+                                재고: <span id="optionStock" class="option-stock">0</span>개
+                            </div>
+                            <div id="additionalPriceInfo" style="margin-top: 5px; display: none;">
+                                <i class="fas fa-plus-circle"></i> 
+                                추가금액: <span id="optionPrice" class="option-price">0</span>원
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- 수량 선택 -->
                     <div class="quantity-section" th:if="${product.stockQuantity > 0}">
                         <label class="quantity-label">수량</label>
@@ -732,6 +819,48 @@
         <script th:inline="javascript">
             const productId = /*[[${product.id}]]*/ 0;
             const maxStock = /*[[${product.stockQuantity}]]*/ 0;
+            const hasOptions = /*[[${!productOptions.isEmpty()}]]*/ false;
+            
+            let selectedOptionId = null;
+            let selectedOptionStock = 0;
+            
+            // 옵션 선택
+            function selectOption() {
+                const selectElement = document.getElementById('optionSelect');
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                
+                if (selectedOption.value === '') {
+                    // 옵션 선택 안 됨
+                    document.getElementById('optionInfo').classList.remove('active');
+                    selectedOptionId = null;
+                    selectedOptionStock = 0;
+                    document.getElementById('quantity').value = 1;
+                    document.getElementById('quantity').max = maxStock;
+                    return;
+                }
+                
+                // 선택된 옵션 정보 저장
+                selectedOptionId = parseInt(selectedOption.value);
+                selectedOptionStock = parseInt(selectedOption.getAttribute('data-stock'));
+                const additionalPrice = parseInt(selectedOption.getAttribute('data-price'));
+                
+                // 옵션 정보 표시
+                document.getElementById('optionStock').textContent = selectedOptionStock;
+                document.getElementById('optionPrice').textContent = additionalPrice.toLocaleString();
+                
+                // 추가 금액이 있으면 표시
+                if (additionalPrice > 0) {
+                    document.getElementById('additionalPriceInfo').style.display = 'block';
+                } else {
+                    document.getElementById('additionalPriceInfo').style.display = 'none';
+                }
+                
+                document.getElementById('optionInfo').classList.add('active');
+                
+                // 수량 입력란 max 값 업데이트
+                document.getElementById('quantity').max = selectedOptionStock;
+                document.getElementById('quantity').value = 1;
+            }
             
             // 수량 감소
             function decreaseQty() {
@@ -748,7 +877,10 @@
                 const qtyInput = document.getElementById('quantity');
                 let currentQty = parseInt(qtyInput.value);
                 
-                if (currentQty < maxStock) {
+                // 옵션이 있으면 선택된 옵션 재고, 없으면 상품 재고
+                const stockLimit = hasOptions && selectedOptionId ? selectedOptionStock : maxStock;
+                
+                if (currentQty < stockLimit) {
                     qtyInput.value = currentQty + 1;
                 } else {
                     alert('재고 수량을 초과할 수 없습니다.');
@@ -767,6 +899,12 @@
                     return;
                 }
                 
+                // 옵션이 있는데 선택 안 했으면
+                if (hasOptions && !selectedOptionId) {
+                    alert('옵션을 선택해주세요.');
+                    return;
+                }
+                
                 const quantity = parseInt(document.getElementById('quantity').value);
                 
                 try {
@@ -777,6 +915,7 @@
                         },
                         body: JSON.stringify({
                             productId: productId,
+                            productOptionId: selectedOptionId,  // 옵션 ID 추가
                             quantity: quantity
                         })
                     });
@@ -834,6 +973,12 @@
                     return;
                 }
                 
+                // 옵션이 있는데 선택 안 했으면
+                if (hasOptions && !selectedOptionId) {
+                    alert('옵션을 선택해주세요.');
+                    return;
+                }
+                
                 const quantity = parseInt(document.getElementById('quantity').value);
                 
                 try {
@@ -845,6 +990,7 @@
                         },
                         body: JSON.stringify({
                             productId: productId,
+                            productOptionId: selectedOptionId,  // 옵션 ID 추가
                             quantity: quantity
                         })
                     });

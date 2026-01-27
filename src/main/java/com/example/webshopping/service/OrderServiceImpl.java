@@ -8,10 +8,7 @@ import com.example.webshopping.dto.OrderResponseDTO;
 import com.example.webshopping.dto.PaymentRequestDTO;
 import com.example.webshopping.dto.PaymentResponseDTO;
 import com.example.webshopping.entity.*;
-import com.example.webshopping.repository.CartRepository;
-import com.example.webshopping.repository.MembersRepository;
-import com.example.webshopping.repository.OrderRepository;
-import com.example.webshopping.repository.ProductRepository;
+import com.example.webshopping.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
+    private final ProductOptionRepository productOptionRepository;
 
 
     @Override
@@ -68,16 +66,23 @@ public class OrderServiceImpl implements OrderService {
         // 4. 장바구니 상품들을 주문 상품으로 변환
         for (CartItem cartItem : cart.getCartItems()) {
             Product product = cartItem.getProduct();
+            ProductOption productOption = cartItem.getProductOption();
 
-            if (product.getStockQuantity() < cartItem.getQuantity()) {
+            // 재고 확인 - 옵션이 있으면 옵션 재고, 없으면 상품 재고
+            int availableStock = productOption != null ? 
+                    productOption.getStockQuantity() : product.getStockQuantity();
+            
+            if (availableStock < cartItem.getQuantity()) {
+                String optionInfo = productOption != null ? 
+                        " (" + productOption.getOptionType() + ": " + productOption.getOptionValue() + ")" : "";
                 throw new IllegalStateException(
-                        product.getProductName() + "의 재고가 부족합니다. (현재 재고 : "
-                                + product.getStockQuantity() + "개)"
+                        product.getProductName() + optionInfo + "의 재고가 부족합니다. (현재 재고: "
+                                + availableStock + "개)"
                 );
             }
 
             // OrderItem 생성 (재고 차감 포함)
-            OrderItem orderItem = OrderItem.createOrderItem(product, cartItem.getQuantity());
+            OrderItem orderItem = OrderItem.createOrderItem(product, productOption, cartItem.getQuantity());
             order.addOrderItem(orderItem);
 
         }
@@ -131,18 +136,27 @@ public class OrderServiceImpl implements OrderService {
         // 4. 장바구니 상품들을 주문 상품으로 변환
         for (CartItem cartItem : cart.getCartItems()) {
             Product product = cartItem.getProduct();
+            ProductOption productOption = cartItem.getProductOption();
             
-            if (product.getStockQuantity() < cartItem.getQuantity()) {
+            // 재고 확인 - 옵션이 있으면 옵션 재고, 없으면 상품 재고
+            int availableStock = productOption != null ? 
+                    productOption.getStockQuantity() : product.getStockQuantity();
+            
+            if (availableStock < cartItem.getQuantity()) {
+                String optionInfo = productOption != null ? 
+                        " (" + productOption.getOptionType() + ": " + productOption.getOptionValue() + ")" : "";
                 throw new IllegalStateException(
-                        product.getProductName() + "의 재고가 부족합니다. (현재 재고 : "
-                                + product.getStockQuantity() + "개)"
+                        product.getProductName() + optionInfo + "의 재고가 부족합니다. (현재 재고: "
+                                + availableStock + "개)"
                 );
             }
             
             // OrderItem 생성 (재고는 결제 완료 후 차감)
+            int itemPrice = product.getDiscountPrice() + (productOption != null ? productOption.getAdditionalPrice() : 0);
             OrderItem orderItem = OrderItem.builder()
                     .product(product)
-                    .orderPrice(product.getDiscountPrice())
+                    .productOption(productOption)
+                    .orderPrice(itemPrice)
                     .quantity(cartItem.getQuantity())
                     .build();
             order.addOrderItem(orderItem);
@@ -187,9 +201,17 @@ public class OrderServiceImpl implements OrderService {
         
         // 5. 재고 차감
         for (OrderItem orderItem : order.getOrderItems()) {
-            Product product = orderItem.getProduct();
-            product.setStockQuantity(product.getStockQuantity() - orderItem.getQuantity());
-            productRepository.save(product);
+            if (orderItem.getProductOption() != null) {
+                // 옵션 재고 차감
+                ProductOption option = orderItem.getProductOption();
+                option.setStockQuantity(option.getStockQuantity() - orderItem.getQuantity());
+                productOptionRepository.save(option);
+            } else {
+                // 상품 재고 차감
+                Product product = orderItem.getProduct();
+                product.setStockQuantity(product.getStockQuantity() - orderItem.getQuantity());
+                productRepository.save(product);
+            }
         }
         
         // 6. 장바구니 비우기
@@ -245,14 +267,21 @@ public class OrderServiceImpl implements OrderService {
     // Order 엔티티를 OrderResponseDTO로 변환
     public OrderResponseDTO convertToDTO(Order order) {
         List<OrderItemDTO> itemDTOs = order.getOrderItems().stream()
-                .map(item -> OrderItemDTO.builder()
-                        .orderItemId(item.getId())
-                        .productId(item.getProduct().getId())
-                        .productName(item.getProduct().getProductName())
-                        .imageUrl(item.getProduct().getRepImageUrl())
-                        .quantity(item.getQuantity())
-                        .orderPrice(item.getOrderPrice())
-                        .build())
+                .map(item -> {
+                    ProductOption option = item.getProductOption();
+                    return OrderItemDTO.builder()
+                            .orderItemId(item.getId())
+                            .productId(item.getProduct().getId())
+                            .productName(item.getProduct().getProductName())
+                            .imageUrl(item.getProduct().getRepImageUrl())
+                            .quantity(item.getQuantity())
+                            .orderPrice(item.getOrderPrice())
+                            // 옵션 정보 추가
+                            .productOptionId(option != null ? option.getId() : null)
+                            .optionType(option != null ? option.getOptionType() : null)
+                            .optionValue(option != null ? option.getOptionValue() : null)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         return OrderResponseDTO.builder()

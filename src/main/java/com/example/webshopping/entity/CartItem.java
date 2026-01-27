@@ -28,6 +28,11 @@ public class CartItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    // 선택한 옵션 (null이면 옵션 없는 상품)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_option_id")
+    private ProductOption productOption;
+
     @Column(nullable = false)
     private Integer quantity;
 
@@ -38,14 +43,16 @@ public class CartItem {
     protected void onCreate() {
         this.createdDate = LocalDateTime.now();
     }
+    
     public void addQuantity(int quantity) {
         this.quantity += quantity;
     }
 
-    public static CartItem createCartItem(Cart cart, Product product, Integer quantity) {
+    public static CartItem createCartItem(Cart cart, Product product, ProductOption productOption, Integer quantity) {
         return CartItem.builder()
                 .cart(cart)
                 .product(product)
+                .productOption(productOption)
                 .quantity(quantity)
                 .createdDate(LocalDateTime.now())
                 .build();

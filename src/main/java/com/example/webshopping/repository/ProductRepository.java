@@ -28,10 +28,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategory_Id(@Param("categoryId") Long categoryId);
     
     /**
-     * 카테고리 + 가격 필터 (최신순) - 페이징
+     * 카테고리별 상품 조회 (모든 하위 카테고리 포함 - 재귀)
+     * - 대분류 선택 시: 대분류 + 모든 중분류 + 모든 소분류 상품 조회
+     * - 중분류 선택 시: 중분류 + 모든 소분류 상품 조회
+     * - 소분류 선택 시: 해당 소분류 상품만 조회
      */
     @Query("SELECT p FROM Product p " +
            "WHERE p.category.id = :categoryId " +
+           "OR p.category.parent.id = :categoryId " +
+           "OR p.category.parent.parent.id = :categoryId " +
            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) " +
            "ORDER BY CASE WHEN p.stockQuantity > 0 THEN 0 ELSE 1 END, p.createdDate DESC")
@@ -43,10 +48,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
     
     /**
-     * 카테고리 + 가격 낮은순 - 페이징
+     * 카테고리 + 가격 낮은순 (모든 하위 카테고리 포함)
      */
     @Query("SELECT p FROM Product p " +
            "WHERE p.category.id = :categoryId " +
+           "OR p.category.parent.id = :categoryId " +
+           "OR p.category.parent.parent.id = :categoryId " +
            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) " +
            "ORDER BY CASE WHEN p.stockQuantity > 0 THEN 0 ELSE 1 END, p.price ASC")
@@ -58,10 +65,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
     
     /**
-     * 카테고리 + 가격 높은순 - 페이징
+     * 카테고리 + 가격 높은순 (모든 하위 카테고리 포함)
      */
     @Query("SELECT p FROM Product p " +
            "WHERE p.category.id = :categoryId " +
+           "OR p.category.parent.id = :categoryId " +
+           "OR p.category.parent.parent.id = :categoryId " +
            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) " +
            "ORDER BY CASE WHEN p.stockQuantity > 0 THEN 0 ELSE 1 END, p.price DESC")
@@ -73,11 +82,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
     
     /**
-     * 카테고리 + 인기순 (리뷰 많은순) - 페이징
+     * 카테고리 + 인기순 (모든 하위 카테고리 포함)
      */
     @Query("SELECT p FROM Product p " +
            "LEFT JOIN p.reviews r " +
            "WHERE p.category.id = :categoryId " +
+           "OR p.category.parent.id = :categoryId " +
+           "OR p.category.parent.parent.id = :categoryId " +
            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) " +
            "GROUP BY p " +

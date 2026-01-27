@@ -5,16 +5,77 @@
 
 <br>
 
-[![Java](https://img.shields.io/badge/Java_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.5.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
-[![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)](https://gradle.org/)
 
-<br>
+## 🆕 최근 업데이트
 
-## 🆕 최근 업데이트 (2026-01-26)
+### 📦 2026-01-27 - 상품 옵션 기능 구현
 
-### ✨ 관리자 대시보드 통계 시스템 추가
+#### ✨ 주요 기능
+- **상품 옵션 시스템**: 사이즈, 색상 등 다양한 옵션 지원
+  - 옵션별 재고 관리
+  - 옵션별 추가 금액 설정
+  - 품절 옵션 선택 불가
+- **상품 상세 페이지**: 
+  - 옵션 선택 드롭다운 UI
+  - 선택한 옵션의 재고/추가금액 실시간 표시
+  - 옵션별 재고 초과 방지
+- **장바구니**: 
+  - 선택된 옵션 정보 표시 (타입: 값, 추가금액)
+  - 옵션별 재고 표시 및 수량 조절
+- **주문 시스템**: 
+  - 옵션 정보 포함한 주문 생성
+  - 옵션별 재고 차감
+  - 주문 내역에 옵션 표시
+
+#### 🗂️ 카테고리 계층 구조 개선
+- **재귀적 하위 카테고리 조회**:
+  - 대분류 클릭 → 모든 중분류 + 소분류 상품 표시
+  - 중분류 클릭 → 모든 소분류 상품 표시
+  - 소분류 클릭 → 해당 소분류 상품만 표시
+
+#### 💡 **구현 핵심 로직**
+```java
+// Entity 구조
+@Entity
+public class CartItem {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_option_id")
+    private ProductOption productOption;  // 선택한 옵션
+}
+
+@Entity
+public class OrderItem {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_option_id")
+    private ProductOption productOption;  // 주문한 옵션
+    
+    public static OrderItem createOrderItem(Product product, ProductOption productOption, Integer quantity) {
+        // 옵션이 있으면 옵션 재고, 없으면 상품 재고 차감
+        if (productOption != null) {
+            productOption.setStockQuantity(productOption.getStockQuantity() - quantity);
+        } else {
+            product.setStockQuantity(product.getStockQuantity() - quantity);
+        }
+    }
+}
+
+// 카테고리 계층 구조 쿼리 (3단계)
+@Query("SELECT p FROM Product p " +
+       "WHERE p.category.id = :categoryId " +
+       "OR p.category.parent.id = :categoryId " +
+       "OR p.category.parent.parent.id = :categoryId")
+Page<Product> findByCategoryWithHierarchy(@Param("categoryId") Long categoryId, Pageable pageable);
+```
+
+#### 📌 **페이지별 구현 사항**
+- **상품 상세**: 옵션 드롭다운 + 선택 시 재고/추가금액 표시
+- **장바구니**: 상품명 + 옵션 정보 + 추가금액 표시
+- **주문 내역**: 주문한 상품 + 옵션 정보 표시
+- **주문 상세**: 상품별 옵션 상세 정보 표시
+
+---
+
+### 📊 2026-01-26 - 관리자 대시보드 통계 시스템 추가
 
 #### 📊 실시간 통계 카드 (4개)
 - **오늘 매출**: 전일 대비 증감률 표시 (▲ 15.2% / ▼ 3.1%)
@@ -248,51 +309,6 @@ private LocalDateTime updatedDate;  // 주문 수정 시간 (상태 변경 추�
 
 <br>
 
----
-
-## 📸 화면 구성
-
-### 🏠 **메인 페이지**
-> 카테고리별 상품 진입, 검색 기능
-
-![메인 페이지](docs/main-page.png)
-
-<br>
-
-### 🛍️ **상품 목록 페이지**
-> 검색/필터/정렬/페이징 기능
-
-![상품 목록](docs/product-list-page.png)
-
-<br>
-
-### 🛒 **장바구니 페이지**
-> 상품 수량 조절, 선택 삭제
-
-![장바구니](docs/cart-page.png)
-
-<br>
-
-### 💳 **주문/결제 페이지**
-> Daum 주소 API, 전화번호 포맷팅
-
-![주문/결제](docs/checkout-page.png)
-
-<br>
-
-### 👤 **마이페이지 (리뉴얼)**
-> 대시보드, 기본정보, 주문내역 탭
-
-![마이페이지](docs/mypage.png)
-
-<br>
-
-### 👨‍💼 **관리자 주문 관리**
-> 검색/필터/페이징, 다음단계 버튼
-
-![관리자 주문 관리](docs/admin-orders.png)
-
-<br>
 
 ---
 
@@ -312,6 +328,9 @@ private LocalDateTime updatedDate;  // 주문 수정 시간 (상태 변경 추�
 
 ### **Database**
 ![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+
+### **Infrastructure**
+![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white)
 
 ### **Build Tool**
 ![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)
@@ -988,6 +1007,7 @@ CAST(o.id AS string) LIKE %:keyword%  // ✅ id를 주문번호로 사용
 #### **인프라 개선**
 ```
 ✅ 구상 중:
+- Nginx 리버스 프록시로 포트번호 분기 (다른 프로젝트도 동일 서버에 배포 예정)
 - AWS S3로 이미지 업로드 전환
 - Redis Session 관리 (장바구니 성능 향상)
 - AWS RDS 데이터베이스 전환
@@ -1020,7 +1040,7 @@ CAST(o.id AS string) LIKE %:keyword%  // ✅ id를 주문번호로 사용
 ## 🔗 관련 링크
 - **GitHub Repository**: https://github.com/HyochanCodeRepo/webShopping
 - **시연 영상**: (추가 예정)
-- **배포 URL**: (추가 예정)
+- **배포 URL**: http://43.201.22.151:8080/
 
 <br>
 
