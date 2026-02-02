@@ -411,14 +411,13 @@ src/test/java/com/example/webshopping/
   - Service 계층 단위 테스트 (비즈니스 로직 검증)
   - Repository 통합 테스트 (복잡한 쿼리 검증)
   - 재고 차감, 주문 취소 등 핵심 로직 테스트
-- **위치**: `src/test/java/com/example/webshopping`
 
 ---
 
 ## 🔗 Links
 
 - **GitHub**: https://github.com/HyochanCodeRepo/webShopping
-- **배포 URL**: http://43.201.22.151:8080/
+- **배포 URL**: http://52.78.152.205:8080/
 - **개발자**: 이효찬 (hyochan.lee91@gmail.com)
 
 ---
@@ -426,3 +425,4 @@ src/test/java/com/example/webshopping/
 ## 📝 License
 
 이 프로젝트는 포트폴리오 목적으로 제작되었습니다.
+
